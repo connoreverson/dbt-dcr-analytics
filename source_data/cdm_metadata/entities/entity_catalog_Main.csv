@@ -1,0 +1,2 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+Main,CustTable,CustTable.1.2.cdm.json/CustTable,,main,cust_table,Relationship_BankConstantSymbolRelationshipId

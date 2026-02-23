@@ -1,0 +1,23 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+crmCommon,Account,Account.1.4.cdm.json/Account,Business that represents a customer or potential customer. The company that is billed in business transactions.,crm_common,account,createdBy
+crmCommon,AccountLeads,AccountLeads.1.4.cdm.json/AccountLeads,description.,crm_common,account_leads,accountLeadId
+crmCommon,Activity,Activity.1.3.cdm.json/Activity,"Task performed, or to be performed, by a user. An activity is any action for which an entry can be made on a calendar.",crm_common,activity,createdBy
+crmCommon,Appointment,Appointment.1.4.cdm.json/Appointment,Commitment representing a time interval with start/end times and duration.,crm_common,appointment,createdBy
+crmCommon,Campaign,Campaign.1.3.cdm.json/Campaign,"Container for campaign activities and responses, sales literature, products, and lists to create, plan, execute, and track the results of a specific marketing campaign through its life.",crm_common,campaign,createdBy
+crmCommon,CampaignActivity,CampaignActivity.1.3.cdm.json/CampaignActivity,"Task performed, or to be performed, by a user for planning or running a campaign.",crm_common,campaign_activity,createdBy
+crmCommon,CampaignActivityItem,CampaignActivityItem.1.3.cdm.json/CampaignActivityItem,"Work item of a campaign activity, such as a list or sales literature.",crm_common,campaign_activity_item,campaignActivityItemId
+crmCommon,CampaignItem,CampaignItem.1.3.cdm.json/CampaignItem,"Work item in a campaign, a list or sales literature.",crm_common,campaign_item,campaignItemId
+crmCommon,CampaignResponse,CampaignResponse.1.4.cdm.json/CampaignResponse,Response from an existing or a potential new customer for a campaign.,crm_common,campaign_response,createdBy
+crmCommon,Contact,Contact.1.4.cdm.json/Contact,"Person with whom a business unit has a relationship, such as customer, supplier, and colleague.",crm_common,contact,createdBy
+crmCommon,ContactLeads,ContactLeads.1.4.cdm.json/ContactLeads,,crm_common,contact_leads,contactLeadId
+crmCommon,Email,Email.1.4.cdm.json/Email,Activity that is delivered using email protocols.,crm_common,email,createdBy
+crmCommon,Fax,Fax.1.3.cdm.json/Fax,Activity that tracks call outcome and number of pages for a fax and optionally stores an electronic copy of the document.,crm_common,fax,createdBy
+crmCommon,Lead,Lead.1.4.cdm.json/Lead,"Prospect or potential sales opportunity. Leads are converted into accounts, contacts, or opportunities when they are qualified. Otherwise, they are deleted or archived.",crm_common,lead,createdBy
+crmCommon,LeadAddress,LeadAddress.1.4.cdm.json/LeadAddress,Address information for a lead.,crm_common,lead_address,leadAddressId
+crmCommon,Letter,Letter.1.3.cdm.json/Letter,Activity that tracks the delivery of a letter. The activity can contain the electronic copy of the letter.,crm_common,letter,createdBy
+crmCommon,MarketingList,MarketingList.1.3.cdm.json/MarketingList,Group of existing or potential customers created for a marketing campaign or other sales purposes.,crm_common,marketing_list,createdBy
+crmCommon,MarketingListMember,MarketingListMember.1.4.cdm.json/MarketingListMember,Item in a marketing list.,crm_common,marketing_list_member,listMemberId
+crmCommon,PhoneCall,PhoneCall.1.4.cdm.json/PhoneCall,Activity to track a telephone call.,crm_common,phone_call,createdBy
+crmCommon,QuickCampaign,QuickCampaign.1.3.cdm.json/QuickCampaign,"System operation used to perform lengthy and asynchronous operations on large data sets, such as distributing a campaign activity or quick campaign.",crm_common,quick_campaign,createdBy
+crmCommon,RecurringAppointment,RecurringAppointment.1.3.cdm.json/RecurringAppointment,The Master appointment of a recurring appointment series.,crm_common,recurring_appointment,createdBy
+crmCommon,SocialActivity,SocialActivity.1.4.cdm.json/SocialActivity,For internal use only.,crm_common,social_activity,createdBy

@@ -1,0 +1,11 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+Activities,AuditResponse,AuditResponse.1.0.cdm.json/AuditResponse,Audit Response,activities,audit_response,auditResponseId
+Activities,ExecutionActivityItem,ExecutionActivityItem.1.0.cdm.json/ExecutionActivityItem,Execution activity item,activities,execution_activity_item,executionactivityitemId
+Activities,OutletZone,OutletZone.1.0.cdm.json/OutletZone,"Defines a common area in the outlet where an execution activity takes place. Examples: Entrance, Frozen foods, Pharmacy etc.",activities,outlet_zone,outletzoneId
+Activities,QuestionType,QuestionType.1.0.cdm.json/QuestionType,Question type,activities,question_type,questionTypeId
+Activities,SOSDefinition,SOSDefinition.1.0.cdm.json/SOSDefinition,Caters a definition/template for Share of Shelf Check activity,activities,sos_definition,SOSDefinitionId
+Activities,SOSResponse,SOSResponse.1.0.cdm.json/SOSResponse,,activities,sos_response,SOSResponseId
+Activities,SurveyResponse,SurveyResponse.1.0.cdm.json/SurveyResponse,Survey response,activities,survey_response,surveyresponseId
+Activities,TargetGroup,TargetGroup.1.0.cdm.json/TargetGroup,Target groups are used to group outlets into segments,activities,target_group,targetgroupId
+Activities,TaskResponse,TaskResponse.1.0.cdm.json/TaskResponse,,activities,task_response,taskresponseId
+Activities,VisitActivity,VisitActivity.1.0.cdm.json/VisitActivity,Activities to be performed during a visit,activities,visit_activity,visitactivityId

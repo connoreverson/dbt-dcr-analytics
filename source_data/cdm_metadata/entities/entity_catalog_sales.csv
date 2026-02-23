@@ -1,0 +1,30 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+sales,Competitor,Competitor.1.3.cdm.json/Competitor,Business competing for the sale represented by a lead or opportunity.,sales,competitor,competitorId
+sales,CompetitorAddress,CompetitorAddress.1.3.cdm.json/CompetitorAddress,Additional addresses for a competitor. The first two addresses are stored in the competitor object.,sales,competitor_address,competitorAddressId
+sales,CompetitorProduct,CompetitorProduct.1.3.cdm.json/CompetitorProduct,Association between a competitor and a product offered by the competitor.,sales,competitor_product,competitorProductId
+sales,CompetitorSalesLiterature,CompetitorSalesLiterature.1.3.cdm.json/CompetitorSalesLiterature,,sales,competitor_sales_literature,competitorSalesLiteratureId
+sales,ContactInvoices,ContactInvoices.1.4.cdm.json/ContactInvoices,,sales,contact_invoices,contactInvoiceId
+sales,ContactOrders,ContactOrders.1.4.cdm.json/ContactOrders,,sales,contact_orders,contactOrderId
+sales,ContactQuotes,ContactQuotes.1.4.cdm.json/ContactQuotes,,sales,contact_quotes,contactQuoteId
+sales,Discount,Discount.1.3.cdm.json/Discount,Price reduction made from the list price of a product or service based on the quantity purchased.,sales,discount,discountId
+sales,DiscountList,DiscountList.1.3.cdm.json/DiscountList,Type of discount specified as either a percentage or an amount.,sales,discount_list,discountTypeId
+sales,Invoice,Invoice.1.4.cdm.json/Invoice,Order that has been billed.,sales,invoice,createdBy
+sales,InvoiceProduct,InvoiceProduct.1.4.cdm.json/InvoiceProduct,Line item in an invoice containing detailed billing information for a product.,sales,invoice_product,createdBy
+sales,LeadCompetitors,LeadCompetitors.1.4.cdm.json/LeadCompetitors,,sales,lead_competitors,leadCompetitorId
+sales,LeadProduct,LeadProduct.1.4.cdm.json/LeadProduct,,sales,lead_product,leadProductId
+sales,Opportunity,Opportunity.1.4.cdm.json/Opportunity,"Potential revenue-generating event, or sale to an account, which needs to be tracked through a sales process to completion.",sales,opportunity,createdBy
+sales,OpportunityClose,OpportunityClose.1.4.cdm.json/OpportunityClose,"Activity that is created automatically when an opportunity is closed, containing information such as the description of the closing and actual revenue.",sales,opportunity_close,createdBy
+sales,OpportunityCompetitors,OpportunityCompetitors.1.4.cdm.json/OpportunityCompetitors,,sales,opportunity_competitors,opportunityCompetitorId
+sales,OpportunityProduct,OpportunityProduct.1.4.cdm.json/OpportunityProduct,,sales,opportunity_product,
+sales,OpportunityRelationship,OpportunityRelationship.1.4.cdm.json/OpportunityRelationship,Relationship between an account or contact and an opportunity.,sales,opportunity_relationship,createdBy
+sales,Order,Order.1.4.cdm.json/Order,Quote that has been accepted.,sales,order,createdBy
+sales,OrderClose,OrderClose.1.4.cdm.json/OrderClose,Activity generated automatically when an order is closed.,sales,order_close,createdBy
+sales,OrderProduct,OrderProduct.1.4.cdm.json/OrderProduct,Line item in a sales order.,sales,order_product,createdBy
+sales,PriceListItem,PriceListItem.1.3.cdm.json/PriceListItem,"Information about how to price a product in the specified price level, including pricing method, rounding option, and discount type based on a specified product unit.",sales,price_list_item,productPriceLevelId
+sales,ProductSalesLiterature,ProductSalesLiterature.1.3.cdm.json/ProductSalesLiterature,,sales,product_sales_literature,productSalesLiteratureId
+sales,PropertyInstance,PropertyInstance.1.4.cdm.json/PropertyInstance,Instance of a property with its value.,sales,property_instance,createdBy
+sales,Quote,Quote.1.4.cdm.json/Quote,"Formal offer for products and/or services, proposed at specific prices and related payment terms, which is sent to a prospective customer.",sales,quote,createdBy
+sales,QuoteClose,QuoteClose.1.4.cdm.json/QuoteClose,Activity generated when a quote is closed.,sales,quote_close,createdBy
+sales,QuoteProduct,QuoteProduct.1.4.cdm.json/QuoteProduct,"Product line item in a quote. The details include such information as product ID, description, quantity, and cost.",sales,quote_product,createdBy
+sales,SalesAttachment,SalesAttachment.1.3.cdm.json/SalesAttachment,Item in the sales literature collection.,sales,sales_attachment,salesLiteratureItemId
+sales,SalesLiterature,SalesLiterature.1.3.cdm.json/SalesLiterature,"Storage of sales literature, which may contain one or more documents.",sales,sales_literature,salesLiteratureId

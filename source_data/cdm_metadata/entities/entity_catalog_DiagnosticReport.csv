@@ -1,0 +1,2 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+DiagnosticReport,DiagnosticReport,DiagnosticReport.1.2.cdm.json/DiagnosticReport,,diagnostic_report,diagnostic_report,createdBy

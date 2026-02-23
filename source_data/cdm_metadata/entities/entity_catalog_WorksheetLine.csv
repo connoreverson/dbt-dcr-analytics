@@ -1,0 +1,2 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+WorksheetLine,CommReportTransItem_RU,CommReportTransItem_RU.1.2.cdm.json/CommReportTransItem_RU,,worksheet_line,comm_report_trans_item_ru,Relationship_AgreementHeaderExt_RURelationshipId

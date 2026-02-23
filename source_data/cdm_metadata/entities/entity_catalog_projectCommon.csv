@@ -1,0 +1,11 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+projectCommon,BookableResource,BookableResource.1.4.cdm.json/BookableResource,Resource that has capacity which can be allocated to work.,project_common,bookable_resource,createdBy
+projectCommon,BookableResourceBooking,BookableResourceBooking.1.4.cdm.json/BookableResourceBooking,Represents the line details of a resource booking.,project_common,bookable_resource_booking,createdBy
+projectCommon,BookableResourceBookingHeader,BookableResourceBookingHeader.1.4.cdm.json/BookableResourceBookingHeader,Reservation entity representing the summary of the associated resource bookings.,project_common,bookable_resource_booking_header,createdBy
+projectCommon,BookingStatus,BookingStatus.1.3.cdm.json/BookingStatus,Allows creation of multiple sub statuses mapped to a booking status option.,project_common,booking_status,createdBy
+projectCommon,Contact,Contact.1.4.cdm.json/Contact,"Person with whom a business unit has a relationship, such as customer, supplier, and colleague.",project_common,contact,createdBy
+projectCommon,Lead,Lead.1.4.cdm.json/Lead,"Prospect or potential sales opportunity. Leads are converted into accounts, contacts, or opportunities when they are qualified. Otherwise, they are deleted or archived.",project_common,lead,createdBy
+projectCommon,RatingValue,RatingValue.1.3.cdm.json/RatingValue,A unique value associated with a rating model that allows providing a user friendly rating value.,project_common,rating_value,createdBy
+projectCommon,RelationshipInsightsUnifiedConfig,RelationshipInsightsUnifiedConfig.1.3.cdm.json/RelationshipInsightsUnifiedConfig,,project_common,relationship_insights_unified_config,createdBy
+projectCommon,Siconfig,Siconfig.1.3.cdm.json/Siconfig,,project_common,siconfig,createdBy
+projectCommon,User,User.1.3.cdm.json/User,Person with access to the Microsoft CRM system and who owns objects in the Microsoft CRM database.,project_common,user,systemUserId

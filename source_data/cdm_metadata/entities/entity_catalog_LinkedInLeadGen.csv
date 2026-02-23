@@ -1,0 +1,14 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+LinkedInLeadGen,Lead,Lead.1.2.cdm.json/Lead,"Prospect or potential sales opportunity. Leads are converted into accounts, contacts, or opportunities when they are qualified. Otherwise, they are deleted or archived.",linked_in_lead_gen,lead,createdBy
+LinkedInLeadGen,LeadEntityField,LeadEntityField.1.1.cdm.json/LeadEntityField,,linked_in_lead_gen,lead_entity_field,createdBy
+LinkedInLeadGen,LinkedInAccount,LinkedInAccount.1.1.cdm.json/LinkedInAccount,The LinkedIn account where forms are created and published.,linked_in_lead_gen,linked_in_account,createdBy
+LinkedInLeadGen,LinkedInActivity,LinkedInActivity.1.1.cdm.json/LinkedInActivity,,linked_in_lead_gen,linked_in_activity,createdBy
+LinkedInLeadGen,LinkedInCampaign,LinkedInCampaign.1.1.cdm.json/LinkedInCampaign,Campaign used to capture submissions from prospects.,linked_in_lead_gen,linked_in_campaign,createdBy
+LinkedInLeadGen,LinkedInLeadGenIntegrationConfiguration,LinkedInLeadGenIntegrationConfiguration.1.1.cdm.json/LinkedInLeadGenIntegrationConfiguration,Configuration information for LinkedIn Lead Gen Forms Connector,linked_in_lead_gen,linked_in_lead_gen_integration_configuration,createdBy
+LinkedInLeadGen,FieldMapping,FieldMapping.1.1.cdm.json/FieldMapping,Individual question on a LinkedIn form,linked_in_lead_gen,field_mapping,createdBy
+LinkedInLeadGen,LinkedInLeadGenForm,LinkedInLeadGenForm.1.1.cdm.json/LinkedInLeadGenForm,Form shown to prospects on LinkedIn,linked_in_lead_gen,linked_in_lead_gen_form,createdBy
+LinkedInLeadGen,LinkedInFormSubmission,LinkedInFormSubmission.1.2.cdm.json/LinkedInFormSubmission,Answers to individual questions on a form submitted by a LinkedIn member,linked_in_lead_gen,linked_in_form_submission,createdBy
+LinkedInLeadGen,LinkedInFormQuestion,LinkedInFormQuestion.1.1.cdm.json/LinkedInFormQuestion,,linked_in_lead_gen,linked_in_form_question,createdBy
+LinkedInLeadGen,LinkedInLeadGenFormSubmission,LinkedInLeadGenFormSubmission.1.1.cdm.json/LinkedInLeadGenFormSubmission,Submissions from prospects on LinkedIn,linked_in_lead_gen,linked_in_lead_gen_form_submission,createdBy
+LinkedInLeadGen,LinkedInMatching,LinkedInMatching.1.1.cdm.json/LinkedInMatching,Strategy used to associate a LinkedIn form submission with a Dynamics 365 lead,linked_in_lead_gen,linked_in_matching,createdBy
+LinkedInLeadGen,LinkedInUserProfile,LinkedInUserProfile.1.1.cdm.json/LinkedInUserProfile,LinkedIn member who runs campaigns and captures leads on LinkedIn.,linked_in_lead_gen,linked_in_user_profile,createdBy

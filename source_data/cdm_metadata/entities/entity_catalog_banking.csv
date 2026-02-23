@@ -1,0 +1,25 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+banking,Account,Account.1.5.cdm.json/Account,A company that represents a customer or a potential customer.,banking,account,createdBy
+banking,Contact,Contact.1.5.cdm.json/Contact,A person record is one associated with a patron of the bank.,banking,contact,createdBy
+banking,Lead,Lead.1.5.cdm.json/Lead,A prospect represents a potential customer or sale happening in the system. A prospect can be represented by either prospects or referrals.,banking,lead,createdBy
+banking,LeadToOpportunitySalesProcess,LeadToOpportunitySalesProcess.1.0.1.cdm.json/LeadToOpportunitySalesProcess,Process entity for Lead to Opportunity  Sales Process.,banking,lead_to_opportunity_sales_process,leadId
+banking,Bank,Bank.1.3.cdm.json/Bank,The physical bank location which contains information such as the name and location of the bank.,banking,bank,createdBy
+banking,Branch,Branch.1.3.cdm.json/Branch,A branch is used to represent the location of a bank branch.,banking,branch,createdBy
+banking,BusinessCheckingAccount,BusinessCheckingAccount.1.4.cdm.json/BusinessCheckingAccount,Process entity for a Business Checking Account.,banking,business_checking_account,accountId
+banking,CertificateOfDeposit,CertificateOfDeposit.1.5.cdm.json/CertificateOfDeposit,Process entity for a Certificate of Deposit.,banking,certificate_of_deposit,contactId
+banking,Collateral,Collateral.1.5.cdm.json/Collateral,Collateral entity represents the collateral information related to a commercial loan product that the customer holds with the bank.,banking,collateral,createdBy
+banking,CommercialDeposit,CommercialDeposit.1.5.cdm.json/CommercialDeposit,Process entity for a Commercial Deposit.,banking,commercial_deposit,accountId
+banking,CommercialLoan,CommercialLoan.1.4.cdm.json/CommercialLoan,Process entity for a Commercial Loan.,banking,commercial_loan,accountId
+banking,Company360,Company360.1.5.cdm.json/Company360,Process entity for Company 360.,banking,company360,accountId
+banking,CompanyOnboarding,CompanyOnboarding.1.5.cdm.json/CompanyOnboarding,Process entity for Company Onboarding.,banking,company_onboarding,accountId
+banking,ContactOnboardingFromProspect,ContactOnboardingFromProspect.1.5.cdm.json/ContactOnboardingFromProspect,Process entity for Contact Onboarding from Prospect.,banking,contact_onboarding_from_prospect,contactId
+banking,Customer360Person,Customer360Person.1.5.cdm.json/Customer360Person,Process entity for Customer 360 Person.,banking,customer360_person,contactId
+banking,CustomerJourney,CustomerJourney.1.5.cdm.json/CustomerJourney,Process entity for a Customer Journey.,banking,customer_journey,createdBy
+banking,FinancialProduct,FinancialProduct.1.5.cdm.json/FinancialProduct,The record of the different products that the customer holds with the bank.,banking,financial_product,createdBy
+banking,KYC,KYC.1.5.cdm.json/KYC,"A KYC or Know Your Customer is used to gather information on the customer in a regular interval. The KYCs collect information such as where they live, collecting their updated or different ID information, and their risk level at that point in time.",banking,kyc,createdBy
+banking,Limit,Limit.1.5.cdm.json/Limit,"Limit entity represents corporate client's limits set up in the limit management system or the bank's backend systems such as core banking, treasury, or trade finance systems.",banking,limit,createdBy
+banking,RequestedFacility,RequestedFacility.1.5.cdm.json/RequestedFacility,A requested facility represents a facility that is requested by a corporate customer applying for line of credit.,banking,requested_facility,createdBy
+banking,Syndicates,Syndicates.1.5.cdm.json/Syndicates,"A syndicate represents the information related to a commercial loan product that the customer holds with the bank. The syndicate will reference a specific loan, the contribution percentage, the amount and the specific bank that holds the syndicate.",banking,syndicates,createdBy
+banking,MortgageApplication,MortgageApplication.1.5.cdm.json/MortgageApplication,Process entity for a Mortgage.,banking,mortgage_application,contactId
+banking,Opportunity,Opportunity.1.5.cdm.json/Opportunity,An opportunity represents a qualified prospect or an existing customer's interest in a product of the bank.,banking,opportunity,createdBy
+banking,Product,Product.1.3.cdm.json/Product,The products of the bank that the prospect or referral is interested in.,banking,product,productId

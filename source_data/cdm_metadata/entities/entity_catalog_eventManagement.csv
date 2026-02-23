@@ -1,0 +1,47 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+EventManagement,Account,Account.1.2.cdm.json/Account,Business that represents a customer or potential customer. The company that is billed in business transactions.,event_management,account,createdBy
+EventManagement,Contact,Contact.1.2.cdm.json/Contact,"Person with whom a business unit has a relationship, such as customer, supplier, and colleague.",event_management,contact,createdBy
+EventManagement,Lead,Lead.1.2.cdm.json/Lead,"Prospect or potential sales opportunity. Leads are converted into accounts, contacts, or opportunities when they are qualified. Otherwise, they are deleted or archived.",event_management,lead,createdBy
+EventManagement,AttendeePass,AttendeePass.1.2.cdm.json/AttendeePass,,event_management,attendee_pass,createdBy
+EventManagement,AuthenticationSettings,AuthenticationSettings.1.1.cdm.json/AuthenticationSettings,,event_management,authentication_settings,createdBy
+EventManagement,EventMainBusinessProcessFlow,EventMainBusinessProcessFlow.1.2.cdm.json/EventMainBusinessProcessFlow,Base entity for the event main business process flow,event_management,event_main_business_process_flow,activeStageId
+EventManagement,Bucket,Bucket.1.1.cdm.json/Bucket,,event_management,bucket,createdBy
+EventManagement,Building,Building.1.2.cdm.json/Building,A single venue can be comprised of zero or more buildings where event activities are held. Each building in turn is comprised of zero or more rooms where event activities are held.,event_management,building,createdBy
+EventManagement,CheckIn,CheckIn.1.2.cdm.json/CheckIn,,event_management,check_in,createdBy
+EventManagement,CustomRegistrationField,CustomRegistrationField.1.2.cdm.json/CustomRegistrationField,,event_management,custom_registration_field,createdBy
+EventManagement,EntityCounter,EntityCounter.1.1.cdm.json/EntityCounter,,event_management,entity_counter,createdBy
+EventManagement,Event,Event.1.2.cdm.json/Event,Container to manage and plan marketing activities that take place at a specific venue or location,event_management,event,createdBy
+EventManagement,EventAdministration,EventAdministration.1.2.cdm.json/EventAdministration,Event administration entity,event_management,event_administration,createdBy
+EventManagement,EventCustomRegistrationField,EventCustomRegistrationField.1.2.cdm.json/EventCustomRegistrationField,,event_management,event_custom_registration_field,createdBy
+EventManagement,EventManagementActivity,EventManagementActivity.1.1.cdm.json/EventManagementActivity,,event_management,event_management_activity,createdBy
+EventManagement,EventManagementConfiguration,EventManagementConfiguration.1.2.cdm.json/EventManagementConfiguration,,event_management,event_management_configuration,createdBy
+EventManagement,EventPurchase,EventPurchase.1.2.cdm.json/EventPurchase,Tracking the purchases of event passes,event_management,event_purchase,createdBy
+EventManagement,EventPurchaseAttendee,EventPurchaseAttendee.1.2.cdm.json/EventPurchaseAttendee,,event_management,event_purchase_attendee,createdBy
+EventManagement,EventPurchaseContact,EventPurchaseContact.1.1.cdm.json/EventPurchaseContact,,event_management,event_purchase_contact,createdBy
+EventManagement,EventPurchasePass,EventPurchasePass.1.1.cdm.json/EventPurchasePass,Passes included in the purchase,event_management,event_purchase_pass,createdBy
+EventManagement,EventRegistration,EventRegistration.1.2.cdm.json/EventRegistration,,event_management,event_registration,createdBy
+EventManagement,EventTeamMember,EventTeamMember.1.2.cdm.json/EventTeamMember,,event_management,event_team_member,createdBy
+EventManagement,EventVendor,EventVendor.1.2.cdm.json/EventVendor,,event_management,event_vendor,createdBy
+EventManagement,Hotel,Hotel.1.2.cdm.json/Hotel,"This represents a single hotel property. Each individual property belongs to a hotel group (such as a chain of hotels), which is represented by an account.",event_management,hotel,createdBy
+EventManagement,HotelRoomAllocation,HotelRoomAllocation.1.2.cdm.json/HotelRoomAllocation,This entity records the number of rooms that have been allocated from a single hotel for guests of a single event.,event_management,hotel_room_allocation,createdBy
+EventManagement,HotelRoomReservation,HotelRoomReservation.1.2.cdm.json/HotelRoomReservation,Each record of this type tracks a single request made by an event attendee (through the registration portal) to reserve a hotel room from the available hotel allocations,event_management,hotel_room_reservation,createdBy
+EventManagement,Layout,Layout.1.2.cdm.json/Layout,"The layout entity defines the various layouts that can be applied to each room, including the maximum capacity of each layout.",event_management,layout,createdBy
+EventManagement,Pass,Pass.1.2.cdm.json/Pass,Information about passes,event_management,pass,createdBy
+EventManagement,RegistrationResponse,RegistrationResponse.1.1.cdm.json/RegistrationResponse,,event_management,registration_response,createdBy
+EventManagement,Room,Room.1.2.cdm.json/Room,"A room is where a session may be held. A single room can be used in any of several layouts, which can impact the max. occupancy of the room.",event_management,room,createdBy
+EventManagement,RoomReservation,RoomReservation.1.2.cdm.json/RoomReservation,,event_management,room_reservation,createdBy
+EventManagement,Session,Session.1.2.cdm.json/Session,,event_management,session,createdBy
+EventManagement,SessionRegistration,SessionRegistration.1.2.cdm.json/SessionRegistration,,event_management,session_registration,createdBy
+EventManagement,SessionTrack,SessionTrack.1.2.cdm.json/SessionTrack,,event_management,session_track,createdBy
+EventManagement,Speaker,Speaker.1.2.cdm.json/Speaker,Biographies of individual speakers appearing at an event,event_management,speaker,createdBy
+EventManagement,SpeakerEngagement,SpeakerEngagement.1.2.cdm.json/SpeakerEngagement,,event_management,speaker_engagement,createdBy
+EventManagement,SponsorableArticle,SponsorableArticle.1.2.cdm.json/SponsorableArticle,An item or a group of items that can be sponsored,event_management,sponsorable_article,createdBy
+EventManagement,Sponsorship,Sponsorship.1.2.cdm.json/Sponsorship,,event_management,sponsorship,createdBy
+EventManagement,Venue,Venue.1.2.cdm.json/Venue,"The venue describes the location at which all event sessions and activities take place. A single event venue can be comprised of zero or more buildings, each of which can have zero or more rooms where sessions take place.",event_management,venue,createdBy
+EventManagement,WaitlistItem,WaitlistItem.1.1.cdm.json/WaitlistItem,,event_management,waitlist_item,createdBy
+EventManagement,WebApplication,WebApplication.1.1.cdm.json/WebApplication,,event_management,web_application,createdBy
+EventManagement,WebinarConfiguration,WebinarConfiguration.1.2.cdm.json/WebinarConfiguration,,event_management,webinar_configuration,createdBy
+EventManagement,WebinarConsent,WebinarConsent.1.1.cdm.json/WebinarConsent,,event_management,webinar_consent,createdBy
+EventManagement,WebinarProvider,WebinarProvider.1.1.cdm.json/WebinarProvider,A company that provides the infrastrucutre needed for hosting a webinar,event_management,webinar_provider,createdBy
+EventManagement,WebinarType,WebinarType.1.2.cdm.json/WebinarType,Types of webinars from the On24 API,event_management,webinar_type,createdBy
+EventManagement,WebsiteTableConfiguration,WebsiteTableConfiguration.1.1.cdm.json/WebsiteTableConfiguration,,event_management,website_table_configuration,createdBy

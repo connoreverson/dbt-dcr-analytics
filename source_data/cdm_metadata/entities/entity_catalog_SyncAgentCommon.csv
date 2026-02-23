@@ -1,0 +1,7 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+SyncAgentCommon,Contact,Contact.1.1.cdm.json/Contact,"Person with whom a business unit has a relationship, such as customer, supplier, and colleague.",sync_agent_common,contact,createdBy
+SyncAgentCommon,AttributeValueMap,AttributeValueMap.1.2.cdm.json/AttributeValueMap,,sync_agent_common,attribute_value_map,createdBy
+SyncAgentCommon,AzureFHIRResource,AzureFHIRResource.1.1.cdm.json/AzureFHIRResource,,sync_agent_common,azure_fhir_resource,createdBy
+SyncAgentCommon,SyncAgentLog,SyncAgentLog.1.2.cdm.json/SyncAgentLog,,sync_agent_common,sync_agent_log,createdBy
+SyncAgentCommon,UpdateServiceAttributeMap,UpdateServiceAttributeMap.1.2.cdm.json/UpdateServiceAttributeMap,,sync_agent_common,update_service_attribute_map,createdBy
+SyncAgentCommon,UpdateServiceEntityMap,UpdateServiceEntityMap.1.2.cdm.json/UpdateServiceEntityMap,,sync_agent_common,update_service_entity_map,createdBy

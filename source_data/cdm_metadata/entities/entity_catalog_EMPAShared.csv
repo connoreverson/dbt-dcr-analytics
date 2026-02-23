@@ -1,0 +1,2 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+EMPAShared,SharedCategoryEntity,SharedCategoryEntity.1.2.cdm.json/SharedCategoryEntity,,empa_shared,shared_category_entity,

@@ -1,0 +1,4 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+Reference,ISOCurrencyCode,ISOCurrencyCode.1.1.cdm.json/ISOCurrencyCode,,reference,iso_currency_code,
+Reference,CurrencyGender,CurrencyGender.1.2.cdm.json/CurrencyGender,,reference,currency_gender,
+Reference,ExchangeRate,ExchangeRate.1.2.cdm.json/ExchangeRate,,reference,exchange_rate,Relationship_ExchangeRateCurrencyPairRelationshipId

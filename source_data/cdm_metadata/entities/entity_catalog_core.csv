@@ -1,0 +1,4 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+core,CdsStandard,wellKnownCDSAttributeGroups.1.3.cdm.json/CdsStandard,,core,cds_standard,createdBy
+core,ActivityCommon,wellKnownCDSAttributeGroups.1.3.cdm.json/ActivityCommon,,core,activity_common,createdBy
+core,ActivitySystem,wellKnownCDSAttributeGroups.1.3.cdm.json/ActivitySystem,,core,activity_system,createdBy

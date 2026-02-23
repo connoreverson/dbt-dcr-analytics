@@ -1,0 +1,196 @@
+cdm_manifest_name,cdm_manifest_path,cdm_version,dbt_schema_name
+schema.1.5.0,local:/schema.1.5.0.manifest.cdm.json,1.5.0,schema_1_5_0
+standards,local:/standards.1.1.11.manifest.cdm.json,1.1.11,standards
+cdmfoundation,local:/cdmfoundation/cdmfoundation.3.0.manifest.cdm.json,3.0,cdmfoundation
+core,local:/core/core.1.5.1.manifest.cdm.json,1.5.1,core
+applicationCommon,local:/core/applicationCommon/applicationCommon.1.5.manifest.cdm.json,1.5,application_common
+foundationCommon,local:/core/applicationCommon/foundationCommon/foundationCommon.1.5.manifest.cdm.json,1.5,foundation_common
+crmCommon,local:/core/applicationCommon/foundationCommon/crmCommon/crmCommon.1.5.manifest.cdm.json,1.5,crm_common
+Dynamics CRM Common,local:/core/applicationCommon/foundationCommon/crmCommon/crmCommonOnly.1.4.manifest.cdm.json,1.4,dynamics_crm_common
+accelerators,local:/core/applicationCommon/foundationCommon/crmCommon/accelerators/accelerators.1.1.8.manifest.cdm.json,1.1.8,accelerators
+automotive,local:/core/applicationCommon/foundationCommon/crmCommon/accelerators/automotive/automotive.1.5.manifest.cdm.json,1.5,automotive
+education,local:/core/applicationCommon/foundationCommon/crmCommon/accelerators/education/education.1.1.4.manifest.cdm.json,1.1.4,education
+higherEducation,local:/core/applicationCommon/foundationCommon/crmCommon/accelerators/education/higherEducation/higherEducation.1.4.manifest.cdm.json,1.4,higher_education
+financialServices,local:/core/applicationCommon/foundationCommon/crmCommon/accelerators/financialServices/financialServices.1.0.6.manifest.cdm.json,1.0.6,financial_services
+banking,local:/core/applicationCommon/foundationCommon/crmCommon/accelerators/financialServices/banking/banking.1.5.manifest.cdm.json,1.5,banking
+healthCare,local:/core/applicationCommon/foundationCommon/crmCommon/accelerators/healthCare/healthCare.1.0.7.manifest.cdm.json,1.0.7,health_care
+electronicMedicalRecords,local:/core/applicationCommon/foundationCommon/crmCommon/accelerators/healthCare/electronicMedicalRecords/electronicMedicalRecords.2.4.manifest.cdm.json,2.4,electronic_medical_records
+nonProfit,local:/core/applicationCommon/foundationCommon/crmCommon/accelerators/nonProfit/nonProfit.1.0.7.manifest.cdm.json,1.0.7,non_profit
+nonProfitCore,local:/core/applicationCommon/foundationCommon/crmCommon/accelerators/nonProfit/nonProfitCore/nonProfitCore.2.4.manifest.cdm.json,2.4,non_profit_core
+nonProfitForSales,local:/core/applicationCommon/foundationCommon/crmCommon/accelerators/nonProfit/nonProfitForSales/nonProfitForSales.2.4.manifest.cdm.json,2.4,non_profit_for_sales
+nonProfitIati,local:/core/applicationCommon/foundationCommon/crmCommon/accelerators/nonProfit/nonProfitIati/nonProfitIati.2.4.manifest.cdm.json,2.4,non_profit_iati
+nonProfitMeasurement,local:/core/applicationCommon/foundationCommon/crmCommon/accelerators/nonProfit/nonProfitMeasurement/nonProfitMeasurement.2.4.manifest.cdm.json,2.4,non_profit_measurement
+nonProfitVolunteers,local:/core/applicationCommon/foundationCommon/crmCommon/accelerators/nonProfit/nonProfitVolunteers/nonProfitVolunteers.2.4.manifest.cdm.json,2.4,non_profit_volunteers
+projectCommon,local:/core/applicationCommon/foundationCommon/crmCommon/projectCommon/projectCommon.1.4.manifest.cdm.json,1.4,project_common
+projectServiceAutomation,local:/core/applicationCommon/foundationCommon/crmCommon/projectCommon/projectServiceAutomation/projectServiceAutomation.1.4.manifest.cdm.json,1.4,project_service_automation
+scheduling,local:/core/applicationCommon/foundationCommon/crmCommon/projectCommon/scheduling/scheduling.1.4.manifest.cdm.json,1.4,scheduling
+sales,local:/core/applicationCommon/foundationCommon/crmCommon/sales/sales.1.4.manifest.cdm.json,1.4,sales
+service,local:/core/applicationCommon/foundationCommon/crmCommon/service/service.1.5.manifest.cdm.json,1.5,service
+solutions,local:/core/applicationCommon/foundationCommon/crmCommon/solutions/solutions.1.0.8.manifest.cdm.json,1.0.8,solutions
+customerInsights,local:/core/applicationCommon/foundationCommon/crmCommon/solutions/customerInsights/customerInsights.1.5.manifest.cdm.json,1.5,customer_insights
+marketing,local:/core/applicationCommon/foundationCommon/crmCommon/solutions/marketing/marketing.2.2.manifest.cdm.json,2.2,marketing
+eventManagement,local:/core/applicationCommon/foundationCommon/crmCommon/solutions/marketing/eventManagement/eventManagement.1.4.manifest.cdm.json,1.4,event_management
+interactions,local:/core/applicationCommon/foundationCommon/crmCommon/solutions/marketing/interactions/interactions.1.3.manifest.cdm.json,1.3,interactions
+LinkedInLeads,local:/core/applicationCommon/foundationCommon/crmCommon/solutions/marketing/LinkedInLeads/LinkedInLeads.1.5.manifest.cdm.json,1.5,linked_in_leads
+marketingLeads,local:/core/applicationCommon/foundationCommon/crmCommon/solutions/marketing/marketingLeads/marketingLeads.1.3.manifest.cdm.json,1.3,marketing_leads
+portals,local:/core/applicationCommon/foundationCommon/crmCommon/solutions/portals/portals.1.4.manifest.cdm.json,1.4,portals
+financialCommon,local:/core/applicationCommon/foundationCommon/financialCommon/financialCommon.1.4.manifest.cdm.json,1.4,financial_common
+productInsights,local:/core/applicationCommon/foundationCommon/productInsights/productInsights.1.3.manifest.cdm.json,1.3,product_insights
+operationsCommon,local:/core/operationsCommon/operationsCommon.1.1.1.manifest.cdm.json,1.1.1,operations_common
+Entities,local:/core/operationsCommon/Entities/Entities.1.1.3.manifest.cdm.json,1.1.3,entities
+Commerce,local:/core/operationsCommon/Entities/Commerce/Commerce.1.0.2.manifest.cdm.json,1.0.2,commerce
+CashManagement,local:/core/operationsCommon/Entities/Commerce/CashManagement/CashManagement.1.1.manifest.cdm.json,1.1,cash_management
+ChannelManagement,local:/core/operationsCommon/Entities/Commerce/ChannelManagement/ChannelManagement.1.1.manifest.cdm.json,1.1,channel_management
+BrickAndMortarStore,local:/core/operationsCommon/Entities/Commerce/ChannelManagement/BrickAndMortarStore/BrickAndMortarStore.1.1.manifest.cdm.json,1.1,brick_and_mortar_store
+CallCenter,local:/core/operationsCommon/Entities/Commerce/ChannelManagement/CallCenter/CallCenter.1.1.manifest.cdm.json,1.1,call_center
+OnlineStore,local:/core/operationsCommon/Entities/Commerce/ChannelManagement/OnlineStore/OnlineStore.1.1.manifest.cdm.json,1.1,online_store
+CommerceCustomers,local:/core/operationsCommon/Entities/Commerce/CommerceCustomers/CommerceCustomers.1.1.manifest.cdm.json,1.1,commerce_customers
+CommerceEmployees,local:/core/operationsCommon/Entities/Commerce/CommerceEmployees/CommerceEmployees.1.1.manifest.cdm.json,1.1,commerce_employees
+CommerceMiscellaneous,local:/core/operationsCommon/Entities/Commerce/CommerceMiscellaneous/CommerceMiscellaneous.1.1.manifest.cdm.json,1.1,commerce_miscellaneous
+InventoryAndAdvancedWarehouse,local:/core/operationsCommon/Entities/Commerce/InventoryAndAdvancedWarehouse/InventoryAndAdvancedWarehouse.1.1.manifest.cdm.json,1.1,inventory_and_advanced_warehouse
+Merchandising,local:/core/operationsCommon/Entities/Commerce/Merchandising/Merchandising.1.1.manifest.cdm.json,1.1,merchandising
+Payments,local:/core/operationsCommon/Entities/Commerce/Payments/Payments.1.1.manifest.cdm.json,1.1,payments
+TransactionsAndOrders,local:/core/operationsCommon/Entities/Commerce/TransactionsAndOrders/TransactionsAndOrders.1.1.manifest.cdm.json,1.1,transactions_and_orders
+Common,local:/core/operationsCommon/Entities/Common/Common.1.0.3.manifest.cdm.json,1.0.3,common
+Currency,local:/core/operationsCommon/Entities/Common/Currency/Currency.1.2.manifest.cdm.json,1.2,currency
+Customer,local:/core/operationsCommon/Entities/Common/Customer/Customer.1.2.manifest.cdm.json,1.2,customer
+EMPAShared,local:/core/operationsCommon/Entities/Common/EMPAShared/EMPAShared.1.2.manifest.cdm.json,1.2,empa_shared
+GAB,local:/core/operationsCommon/Entities/Common/GAB/GAB.1.2.manifest.cdm.json,1.2,gab
+Finance,local:/core/operationsCommon/Entities/Finance/Finance.1.0.3.manifest.cdm.json,1.0.3,finance
+AccountsPayable,local:/core/operationsCommon/Entities/Finance/AccountsPayable/AccountsPayable.1.2.manifest.cdm.json,1.2,accounts_payable
+AccountsReceivable,local:/core/operationsCommon/Entities/Finance/AccountsReceivable/AccountsReceivable.1.2.manifest.cdm.json,1.2,accounts_receivable
+APARShared,local:/core/operationsCommon/Entities/Finance/APARShared/APARShared.1.2.manifest.cdm.json,1.2,apar_shared
+Budgeting,local:/core/operationsCommon/Entities/Finance/Budgeting/Budgeting.1.2.manifest.cdm.json,1.2,budgeting
+CashAndBankManagement,local:/core/operationsCommon/Entities/Finance/CashAndBankManagement/CashAndBankManagement.1.2.manifest.cdm.json,1.2,cash_and_bank_management
+EInvoice,local:/core/operationsCommon/Entities/Finance/EInvoice/EInvoice.1.2.manifest.cdm.json,1.2,e_invoice
+FinancialDimensions,local:/core/operationsCommon/Entities/Finance/FinancialDimensions/FinancialDimensions.1.2.manifest.cdm.json,1.2,financial_dimensions
+FiscalBooks_BR,local:/core/operationsCommon/Entities/Finance/FiscalBooks_BR/FiscalBooks_BR.1.2.manifest.cdm.json,1.2,fiscal_books_br
+FixedAssets,local:/core/operationsCommon/Entities/Finance/FixedAssets/FixedAssets.1.2.manifest.cdm.json,1.2,fixed_assets
+GeneralLedger,local:/core/operationsCommon/Entities/Finance/GeneralLedger/GeneralLedger.1.2.manifest.cdm.json,1.2,general_ledger
+RAsset,local:/core/operationsCommon/Entities/Finance/RAsset/RAsset.1.2.manifest.cdm.json,1.2,r_asset
+RCash,local:/core/operationsCommon/Entities/Finance/RCash/RCash.1.2.manifest.cdm.json,1.2,r_cash
+RCashFlowManagement,local:/core/operationsCommon/Entities/Finance/RCashFlowManagement/RCashFlowManagement.1.2.manifest.cdm.json,1.2,r_cash_flow_management
+RDeferrals,local:/core/operationsCommon/Entities/Finance/RDeferrals/RDeferrals.1.2.manifest.cdm.json,1.2,r_deferrals
+RSalesPurchBooks,local:/core/operationsCommon/Entities/Finance/RSalesPurchBooks/RSalesPurchBooks.1.2.manifest.cdm.json,1.2,r_sales_purch_books
+RTax25,local:/core/operationsCommon/Entities/Finance/RTax25/RTax25.1.2.manifest.cdm.json,1.2,r_tax25
+Tax,local:/core/operationsCommon/Entities/Finance/Tax/Tax.1.2.manifest.cdm.json,1.2,tax
+TravelAndExpense,local:/core/operationsCommon/Entities/Finance/TravelAndExpense/TravelAndExpense.1.2.manifest.cdm.json,1.2,travel_and_expense
+HumanResources,local:/core/operationsCommon/Entities/HumanResources/HumanResources.1.0.4.manifest.cdm.json,1.0.4,human_resources
+HRM,local:/core/operationsCommon/Entities/HumanResources/HRM/HRM.1.3.manifest.cdm.json,1.3,hrm
+Payroll,local:/core/operationsCommon/Entities/HumanResources/Payroll/Payroll.1.2.manifest.cdm.json,1.2,payroll
+ProfessionalServices,local:/core/operationsCommon/Entities/ProfessionalServices/ProfessionalServices.1.0.3.manifest.cdm.json,1.0.3,professional_services
+ProjectManagementAndAccounting,local:/core/operationsCommon/Entities/ProfessionalServices/ProjectManagementAndAccounting/ProjectManagementAndAccounting.1.2.manifest.cdm.json,1.2,project_management_and_accounting
+SupplyChain,local:/core/operationsCommon/Entities/SupplyChain/SupplyChain.1.0.3.manifest.cdm.json,1.0.3,supply_chain
+CostAccounting,local:/core/operationsCommon/Entities/SupplyChain/CostAccounting/CostAccounting.1.0.1.manifest.cdm.json,1.0.1,cost_accounting
+CostManagement,local:/core/operationsCommon/Entities/SupplyChain/CostManagement/CostManagement.1.2.manifest.cdm.json,1.2,cost_management
+InventoryAndWarehouseManagement,local:/core/operationsCommon/Entities/SupplyChain/InventoryAndWarehouseManagement/InventoryAndWarehouseManagement.1.2.manifest.cdm.json,1.2,inventory_and_warehouse_management
+MasterPlanning,local:/core/operationsCommon/Entities/SupplyChain/MasterPlanning/MasterPlanning.1.2.manifest.cdm.json,1.2,master_planning
+ProcurementAndSourcing,local:/core/operationsCommon/Entities/SupplyChain/ProcurementAndSourcing/ProcurementAndSourcing.1.2.manifest.cdm.json,1.2,procurement_and_sourcing
+ProductInformationManagement,local:/core/operationsCommon/Entities/SupplyChain/ProductInformationManagement/ProductInformationManagement.1.2.manifest.cdm.json,1.2,product_information_management
+ProductionControl,local:/core/operationsCommon/Entities/SupplyChain/ProductionControl/ProductionControl.1.2.manifest.cdm.json,1.2,production_control
+SalesAndMarketing,local:/core/operationsCommon/Entities/SupplyChain/SalesAndMarketing/SalesAndMarketing.1.2.manifest.cdm.json,1.2,sales_and_marketing
+ServiceManagement,local:/core/operationsCommon/Entities/SupplyChain/ServiceManagement/ServiceManagement.1.2.manifest.cdm.json,1.2,service_management
+Transportation,local:/core/operationsCommon/Entities/SupplyChain/Transportation/Transportation.1.2.manifest.cdm.json,1.2,transportation
+Vendor,local:/core/operationsCommon/Entities/SupplyChain/Vendor/Vendor.1.2.manifest.cdm.json,1.2,vendor
+WMS,local:/core/operationsCommon/Entities/SupplyChain/WMS/WMS.1.2.manifest.cdm.json,1.2,wms
+System,local:/core/operationsCommon/Entities/System/System.1.0.3.manifest.cdm.json,1.0.3,system
+OrganizationAdministration,local:/core/operationsCommon/Entities/System/OrganizationAdministration/OrganizationAdministration.1.2.manifest.cdm.json,1.2,organization_administration
+SystemAdministration,local:/core/operationsCommon/Entities/System/SystemAdministration/SystemAdministration.1.2.manifest.cdm.json,1.2,system_administration
+Workflow,local:/core/operationsCommon/Entities/System/Workflow/Workflow.1.2.manifest.cdm.json,1.2,workflow
+Tables,local:/core/operationsCommon/Tables/Tables.1.1.2.manifest.cdm.json,1.1.2,tables
+Group,local:/core/operationsCommon/Tables/Common/Currency/Group/Group.1.2.manifest.cdm.json,1.2,group
+Main,local:/core/operationsCommon/Tables/Common/Customer/Main/Main.1.2.manifest.cdm.json,1.2,main
+Miscellaneous,local:/core/operationsCommon/Tables/Common/Currency/Miscellaneous/Miscellaneous.1.2.manifest.cdm.json,1.2,miscellaneous
+Parameter,local:/core/operationsCommon/Tables/Common/Customer/Parameter/Parameter.1.2.manifest.cdm.json,1.2,parameter
+Transaction,local:/core/operationsCommon/Tables/Common/GAB/Transaction/Transaction.1.2.manifest.cdm.json,1.2,transaction
+TransactionHeader,local:/core/operationsCommon/Tables/Finance/AccountingFoundation/TransactionHeader/TransactionHeader.1.2.manifest.cdm.json,1.2,transaction_header
+TransactionLine,local:/core/operationsCommon/Tables/Finance/AccountingFoundation/TransactionLine/TransactionLine.1.2.manifest.cdm.json,1.2,transaction_line
+WorksheetHeader,local:/core/operationsCommon/Tables/Finance/AccountingFoundation/WorksheetHeader/WorksheetHeader.1.2.manifest.cdm.json,1.2,worksheet_header
+WorksheetLine,local:/core/operationsCommon/Tables/Common/GAB/WorksheetLine/WorksheetLine.1.2.manifest.cdm.json,1.2,worksheet_line
+Reference,local:/core/operationsCommon/Tables/Common/Currency/Reference/Reference.1.2.manifest.cdm.json,1.2,reference
+Staging,local:/core/operationsCommon/Tables/Finance/AccountingFoundation/Staging/Staging.1.2.manifest.cdm.json,1.2,staging
+Intrastat,local:/core/operationsCommon/Tables/Common/Intrastat/Intrastat.1.0.3.manifest.cdm.json,1.0.3,intrastat
+AccountingFoundation,local:/core/operationsCommon/Tables/Finance/AccountingFoundation/AccountingFoundation.1.0.3.manifest.cdm.json,1.0.3,accounting_foundation
+Worksheet,local:/core/operationsCommon/Tables/Finance/AccountingFoundation/Worksheet/Worksheet.1.2.manifest.cdm.json,1.2,worksheet
+Bank,local:/core/operationsCommon/Tables/Finance/Bank/Bank.1.0.3.manifest.cdm.json,1.0.3,bank
+Budget,local:/core/operationsCommon/Tables/Finance/Budget/Budget.1.0.3.manifest.cdm.json,1.0.3,budget
+ComplianceAndInternalControls,local:/core/operationsCommon/Tables/Finance/ComplianceAndInternalControls/ComplianceAndInternalControls.1.0.3.manifest.cdm.json,1.0.3,compliance_and_internal_controls
+EGAIS,local:/core/operationsCommon/Tables/Finance/EGAIS/EGAIS.1.0.3.manifest.cdm.json,1.0.3,egais
+Expense,local:/core/operationsCommon/Tables/Finance/Expense/Expense.1.0.3.manifest.cdm.json,1.0.3,expense
+ExportImportIndia,local:/core/operationsCommon/Tables/Finance/ExportImportIndia/ExportImportIndia.1.0.3.manifest.cdm.json,1.0.3,export_import_india
+FinancialReporting,local:/core/operationsCommon/Tables/Finance/FinancialReporting/FinancialReporting.1.0.3.manifest.cdm.json,1.0.3,financial_reporting
+FiscalBooksBrazil,local:/core/operationsCommon/Tables/Finance/FiscalBooksBrazil/FiscalBooksBrazil.1.0.3.manifest.cdm.json,1.0.3,fiscal_books_brazil
+Ledger,local:/core/operationsCommon/Tables/Finance/Ledger/Ledger.1.0.3.manifest.cdm.json,1.0.3,ledger
+PublicSector,local:/core/operationsCommon/Tables/Finance/PublicSector/PublicSector.1.0.3.manifest.cdm.json,1.0.3,public_sector
+HumanResource,local:/core/operationsCommon/Tables/HumanResources/HumanResource/HumanResource.1.0.3.manifest.cdm.json,1.0.3,human_resource
+Project,local:/core/operationsCommon/Tables/ProfessionalServices/Project/Project.1.0.3.manifest.cdm.json,1.0.3,project
+Costing,local:/core/operationsCommon/Tables/SupplyChain/Costing/Costing.1.0.3.manifest.cdm.json,1.0.3,costing
+Inventory,local:/core/operationsCommon/Tables/SupplyChain/Inventory/Inventory.1.0.3.manifest.cdm.json,1.0.3,inventory
+Framework,local:/core/operationsCommon/Tables/System/SystemAdministration/Framework/Framework.1.2.manifest.cdm.json,1.2,framework
+Production,local:/core/operationsCommon/Tables/SupplyChain/Production/Production.1.0.3.manifest.cdm.json,1.0.3,production
+default,local:/CustomerInsightsJourneys/default.1.0.manifest.cdm.json,1.0,default
+FinancialServices,local:/FinancialServices/FinancialServices.1.0.2.manifest.cdm.json,1.0.2,financial_services
+FinancialServicesCommonDataModel CDM manifest,local:/FinancialServices/FinancialServicesCommonDataModel/FinancialServicesCommonDataModel.1.1.1.manifest.cdm.json,1.1.1,financial_services_common_data_model_cd_mmanifest
+LoanOnboardingDataModel CDM manifest,local:/FinancialServices/LoanOnboardingDataModel/LoanOnboardingDataModel.1.1.manifest.cdm.json,1.1,loan_onboarding_data_model_cd_mmanifest
+Property and Casualty Data Model CDM manifest,local:/FinancialServices/PropertyandCasualtyDataModel/PropertyandCasualtyDataModel.1.0.1.manifest.cdm.json,1.0.1,propertyand_casualty_data_model_cd_mmanifest
+RetailBankingCoreDataModel CDM manifest,local:/FinancialServices/RetailBankingCoreDataModel/RetailBankingCoreDataModel.1.1.manifest.cdm.json,1.1,retail_banking_core_data_model_cd_mmanifest
+Healthcare,local:/Healthcare/Healthcare.1.0.2.manifest.cdm.json,1.0.2,healthcare
+Administration,local:/Healthcare/Administration/Administration.1.0.2.manifest.cdm.json,1.0.2,administration
+AdministrationAppointmentEMR,local:/Healthcare/Administration/AdministrationAppointmentEMR/AdministrationAppointmentEMR.1.2.manifest.cdm.json,1.2,administration_appointment_emr
+AdministrationCommunication,local:/Healthcare/Administration/AdministrationCommunication/AdministrationCommunication.1.2.manifest.cdm.json,1.2,administration_communication
+AdministrationCore,local:/Healthcare/Administration/AdministrationCore/AdministrationCore.1.2.manifest.cdm.json,1.2,administration_core
+AdministrationDevice,local:/Healthcare/Administration/AdministrationDevice/AdministrationDevice.1.2.manifest.cdm.json,1.2,administration_device
+AdministrationEncounter,local:/Healthcare/Administration/AdministrationEncounter/AdministrationEncounter.1.2.manifest.cdm.json,1.2,administration_encounter
+AdministrationHealthServices,local:/Healthcare/Administration/AdministrationHealthServices/AdministrationHealthServices.1.2.manifest.cdm.json,1.2,administration_health_services
+Application,local:/Healthcare/Application/Application.1.0.2.manifest.cdm.json,1.0.2,application
+HealthcareCareManagement,local:/Healthcare/Application/HealthcareCareManagement/HealthcareCareManagement.1.2.manifest.cdm.json,1.2,healthcare_care_management
+HealthcareHomeHealth,local:/Healthcare/Application/HealthcareHomeHealth/HealthcareHomeHealth.1.2.manifest.cdm.json,1.2,healthcare_home_health
+HealthcarePatientAccess,local:/Healthcare/Application/HealthcarePatientAccess/HealthcarePatientAccess.1.2.manifest.cdm.json,1.2,healthcare_patient_access
+HealthcarePatientServiceCenter,local:/Healthcare/Application/HealthcarePatientServiceCenter/HealthcarePatientServiceCenter.1.0.manifest.cdm.json,1.0,healthcare_patient_service_center
+AzureAPIforFHIRsupport,local:/Healthcare/AzureAPIforFHIRsupport/AzureAPIforFHIRsupport.1.0.2.manifest.cdm.json,1.0.2,azure_ap_ifor_fhi_rsupport
+SyncAgentCDMUpdates,local:/Healthcare/AzureAPIforFHIRsupport/SyncAgentCDMUpdates/SyncAgentCDMUpdates.1.2.manifest.cdm.json,1.2,sync_agent_cdm_updates
+SyncAgentCommon,local:/Healthcare/AzureAPIforFHIRsupport/SyncAgentCommon/SyncAgentCommon.1.2.manifest.cdm.json,1.2,sync_agent_common
+Clinical,local:/Healthcare/Clinical/Clinical.1.0.2.manifest.cdm.json,1.0.2,clinical
+ClinicalCareTeam,local:/Healthcare/Clinical/ClinicalCareTeam/ClinicalCareTeam.1.2.manifest.cdm.json,1.2,clinical_care_team
+ClinicalCore,local:/Healthcare/Clinical/ClinicalCore/ClinicalCore.1.2.manifest.cdm.json,1.2,clinical_core
+ClinicalProcedure,local:/Healthcare/Clinical/ClinicalProcedure/ClinicalProcedure.1.2.manifest.cdm.json,1.2,clinical_procedure
+ClinicalReasoningCore,local:/Healthcare/Clinical/ClinicalReasoningCore/ClinicalReasoningCore.1.2.manifest.cdm.json,1.2,clinical_reasoning_core
+Diagnostics,local:/Healthcare/Diagnostics/Diagnostics.1.0.2.manifest.cdm.json,1.0.2,diagnostics
+DiagnosticCore,local:/Healthcare/Diagnostics/DiagnosticCore/DiagnosticCore.1.2.manifest.cdm.json,1.2,diagnostic_core
+DiagnosticReport,local:/Healthcare/Diagnostics/DiagnosticReport/DiagnosticReport.1.2.manifest.cdm.json,1.2,diagnostic_report
+Financial,local:/Healthcare/Financial/Financial/Financial.1.2.manifest.cdm.json,1.2,financial
+Foundational,local:/Healthcare/Foundational/Foundational.1.0.2.manifest.cdm.json,1.0.2,foundational
+Commoncore,local:/Healthcare/Foundational/Commoncore/Commoncore.1.2.manifest.cdm.json,1.2,commoncore
+HealthcareFoundation,local:/Healthcare/Foundational/HealthcareFoundation/HealthcareFoundation.1.2.manifest.cdm.json,1.2,healthcare_foundation
+Medication,local:/Healthcare/Medication/Medication.1.0.2.manifest.cdm.json,1.0.2,medication
+MedicationCore,local:/Healthcare/Medication/MedicationCore/MedicationCore.1.2.manifest.cdm.json,1.2,medication_core
+WorkflowClinicalProcess,local:/Healthcare/Workflow/WorkflowClinicalProcess/WorkflowClinicalProcess.1.2.manifest.cdm.json,1.2,workflow_clinical_process
+WorkflowCore,local:/Healthcare/Workflow/WorkflowCore/WorkflowCore.1.2.manifest.cdm.json,1.2,workflow_core
+WorkflowReferral,local:/Healthcare/Workflow/WorkflowReferral/WorkflowReferral.1.2.manifest.cdm.json,1.2,workflow_referral
+Supporting Entities,local:/manifests/automotiveAccelerator.1.4.manifest.cdm.json,1.4,supporting_entities
+Supporting Entities,local:/manifests/bankingAccelerator.1.4.manifest.cdm.json,1.4,supporting_entities
+Supporting Entities,local:/manifests/dynamicsCRM.1.4.manifest.cdm.json,1.4,supporting_entities
+Supporting Entities,local:/manifests/electronicMedicalRecordsAccelerator.1.4.manifest.cdm.json,1.4,supporting_entities
+Public CDM References,local:/manifests/exploreFirst.1.0.5.manifest.cdm.json,1.0.5,public_cdm_references
+Supporting Entities,local:/manifests/financeAndOperations.1.4.manifest.cdm.json,1.4,supporting_entities
+Supporting Entities,local:/manifests/higherEducationAccelerator.1.4.manifest.cdm.json,1.4,supporting_entities
+Supporting Entities,local:/manifests/insightsApplications.1.4.manifest.cdm.json,1.4,supporting_entities
+Supporting Entities,local:/manifests/nonProfitAccelerator.1.4.manifest.cdm.json,1.4,supporting_entities
+Power Query Map To Entity Definitions,local:/manifests/pqMapToEntityRoot.1.2.2.manifest.cdm.json,1.2.2,power_query_map_to_entity_definitions
+Marketing,local:/Marketing/Marketing.1.1.1.manifest.cdm.json,1.1.1,marketing
+EventManagement,local:/Marketing/EventManagement/EventManagement.1.2.manifest.cdm.json,1.2,event_management
+GdprConsentManagement,local:/Marketing/GdprConsentManagement/GdprConsentManagement.1.1.manifest.cdm.json,1.1,gdpr_consent_management
+LeadManagement,local:/Marketing/LeadManagement/LeadManagement.1.2.manifest.cdm.json,1.2,lead_management
+LinkedInLeadGen,local:/Marketing/LinkedInLeadGen/LinkedInLeadGen.1.2.manifest.cdm.json,1.2,linked_in_lead_gen
+MarketingSolution,local:/Marketing/MarketingSolution/MarketingSolution.1.2.manifest.cdm.json,1.2,marketing_solution
+Retail,local:/Retail/RetailModel.1.0.manifest.cdm.json,1.0,retail
+Activities,local:/Retail/Activities/Activities.1.0.manifest.cdm.json,1.0,activities
+Asset,local:/Retail/Asset/Asset.1.0.manifest.cdm.json,1.0,asset
+SOAClienteling,local:/Retail/SOAClienteling/SOAClienteling.1.0.manifest.cdm.json,1.0,soa_clienteling
+SOACommon,local:/Retail/SOACommon/SOACommon.1.0.manifest.cdm.json,1.0,soa_common
+Visits,local:/Retail/Visits/Visits.1.0.manifest.cdm.json,1.0,visits
+Cloud for Sustainability Data Model CDM manifest,local:/Sustainability/Sustainability.2.0.manifest.cdm.json,2.0,cloudfor_sustainability_data_model_cd_mmanifest
+Cloud for Sustainability Data Model CDM manifest,local:/Sustainability/CloudforSustainabilityCarbonDataModel/CloudforSustainabilityCarbonDataModel.1.0.manifest.cdm.json,1.0,cloudfor_sustainability_data_model_cd_mmanifest
+Cloud for Sustainability Shared Data Model CDM manifest,local:/Sustainability/CloudforSustainabilitySharedDataModel/CloudforSustainabilitySharedDataModel.1.0.manifest.cdm.json,1.0,cloudfor_sustainability_shared_data_model_cd_mmanifest
+Cloud for Sustainability Waste Data Model CDM manifest,local:/Sustainability/CloudforSustainabilityWasteDataModel/CloudforSustainabilityWasteDataModel.1.0.manifest.cdm.json,1.0,cloudfor_sustainability_waste_data_model_cd_mmanifest
+Cloud for Sustainability Water Data Model CDM manifest,local:/Sustainability/CloudforSustainabilityWaterDataModel/CloudforSustainabilityWaterDataModel.1.0.manifest.cdm.json,1.0,cloudfor_sustainability_water_data_model_cd_mmanifest

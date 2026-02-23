@@ -1,0 +1,7 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+LeadManagement,Lead,Lead.1.2.cdm.json/Lead,"Prospect or potential sales opportunity. Leads are converted into accounts, contacts, or opportunities when they are qualified. Otherwise, they are deleted or archived.",lead_management,lead,createdBy
+LeadManagement,LeadScoreDeprecated,LeadScoreDeprecated.1.2.cdm.json/LeadScoreDeprecated,,lead_management,lead_score_deprecated,createdBy
+LeadManagement,LeadScoreModel,LeadScoreModel.1.1.cdm.json/LeadScoreModel,,lead_management,lead_score_model,createdBy
+LeadManagement,LeadScore,LeadScore.1.2.cdm.json/LeadScore,,lead_management,lead_score,createdBy
+LeadManagement,ScoringConfiguration,ScoringConfiguration.1.1.cdm.json/ScoringConfiguration,,lead_management,scoring_configuration,leadscoringconfigurationId
+LeadManagement,LeadToOpportunity,LeadToOpportunity.1.1.cdm.json/LeadToOpportunity,,lead_management,lead_to_opportunity,activeStageId

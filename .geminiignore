@@ -1,0 +1,39 @@
+# Generated artifacts
+*.duckdb
+output/
+tmp/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# dbt artifacts
+target/
+dbt_packages/
+logs/
+
+# IDE and editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# CDM metadata — full library excluded; curated subset for this slice kept
+source_data/cdm_metadata/entities/
+source_data/cdm_metadata/columns/
+source_data/cdm_metadata/manifests/
+source_data/cdm_metadata/semantic_meanings/
+!source_data/cdm_metadata/revenue_slice/
+
+# Agent skills (Claude/Antigravity format, not used by Gemini)
+.agent/skills/
+
+# Claude Code config (not relevant to Gemini)
+.claude/
+CLAUDE.md

@@ -1,0 +1,28 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+foundationCommon,Account,Account.1.3.cdm.json/Account,Business that represents a customer or potential customer. The company that is billed in business transactions.,foundation_common,account,createdBy
+foundationCommon,BookableResource,BookableResource.1.4.cdm.json/BookableResource,Resource that has capacity which can be allocated to work.,foundation_common,bookable_resource,createdBy
+foundationCommon,BookableResourceBooking,BookableResourceBooking.1.4.cdm.json/BookableResourceBooking,Represents the line details of a resource booking.,foundation_common,bookable_resource_booking,createdBy
+foundationCommon,BookableResourceBookingHeader,BookableResourceBookingHeader.1.3.cdm.json/BookableResourceBookingHeader,Reservation entity representing the summary of the associated resource bookings.,foundation_common,bookable_resource_booking_header,createdBy
+foundationCommon,BookableResourceCategory,BookableResourceCategory.1.3.cdm.json/BookableResourceCategory,Categorize resources that have capacity into categories such as roles.,foundation_common,bookable_resource_category,createdBy
+foundationCommon,BookableResourceCategoryAssn,BookableResourceCategoryAssn.1.4.cdm.json/BookableResourceCategoryAssn,Association entity to model the categorization of resources.,foundation_common,bookable_resource_category_assn,createdBy
+foundationCommon,BookableResourceCharacteristic,BookableResourceCharacteristic.1.4.cdm.json/BookableResourceCharacteristic,Associates resources with their characteristics and specifies the proficiency level of a resource for that characteristic.,foundation_common,bookable_resource_characteristic,createdBy
+foundationCommon,BookableResourceGroup,BookableResourceGroup.1.4.cdm.json/BookableResourceGroup,Associates resources with resource groups that they are a member of.,foundation_common,bookable_resource_group,createdBy
+foundationCommon,BookingStatus,BookingStatus.1.3.cdm.json/BookingStatus,Allows creation of multiple sub statuses mapped to a booking status option.,foundation_common,booking_status,createdBy
+foundationCommon,Characteristic,Characteristic.1.3.cdm.json/Characteristic,"Skills, education and certifications of resources.",foundation_common,characteristic,createdBy
+foundationCommon,Company,Company.1.3.cdm.json/Company,Uniquely identifies a Company by name and type,foundation_common,company,createdBy
+foundationCommon,Contact,Contact.1.3.cdm.json/Contact,"Person with whom a business unit has a relationship, such as customer, supplier, and colleague.",foundation_common,contact,createdBy
+foundationCommon,KnowledgeArticle,KnowledgeArticle.1.3.cdm.json/KnowledgeArticle,Organizational knowledge for internal and external use.,foundation_common,knowledge_article,createdBy
+foundationCommon,Organization,Organization.1.2.cdm.json/Organization,"Top level of the Microsoft Dynamics 365 business hierarchy. The organization can be a specific business, holding company, or corporation.",foundation_common,organization,organizationId
+foundationCommon,PriceList,PriceList.1.3.cdm.json/PriceList,Entity that defines pricing levels.,foundation_common,price_list,priceLevelId
+foundationCommon,PriceListItem,PriceListItem.1.3.cdm.json/PriceListItem,"Information about how to price a product in the specified price level, including pricing method, rounding option, and discount type based on a specified product unit.",foundation_common,price_list_item,productPriceLevelId
+foundationCommon,Product,Product.1.3.cdm.json/Product,Information about products and their pricing information.,foundation_common,product,productId
+foundationCommon,ProductAssociation,ProductAssociation.1.3.cdm.json/ProductAssociation,Instance of a product added to a bundle or kit.,foundation_common,product_association,productAssociationId
+foundationCommon,ProductRelationship,ProductRelationship.1.3.cdm.json/ProductRelationship,"Information about the selling relationship between two products, including the relationship type, such as up-sell, cross-sell, substitute, or accessory.",foundation_common,product_relationship,productSubstituteId
+foundationCommon,Property,Property.1.3.cdm.json/Property,Information about a product property.,foundation_common,property,dynamicPropertyId
+foundationCommon,PropertyAssociation,PropertyAssociation.1.3.cdm.json/PropertyAssociation,Association of a property definition with another entity in the system.,foundation_common,property_association,dynamicPropertyAssociationId
+foundationCommon,PropertyInstance,PropertyInstance.1.3.cdm.json/PropertyInstance,Instance of a property with its value.,foundation_common,property_instance,createdBy
+foundationCommon,PropertyOptionSetItem,PropertyOptionSetItem.1.3.cdm.json/PropertyOptionSetItem,Item with a name and value in a property option set type.,foundation_common,property_option_set_item,dynamicPropertyOptionSetValueId
+foundationCommon,RatingModel,RatingModel.1.3.cdm.json/RatingModel,Represents a model to evaluate skills or other related entities.,foundation_common,rating_model,createdBy
+foundationCommon,RatingValue,RatingValue.1.3.cdm.json/RatingValue,A unique value associated with a rating model that allows providing a user friendly rating value.,foundation_common,rating_value,createdBy
+foundationCommon,Unit,Unit.1.3.cdm.json/Unit,Unit of measure.,foundation_common,unit,uoMId
+foundationCommon,UnitGroup,UnitGroup.1.2.cdm.json/UnitGroup,Grouping of units.,foundation_common,unit_group,uoMScheduleId

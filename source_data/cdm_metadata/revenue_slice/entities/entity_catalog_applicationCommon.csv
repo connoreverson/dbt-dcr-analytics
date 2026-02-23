@@ -1,0 +1,44 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+applicationCommon,Account,Account.1.3.cdm.json/Account,Business that represents a customer or potential customer. The company that is billed in business transactions.,application_common,account,createdBy
+applicationCommon,Activity,Activity.1.3.cdm.json/Activity,"Task performed, or to be performed, by a user. An activity is any action for which an entry can be made on a calendar.",application_common,activity,createdBy
+applicationCommon,ActivityParty,ActivityParty.1.4.cdm.json/ActivityParty,Person or group associated with an activity. An activity can have multiple activity parties.,application_common,activity_party,activityPartyId
+applicationCommon,Address,Address.1.3.cdm.json/Address,Address and shipping information. Used to store additional addresses for an account or contact.,application_common,address,customerAddressId
+applicationCommon,Appointment,Appointment.1.4.cdm.json/Appointment,Commitment representing a time interval with start/end times and duration.,application_common,appointment,createdBy
+applicationCommon,Article,Article.1.3.cdm.json/Article,Structured content that is part of the knowledge base.,application_common,article,kbArticleId
+applicationCommon,ArticleComment,ArticleComment.1.3.cdm.json/ArticleComment,Comment on a knowledge base article.,application_common,article_comment,kbArticleCommentId
+applicationCommon,ArticleTemplate,ArticleTemplate.1.3.cdm.json/ArticleTemplate,Template for a knowledge base article that contains the standard attributes of an article.,application_common,article_template,kbArticleTemplateId
+applicationCommon,BusinessUnit,BusinessUnit.1.3.cdm.json/BusinessUnit,"Business, division, or department in the Microsoft Dynamics 365 database.",application_common,business_unit,businessUnitId
+applicationCommon,Connection,Connection.1.4.cdm.json/Connection,Relationship between two entities.,application_common,connection,modifiedBy
+applicationCommon,ConnectionRole,ConnectionRole.1.3.cdm.json/ConnectionRole,Role describing a relationship between a two records.,application_common,connection_role,connectionRoleId
+applicationCommon,Contact,Contact.1.3.cdm.json/Contact,"Person with whom a business unit has a relationship, such as customer, supplier, and colleague.",application_common,contact,createdBy
+applicationCommon,Currency,Currency.1.3.cdm.json/Currency,Currency in which a financial transaction is carried out.,application_common,currency,modifiedBy
+applicationCommon,CustomerRelationship,CustomerRelationship.1.3.cdm.json/CustomerRelationship,Relationship between a customer and a partner in which either can be an account or contact.,application_common,customer_relationship,customerRoleId
+applicationCommon,Email,Email.1.4.cdm.json/Email,Activity that is delivered using email protocols.,application_common,email,createdBy
+applicationCommon,EmailSignature,EmailSignature.1.3.cdm.json/EmailSignature,Signature for email message,application_common,email_signature,emailSignatureId
+applicationCommon,Fax,Fax.1.3.cdm.json/Fax,Activity that tracks call outcome and number of pages for a fax and optionally stores an electronic copy of the document.,application_common,fax,createdBy
+applicationCommon,Feedback,Feedback.1.3.cdm.json/Feedback,Container for feedback and ratings for knowledge articles.,application_common,feedback,feedbackId
+applicationCommon,Goal,Goal.1.3.cdm.json/Goal,Target objective for a user or a team for a specified time period.,application_common,goal,createdBy
+applicationCommon,GoalMetric,GoalMetric.1.3.cdm.json/GoalMetric,"Type of measurement for a goal, such as money amount or count.",application_common,goal_metric,metricId
+applicationCommon,KnowledgeArticle,KnowledgeArticle.1.3.cdm.json/KnowledgeArticle,Organizational knowledge for internal and external use.,application_common,knowledge_article,createdBy
+applicationCommon,KnowledgeArticleCategory,KnowledgeArticleCategory.1.3.cdm.json/KnowledgeArticleCategory,Category for a Knowledge Article.,application_common,knowledge_article_category,knowledgeArticleCategoryId
+applicationCommon,KnowledgeArticleViews,KnowledgeArticleViews.1.3.cdm.json/KnowledgeArticleViews,No of times an article is viewed per day,application_common,knowledge_article_views,knowledgeArticleViewsId
+applicationCommon,KnowledgeBaseRecord,KnowledgeBaseRecord.1.3.cdm.json/KnowledgeBaseRecord,Metadata of knowledge base (KB) articles associated with Microsoft Dynamics 365 entities.,application_common,knowledge_base_record,knowledgeBaseRecordId
+applicationCommon,Letter,Letter.1.3.cdm.json/Letter,Activity that tracks the delivery of a letter. The activity can contain the electronic copy of the letter.,application_common,letter,createdBy
+applicationCommon,Note,Note.1.4.cdm.json/Note,"Note that is attached to one or more objects, including other notes.",application_common,note,annotationId
+applicationCommon,Organization,Organization.1.3.cdm.json/Organization,"Top level of the Microsoft Dynamics 365 business hierarchy. The organization can be a specific business, holding company, or corporation.",application_common,organization,organizationId
+applicationCommon,Owner,Owner.1.1.cdm.json/Owner,Group of undeleted system users and undeleted teams. Owners can be used to control access to specific objects.,application_common,owner,ownerId
+applicationCommon,PhoneCall,PhoneCall.1.4.cdm.json/PhoneCall,Activity to track a telephone call.,application_common,phone_call,createdBy
+applicationCommon,Position,Position.1.3.cdm.json/Position,Position of a user in the hierarchy,application_common,position,positionId
+applicationCommon,Queue,Queue.1.3.cdm.json/Queue,"A list of records that require action, such as accounts, activities, and cases.",application_common,queue,queueId
+applicationCommon,QueueItem,QueueItem.1.4.cdm.json/QueueItem,"A specific item in a queue, such as a case record or an activity record.",application_common,queue_item,queueItemId
+applicationCommon,RecurringAppointment,RecurringAppointment.1.3.cdm.json/RecurringAppointment,The Master appointment of a recurring appointment series.,application_common,recurring_appointment,createdBy
+applicationCommon,SLA,SLA.1.3.cdm.json/SLA,Contains information about the tracked service-level KPIs for cases that belong to different customers.,application_common,sla,SLAId
+applicationCommon,SLAItem,SLAItem.1.3.cdm.json/SLAItem,Contains information about a tracked support KPI for a specific customer.,application_common,sla_item,SLAItemId
+applicationCommon,SLAKPIInstance,SLAKPIInstance.1.4.cdm.json/SLAKPIInstance,Service level agreement (SLA) key performance indicator (KPI) instance that is tracked for an individual case,application_common,slakpi_instance,SLAKPIInstanceId
+applicationCommon,SocialActivity,SocialActivity.1.3.cdm.json/SocialActivity,For internal use only.,application_common,social_activity,createdBy
+applicationCommon,SocialProfile,SocialProfile.1.3.cdm.json/SocialProfile,This entity is used to store social profile information of its associated account and contacts on different social channels.,application_common,social_profile,createdBy
+applicationCommon,Task,Task.1.3.cdm.json/Task,Generic activity representing work needed to be done.,application_common,task,createdBy
+applicationCommon,Team,Team.1.3.cdm.json/Team,Collection of system users that routinely collaborate. Teams can be used to simplify record sharing and provide team members with common access to organization data when team members belong to different Business Units.,application_common,team,teamId
+applicationCommon,TeamMembership,TeamMembership.1.3.cdm.json/TeamMembership,User membership in Teams,application_common,team_membership,teamMembershipId
+applicationCommon,Territory,Territory.1.3.cdm.json/Territory,Territory represents sales regions.,application_common,territory,territoryId
+applicationCommon,User,User.1.3.cdm.json/User,Person with access to the Microsoft CRM system and who owns objects in the Microsoft CRM database.,application_common,user,systemUserId

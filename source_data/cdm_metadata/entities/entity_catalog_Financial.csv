@@ -1,0 +1,26 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+Financial,Account,Account.1.2.cdm.json/Account,Business that represents a customer or potential customer. The company that is billed in business transactions.,financial,account,createdBy
+Financial,BillingAccount,BillingAccount.1.2.cdm.json/BillingAccount,"A financial tool for tracking value accrued for a particular purpose. In the healthcare field, used to track charges for a patient, cost centers, etc.",financial,billing_account,createdBy
+Financial,Claim,Claim.1.2.cdm.json/Claim,"A provider issued list of services and products provided, or to be provided, to a patient which is provided to an insurer for payment recovery.",financial,claim,createdBy
+Financial,ClaimCareTeam,ClaimCareTeam.1.2.cdm.json/ClaimCareTeam,The members of the team who provided the overall service as well as their role and whether responsible and qualifications.,financial,claim_care_team,createdBy
+Financial,ClaimDiagnosis,ClaimDiagnosis.1.2.cdm.json/ClaimDiagnosis,List of patient diagnosis for which care is sought.,financial,claim_diagnosis,createdBy
+Financial,ClaimInformation,ClaimInformation.1.2.cdm.json/ClaimInformation,"Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues. Often there are mutiple jurisdiction specific valuesets which are requi",financial,claim_information,createdBy
+Financial,Insurance,Insurance.1.2.cdm.json/Insurance,Financial instrument by which payment information for health care.,financial,insurance,createdBy
+Financial,ClaimItem,ClaimItem.1.2.cdm.json/ClaimItem,First tier of goods and services.,financial,claim_item,createdBy
+Financial,ClaimResponse,ClaimResponse.1.2.cdm.json/ClaimResponse,,financial,claim_response,createdBy
+Financial,ClaimResponseAddItem,ClaimResponseAddItem.1.2.cdm.json/ClaimResponseAddItem,,financial,claim_response_add_item,createdBy
+Financial,ClaimResponseItem,ClaimResponseItem.1.2.cdm.json/ClaimResponseItem,,financial,claim_response_item,createdBy
+Financial,ClaimResponseItemAdjudication,ClaimResponseItemAdjudication.1.2.cdm.json/ClaimResponseItemAdjudication,,financial,claim_response_item_adjudication,createdBy
+Financial,ClaimResponseItemDetail,ClaimResponseItemDetail.1.2.cdm.json/ClaimResponseItemDetail,The second tier service adjudications for submitted services.,financial,claim_response_item_detail,createdBy
+Financial,ClaimsProcedure,ClaimsProcedure.1.1.cdm.json/ClaimsProcedure,Ordered list of patient procedures performed to support the adjudication.,financial,claims_procedure,createdBy
+Financial,CodeableConcept,CodeableConcept.1.2.cdm.json/CodeableConcept,"A Codeable Concept represents a value that is usually supplied by providing a reference to one or more terminologies, but may also be defined by the provision of text.",financial,codeable_concept,createdBy
+Financial,Contract,Contract.1.2.cdm.json/Contract,,financial,contract,createdBy
+Financial,Coverage,Coverage.1.2.cdm.json/Coverage,"""The party(s) that are responsible for payment (or part of) of charges applied to this account (including self-pay).
+A coverage may only be resposible for specific types of charges, and the sequence o",financial,coverage,createdBy
+Financial,EligibilityRequest,EligibilityRequest.1.2.cdm.json/EligibilityRequest,"The EligibilityRequest provides patient and insurance coverage information to an insurer for them to respond, in the form of an EligibilityResponse, with information regarding whether the stated cover",financial,eligibility_request,createdBy
+Financial,EligibilityRequestItem,EligibilityRequestItem.1.2.cdm.json/EligibilityRequestItem,Eligibility request item.,financial,eligibility_request_item,createdBy
+Financial,EligibilityResponse,EligibilityResponse.1.2.cdm.json/EligibilityResponse,,financial,eligibility_response,createdBy
+Financial,EligibilityResponseInsurance,EligibilityResponseInsurance.1.2.cdm.json/EligibilityResponseInsurance,The insurer may provide both the details for the requested coverage as well as details for additional coverages known to the insurer.,financial,eligibility_response_insurance,createdBy
+Financial,EnrollmentRequest,EnrollmentRequest.1.2.cdm.json/EnrollmentRequest,This resource provides the insurance enrollment details to the insurer regarding a specified coverage,financial,enrollment_request,createdBy
+Financial,EnrollmentResponse,EnrollmentResponse.1.2.cdm.json/EnrollmentResponse,This resource provides enrollment and plan details from the processing of an Enrollment resource.,financial,enrollment_response,createdBy
+Financial,PaymentNotice,PaymentNotice.1.2.cdm.json/PaymentNotice,,financial,payment_notice,createdBy

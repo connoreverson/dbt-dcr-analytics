@@ -1,0 +1,2 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+CallCenter,RetailCallCenterEntity,RetailCallCenterEntity.1.1.cdm.json/RetailCallCenterEntity,,call_center,retail_call_center_entity,BackingTable_CurrencyRelationshipId

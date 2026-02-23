@@ -1,0 +1,5 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+HealthcareCareManagement,CarePlan,CarePlan.1.2.cdm.json/CarePlan,"Describes the intention of how one or more practitioners intend to deliver care for a particular patient, group or community for a period of time, possibly limited to care for a specific condition",healthcare_care_management,care_plan,createdBy
+HealthcareCareManagement,CarePlanActivity,CarePlanActivity.1.2.cdm.json/CarePlanActivity,"Identifies a planned action to occur as part of the plan. For example, a medication to be used, lab tests to perform, self-monitoring, education, etc.",healthcare_care_management,care_plan_activity,createdBy
+HealthcareCareManagement,CarePlanCareTeam,CarePlanCareTeam.1.2.cdm.json/CarePlanCareTeam,Identifies all people and organizations who are expected to be involved in the care envisioned by this plan.,healthcare_care_management,care_plan_care_team,createdBy
+HealthcareCareManagement,CarePlanGoal,CarePlanGoal.1.2.cdm.json/CarePlanGoal,Describes the intended objective(s) of carrying out the care plan.,healthcare_care_management,care_plan_goal,createdBy

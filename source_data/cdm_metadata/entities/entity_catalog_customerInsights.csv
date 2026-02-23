@@ -1,0 +1,6 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+customerInsights,CustomerActivity,CustomerActivity.1.4.cdm.json/CustomerActivity,An activity performed by a user that has observational value to the business.,customer_insights,customer_activity,createdBy
+customerInsights,CustomerProfile,CustomerProfile.1.4.cdm.json/CustomerProfile,A person or organization that either performed or has the potential to engage in a business activity. ,customer_insights,customer_profile,createdBy
+customerInsights,MeasureDefinition,MeasureDefinition.1.4.cdm.json/MeasureDefinition,"Definition of KPIs partitioned by zero or more dimensions (eg. Monthly Active Users, Total Spend By Customer, Average Customer Acquisition Cost)",customer_insights,measure_definition,createdBy
+customerInsights,Segment,Segment.1.4.cdm.json/Segment,Defines a group of members  that exhibit common traits.,customer_insights,segment,createdBy
+customerInsights,SegmentMembership,SegmentMembership.1.4.cdm.json/SegmentMembership,Members participating in a given segment.,customer_insights,segment_membership,createdBy

@@ -1,0 +1,6 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+financialCommon,FinancialActivity,FinancialActivity.1.0.cdm.json/FinancialActivity,"Summarization of financial activity for a ledger, date, account, and dimension combination",financial_common,financial_activity,financialActivityId
+financialCommon,FiscalCalendarPeriod,FiscalCalendarPeriod.1.0.cdm.json/FiscalCalendarPeriod,"Represents the period in which financial activity occurred, as defined by a fiscal calendar.",financial_common,fiscal_calendar_period,fiscalCalendarPeriodId
+financialCommon,Ledger,Ledger.1.0.cdm.json/Ledger,The collection of all accounts making up the central repository of accounting data for a company.,financial_common,ledger,ledgerId
+financialCommon,MainAccount,MainAccount.1.0.cdm.json/MainAccount,An account whose balance is displayed in major financial statements,financial_common,main_account,mainAccountId
+financialCommon,MainAccountCategory,MainAccountCategory.1.0.cdm.json/MainAccountCategory,Provides categorization of main accounts,financial_common,main_account_category,mainAccountCategoryId

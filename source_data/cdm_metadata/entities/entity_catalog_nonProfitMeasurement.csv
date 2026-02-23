@@ -1,0 +1,7 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+nonProfitMeasurement,DeliveryFramework,DeliveryFramework.2.4.cdm.json/DeliveryFramework,"Delivery Framework represents a management unit of work defined by the organization or entity doing the work. In IATI, the Delivery Framework is an “Activity.”",non_profit_measurement,delivery_framework,createdBy
+nonProfitMeasurement,Indicator,Indicator.2.4.cdm.json/Indicator,An Indicator describes what will be measured to track evidence of a Result. Indicators can be qualitative or quantitative and may or may not be aggregable.,non_profit_measurement,indicator,createdBy
+nonProfitMeasurement,MeasurementItem,MeasurementItem.1.4.cdm.json/MeasurementItem,"Library used to store Goals, Objectives, Targets, Outcomes, Indicators, and other items for measurement.",non_profit_measurement,measurement_item,createdBy
+nonProfitMeasurement,MeasurementItemRelationship,MeasurementItemRelationship.1.4.cdm.json/MeasurementItemRelationship,Records the details regarding the relationships between measurement items.,non_profit_measurement,measurement_item_relationship,createdBy
+nonProfitMeasurement,MeasurementItemUsage,MeasurementItemUsage.2.4.cdm.json/MeasurementItemUsage,Used to track where measurement items have been used.,non_profit_measurement,measurement_item_usage,createdBy
+nonProfitMeasurement,Result,Result.2.4.cdm.json/Result,A Result is a container that represents the changes in the context in which an organization operates..,non_profit_measurement,result,createdBy

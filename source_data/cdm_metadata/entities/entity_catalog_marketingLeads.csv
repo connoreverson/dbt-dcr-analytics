@@ -1,0 +1,2 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+marketingLeads,LeadScoringModel,LeadScoringModel.1.3.cdm.json/LeadScoringModel,,marketing_leads,lead_scoring_model,createdBy

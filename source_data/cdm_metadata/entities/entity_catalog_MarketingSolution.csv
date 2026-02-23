@@ -1,0 +1,59 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+MarketingSolution,Account,Account.1.2.cdm.json/Account,Business that represents a customer or potential customer. The company that is billed in business transactions.,marketing_solution,account,createdBy
+MarketingSolution,Appointment,Appointment.1.1.cdm.json/Appointment,,marketing_solution,appointment,associatedCustomerjourneyiterationId
+MarketingSolution,Connection,Connection.1.2.cdm.json/Connection,Relationship between two entities.,marketing_solution,connection,modifiedBy
+MarketingSolution,Contact,Contact.1.2.cdm.json/Contact,"Person with whom a business unit has a relationship, such as customer, supplier, and colleague.",marketing_solution,contact,createdBy
+MarketingSolution,Lead,Lead.1.2.cdm.json/Lead,"Prospect or potential sales opportunity. Leads are converted into accounts, contacts, or opportunities when they are qualified. Otherwise, they are deleted or archived.",marketing_solution,lead,createdBy
+MarketingSolution,MarketingList,MarketingList.1.1.cdm.json/MarketingList,Group of existing or potential customers created for a marketing campaign or other sales purposes.,marketing_solution,marketing_list,createdBy
+MarketingSolution,AppointmentActivityMarketingTemplate,AppointmentActivityMarketingTemplate.1.2.cdm.json/AppointmentActivityMarketingTemplate,,marketing_solution,appointment_activity_marketing_template,createdBy
+MarketingSolution,CdnConfiguration,CdnConfiguration.1.1.cdm.json/CdnConfiguration,,marketing_solution,cdn_configuration,createdBy
+MarketingSolution,AnalyticsConfiguration,AnalyticsConfiguration.1.1.cdm.json/AnalyticsConfiguration,,marketing_solution,analytics_configuration,createdBy
+MarketingSolution,ContentSettings,ContentSettings.1.1.cdm.json/ContentSettings,,marketing_solution,content_settings,createdBy
+MarketingSolution,CustomerInsightsInfo,CustomerInsightsInfo.1.1.cdm.json/CustomerInsightsInfo,,marketing_solution,customer_insights_info,createdBy
+MarketingSolution,CustomerJourney,CustomerJourney.1.2.cdm.json/CustomerJourney,,marketing_solution,customer_journey,createdBy
+MarketingSolution,CustomChannelActivity,CustomChannelActivity.1.1.cdm.json/CustomChannelActivity,,marketing_solution,custom_channel_activity,createdBy
+MarketingSolution,CustomerJourneyIteration,CustomerJourneyIteration.1.1.cdm.json/CustomerJourneyIteration,,marketing_solution,customer_journey_iteration,createdBy
+MarketingSolution,CustomerJourneyRuntimeState,CustomerJourneyRuntimeState.1.2.cdm.json/CustomerJourneyRuntimeState,,marketing_solution,customer_journey_runtime_state,createdBy
+MarketingSolution,CustomerJourneyTemplate,CustomerJourneyTemplate.1.2.cdm.json/CustomerJourneyTemplate,,marketing_solution,customer_journey_template,createdBy
+MarketingSolution,CustomerJourneyWorkflowLink,CustomerJourneyWorkflowLink.1.1.cdm.json/CustomerJourneyWorkflowLink,,marketing_solution,customer_journey_workflow_link,createdBy
+MarketingSolution,DefaultSettings,DefaultSettings.1.2.cdm.json/DefaultSettings,Default settings,marketing_solution,default_settings,createdBy
+MarketingSolution,FormPage,FormPage.1.1.cdm.json/FormPage,,marketing_solution,form_page,createdBy
+MarketingSolution,FormPageTemplate,FormPageTemplate.1.2.cdm.json/FormPageTemplate,,marketing_solution,form_page_template,createdBy
+MarketingSolution,GeoPin,GeoPin.1.2.cdm.json/GeoPin,,marketing_solution,geo_pin,createdBy
+MarketingSolution,ListForm,ListForm.1.2.cdm.json/ListForm,,marketing_solution,list_form,createdBy
+MarketingSolution,LiveEntityDependency,LiveEntityDependency.1.1.cdm.json/LiveEntityDependency,,marketing_solution,live_entity_dependency,createdBy
+MarketingSolution,MarketingConfiguration,MarketingConfiguration.1.1.cdm.json/MarketingConfiguration,,marketing_solution,marketing_configuration,createdBy
+MarketingSolution,MarketingDataImport,MarketingDataImport.1.1.cdm.json/MarketingDataImport,,marketing_solution,marketing_data_import,createdBy
+MarketingSolution,MarketingDynamicContentMetadata,MarketingDynamicContentMetadata.1.1.cdm.json/MarketingDynamicContentMetadata,,marketing_solution,marketing_dynamic_content_metadata,createdBy
+MarketingSolution,MarketingEmail,MarketingEmail.1.2.cdm.json/MarketingEmail,,marketing_solution,marketing_email,createdBy
+MarketingSolution,MarketingEmailDynamicContentMetadata,MarketingEmailDynamicContentMetadata.1.1.cdm.json/MarketingEmailDynamicContentMetadata,,marketing_solution,marketing_email_dynamic_content_metadata,createdBy
+MarketingSolution,MarketingEmailTemplate,MarketingEmailTemplate.1.2.cdm.json/MarketingEmailTemplate,Template for marketing emails,marketing_solution,marketing_email_template,createdBy
+MarketingSolution,MarketingEmailTest,MarketingEmailTest.1.2.cdm.json/MarketingEmailTest,,marketing_solution,marketing_email_test,createdBy
+MarketingSolution,MarketingEmailTestAttribute,MarketingEmailTestAttribute.1.2.cdm.json/MarketingEmailTestAttribute,,marketing_solution,marketing_email_test_attribute,createdBy
+MarketingSolution,MarketingEmailTestSend,MarketingEmailTestSend.1.2.cdm.json/MarketingEmailTestSend,,marketing_solution,marketing_email_test_send,createdBy
+MarketingSolution,MarketingFieldSubmission,MarketingFieldSubmission.1.2.cdm.json/MarketingFieldSubmission,,marketing_solution,marketing_field_submission,createdBy
+MarketingSolution,MarketingForm,MarketingForm.1.2.cdm.json/MarketingForm,,marketing_solution,marketing_form,createdBy
+MarketingSolution,MarketingFormField,MarketingFormField.1.2.cdm.json/MarketingFormField,,marketing_solution,marketing_form_field,createdBy
+MarketingSolution,MarketingFormSubmission,MarketingFormSubmission.1.2.cdm.json/MarketingFormSubmission,,marketing_solution,marketing_form_submission,createdBy
+MarketingSolution,MarketingFormTemplate,MarketingFormTemplate.1.2.cdm.json/MarketingFormTemplate,,marketing_solution,marketing_form_template,createdBy
+MarketingSolution,FormWhitelistRule,FormWhitelistRule.1.2.cdm.json/FormWhitelistRule,,marketing_solution,form_whitelist_rule,createdBy
+MarketingSolution,MarketingPage,MarketingPage.1.2.cdm.json/MarketingPage,,marketing_solution,marketing_page,createdBy
+MarketingSolution,LandingPages,LandingPages.1.2.cdm.json/LandingPages,,marketing_solution,landing_pages,createdBy
+MarketingSolution,MarketingPageTemplate,MarketingPageTemplate.1.2.cdm.json/MarketingPageTemplate,,marketing_solution,marketing_page_template,createdBy
+MarketingSolution,FormMatching,FormMatching.1.2.cdm.json/FormMatching,,marketing_solution,form_matching,createdBy
+MarketingSolution,MatchingStrategyAttribute,MatchingStrategyAttribute.1.2.cdm.json/MatchingStrategyAttribute,,marketing_solution,matching_strategy_attribute,createdBy
+MarketingSolution,MktActivity,MktActivity.1.1.cdm.json/MktActivity,,marketing_solution,mkt_activity,createdBy
+MarketingSolution,PhoneCallActivityMarketingTemplate,PhoneCallActivityMarketingTemplate.1.2.cdm.json/PhoneCallActivityMarketingTemplate,,marketing_solution,phone_call_activity_marketing_template,createdBy
+MarketingSolution,PortalSettings,PortalSettings.1.1.cdm.json/PortalSettings,,marketing_solution,portal_settings,createdBy
+MarketingSolution,RedirectURL,RedirectURL.1.1.cdm.json/RedirectURL,,marketing_solution,redirect_url,createdBy
+MarketingSolution,Segment,Segment.1.2.cdm.json/Segment,,marketing_solution,segment,createdBy
+MarketingSolution,SegmentTemplate,SegmentTemplate.1.2.cdm.json/SegmentTemplate,,marketing_solution,segment_template,createdBy
+MarketingSolution,DomainAuthentication,DomainAuthentication.1.2.cdm.json/DomainAuthentication,,marketing_solution,domain_authentication,createdBy
+MarketingSolution,TaskActivityMarketingTemplate,TaskActivityMarketingTemplate.1.2.cdm.json/TaskActivityMarketingTemplate,,marketing_solution,task_activity_marketing_template,createdBy
+MarketingSolution,UICConfig,UICConfig.1.1.cdm.json/UICConfig,,marketing_solution,uic_config,createdBy
+MarketingSolution,UserGeoRegion,UserGeoRegion.1.2.cdm.json/UserGeoRegion,User geographical region that affects geopolitically sensitive data. Keep just one geo region per user to ensure consistency of this data.,marketing_solution,user_geo_region,createdBy
+MarketingSolution,UserSetting,UserSetting.1.1.cdm.json/UserSetting,,marketing_solution,user_setting,createdBy
+MarketingSolution,MarketingWebsite,MarketingWebsite.1.2.cdm.json/MarketingWebsite,,marketing_solution,marketing_website,createdBy
+MarketingSolution,PhoneCall,PhoneCall.1.2.cdm.json/PhoneCall,Activity to track a telephone call.,marketing_solution,phone_call,createdBy
+MarketingSolution,ProcessSession,ProcessSession.1.1.cdm.json/ProcessSession,,marketing_solution,process_session,createdBy
+MarketingSolution,Task,Task.1.2.cdm.json/Task,Generic activity representing work needed to be done.,marketing_solution,task,createdBy

@@ -1,0 +1,14 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+SOACommon,Note,Note.1.0.cdm.json/Note,"Note that is attached to one or more objects, including other notes.",soa_common,note,annotationId
+SOACommon,ActivityCancellationReason,ActivityCancellationReason.1.0.cdm.json/ActivityCancellationReason,,soa_common,activity_cancellation_reason,activityCancellationReasonId
+SOACommon,Request,Request.1.0.cdm.json/Request,,soa_common,request,activityId
+SOACommon,RequestType,RequestType.1.0.cdm.json/RequestType,Request types,soa_common,request_type,requestTypeId
+SOACommon,TaskType,TaskType.1.0.cdm.json/TaskType,Types of Retail activities,soa_common,task_type,retailActivityTypeId
+SOACommon,AuditDefinition,AuditDefinition.1.0.cdm.json/AuditDefinition,Audit definition,soa_common,audit_definition,auditdefinitionId
+SOACommon,TaskSetup,TaskSetup.1.0.cdm.json/TaskSetup,Task setup,soa_common,task_setup,executionactivityId
+SOACommon,Template,Template.1.0.cdm.json/Template,Template,soa_common,template,executionActivityDefinitionId
+SOACommon,ExecutionPlan,ExecutionPlan.1.0.cdm.json/ExecutionPlan,Execution plan,soa_common,execution_plan,executionPlanId
+SOACommon,SurveyDefinition,SurveyDefinition.1.0.cdm.json/SurveyDefinition,Survey definition,soa_common,survey_definition,surveydefinitionId
+SOACommon,TargetGroupMember,TargetGroupMember.1.0.cdm.json/TargetGroupMember,This entity defines outlet memberships in many target groups. This allows an outlet to be a member of many target groups. ,soa_common,target_group_member,targetgroupmemberId
+SOACommon,TaskDefinition,TaskDefinition.1.0.cdm.json/TaskDefinition,Task definition,soa_common,task_definition,taskdefinitionId
+SOACommon,Task,Task.1.0.cdm.json/Task,Generic activity representing work needed to be done.,soa_common,task,createdBy

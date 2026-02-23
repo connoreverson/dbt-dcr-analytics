@@ -1,0 +1,30 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+scheduling,Actual,Actual.1.4.cdm.json/Actual,,scheduling,actual,createdBy
+scheduling,BookableResourceAssociation,BookableResourceAssociation.1.4.cdm.json/BookableResourceAssociation,,scheduling,bookable_resource_association,createdBy
+scheduling,BookingAlert,BookingAlert.1.3.cdm.json/BookingAlert,Alerts that notify schedule board users of booking issues or information.,scheduling,booking_alert,createdBy
+scheduling,BookingAlertStatus,BookingAlertStatus.1.3.cdm.json/BookingAlertStatus,The status of a booking alert.,scheduling,booking_alert_status,createdBy
+scheduling,BookingChange,BookingChange.1.3.cdm.json/BookingChange,An internal entity used to track changes that affect the schedule board.,scheduling,booking_change,createdBy
+scheduling,BookingRule,BookingRule.1.3.cdm.json/BookingRule,Specify custom rules to be validated by the system before saving a booking record.,scheduling,booking_rule,createdBy
+scheduling,BookingSetupMetadata,BookingSetupMetadata.1.3.cdm.json/BookingSetupMetadata,,scheduling,booking_setup_metadata,createdBy
+scheduling,BusinessClosure,BusinessClosure.1.3.cdm.json/BusinessClosure,,scheduling,business_closure,createdBy
+scheduling,ClientExtension,ClientExtension.1.3.cdm.json/ClientExtension,,scheduling,client_extension,createdBy
+scheduling,Configuration,Configuration.1.3.cdm.json/Configuration,This entity is used to store queries and templates.,scheduling,configuration,createdBy
+scheduling,Organization,Organization.1.3.cdm.json/Organization,"Top level of the Microsoft Dynamics 365 business hierarchy. The organization can be a specific business, holding company, or corporation.",scheduling,organization,organizationId
+scheduling,OrganizationalUnit,OrganizationalUnit.1.3.cdm.json/OrganizationalUnit,,scheduling,organizational_unit,organizationalUnitId
+scheduling,Priority,Priority.1.3.cdm.json/Priority,"Priorities to be used on bookings. In addition, a color could be specified for each priority type and the color selected will be shown visually on the schedule board.",scheduling,priority,createdBy
+scheduling,RequirementCharacteristic,RequirementCharacteristic.1.4.cdm.json/RequirementCharacteristic,Requirement Characteristic,scheduling,requirement_characteristic,createdBy
+scheduling,RequirementGroup,RequirementGroup.1.3.cdm.json/RequirementGroup,Service which has resource requirement offering periods,scheduling,requirement_group,createdBy
+scheduling,RequirementOrganizationUnit,RequirementOrganizationUnit.1.4.cdm.json/RequirementOrganizationUnit,Requirement of Organization Unit,scheduling,requirement_organization_unit,createdBy
+scheduling,RequirementRelationship,RequirementRelationship.1.3.cdm.json/RequirementRelationship,Relationship of requirements in the group,scheduling,requirement_relationship,createdBy
+scheduling,RequirementResourceCategory,RequirementResourceCategory.1.4.cdm.json/RequirementResourceCategory,Requirement Resource Category,scheduling,requirement_resource_category,createdBy
+scheduling,RequirementResourcePreference,RequirementResourcePreference.1.4.cdm.json/RequirementResourcePreference,Requirement Resource Preference,scheduling,requirement_resource_preference,createdBy
+scheduling,RequirementStatus,RequirementStatus.1.3.cdm.json/RequirementStatus,Requirement Status,scheduling,requirement_status,createdBy
+scheduling,ResourceRequirement,ResourceRequirement.1.4.cdm.json/ResourceRequirement,,scheduling,resource_requirement,createdBy
+scheduling,ResourceRequirementDetail,ResourceRequirementDetail.1.4.cdm.json/ResourceRequirementDetail,Resource Requirement Time Detail,scheduling,resource_requirement_detail,createdBy
+scheduling,ResourceTerritory,ResourceTerritory.1.4.cdm.json/ResourceTerritory,Allows to specify for which territory a resource could provide services for,scheduling,resource_territory,createdBy
+scheduling,ScheduleBoardSetting,ScheduleBoardSetting.1.3.cdm.json/ScheduleBoardSetting,To store settings of SB by user & tabs,scheduling,schedule_board_setting,createdBy
+scheduling,SchedulingParameter,SchedulingParameter.1.3.cdm.json/SchedulingParameter,Scheduling Parameters,scheduling,scheduling_parameter,schedulingParameterId
+scheduling,TimeGroup,TimeGroup.1.3.cdm.json/TimeGroup,"Specify time groups consisting of multiple time windows to be used for scheduling, for example.",scheduling,time_group,createdBy
+scheduling,TimeGroupDetail,TimeGroupDetail.1.3.cdm.json/TimeGroupDetail,Specify individual time windows under a time group.,scheduling,time_group_detail,createdBy
+scheduling,TransactionOrigin,TransactionOrigin.1.4.cdm.json/TransactionOrigin,System entity used to record the source of a project cost or sales actual.,scheduling,transaction_origin,createdBy
+scheduling,WorkHourTemplate,WorkHourTemplate.1.4.cdm.json/WorkHourTemplate,Template where resource working hours can be saved and reused.,scheduling,work_hour_template,createdBy

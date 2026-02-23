@@ -1,0 +1,26 @@
+{
+  "context": {
+    "importFormat": "@",
+    "fileFiltering": {
+      "respectGitIgnore": true,
+      "respectGeminiIgnore": true,
+      "enableRecursiveFileSearch": true
+    },
+    "includeDirectories": [
+      "reference",
+      "source_data",
+      ".agent"
+    ],
+    "loadFromIncludeDirectories": false
+  },
+  "tools": {
+    "shell": {
+      "enableInteractiveShell": false
+    }
+  },
+  "general": {
+    "checkpointing": {
+      "enabled": true
+    }
+  }
+}

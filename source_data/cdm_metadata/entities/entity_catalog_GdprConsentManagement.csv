@@ -1,0 +1,7 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+GdprConsentManagement,Contact,Contact.1.1.cdm.json/Contact,"Person with whom a business unit has a relationship, such as customer, supplier, and colleague.",gdpr_consent_management,contact,createdBy
+GdprConsentManagement,CustomerJourney,CustomerJourney.1.1.cdm.json/CustomerJourney,,gdpr_consent_management,customer_journey,createdBy
+GdprConsentManagement,MarketingFeatureConfiguration,MarketingFeatureConfiguration.1.1.cdm.json/MarketingFeatureConfiguration,,gdpr_consent_management,marketing_feature_configuration,
+GdprConsentManagement,LeadScoringModel,LeadScoringModel.1.1.cdm.json/LeadScoringModel,,gdpr_consent_management,lead_scoring_model,
+GdprConsentManagement,DataProtection,DataProtection.1.1.cdm.json/DataProtection,,gdpr_consent_management,data_protection,createdBy
+GdprConsentManagement,GDPRConsentChangeRecord,GDPRConsentChangeRecord.1.1.cdm.json/GDPRConsentChangeRecord,,gdpr_consent_management,gdpr_consent_change_record,createdBy

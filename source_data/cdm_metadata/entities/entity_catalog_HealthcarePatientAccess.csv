@@ -1,0 +1,3 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+HealthcarePatientAccess,SecureMessage,SecureMessage.1.1.cdm.json/SecureMessage,An activity which is used to share information between the user and the customer on the portal.,healthcare_patient_access,secure_message,careProviderId
+HealthcarePatientAccess,AppointmentEMR,AppointmentEMR.1.2.cdm.json/AppointmentEMR,"A booking of a healthcare event among patient(s), practitioner(s), related person(s) and/or device(s) for a specific date/time. This may result in one or more Encounter(s).",healthcare_patient_access,appointment_emr,createdBy

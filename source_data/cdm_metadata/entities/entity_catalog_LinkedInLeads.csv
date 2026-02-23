@@ -1,0 +1,7 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+LinkedInLeads,LinkedInAccount,LinkedInAccount.1.3.cdm.json/LinkedInAccount,The LinkedIn account where forms are created and published.,linked_in_leads,linked_in_account,createdBy
+LinkedInLeads,LinkedInCampaign,LinkedInCampaign.1.3.cdm.json/LinkedInCampaign,Campaign used to capture submissions from prospects.,linked_in_leads,linked_in_campaign,createdBy
+LinkedInLeads,LinkedInFormQuestion,LinkedInFormQuestion.1.3.cdm.json/LinkedInFormQuestion,,linked_in_leads,linked_in_form_question,createdBy
+LinkedInLeads,LinkedInFormSubmissionAnswer,LinkedInFormSubmissionAnswer.1.4.cdm.json/LinkedInFormSubmissionAnswer,Answers to individual questions on a form submitted by a LinkedIn member,linked_in_leads,linked_in_form_submission_answer,createdBy
+LinkedInLeads,LinkedInLeadGenForm,LinkedInLeadGenForm.1.3.cdm.json/LinkedInLeadGenForm,Form shown to prospects on LinkedIn,linked_in_leads,linked_in_lead_gen_form,createdBy
+LinkedInLeads,LinkedInLeadGenFormSubmission,LinkedInLeadGenFormSubmission.1.4.cdm.json/LinkedInLeadGenFormSubmission,Submissions from prospects on LinkedIn,linked_in_leads,linked_in_lead_gen_form_submission,createdBy

@@ -1,0 +1,11 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+Supporting Entities,Address,/core/applicationCommon/Address.1.3.cdm.json/Address,Address and shipping information. Used to store additional addresses for an account or contact.,supporting_entities,address,customerAddressId
+Supporting Entities,BusinessUnit,/core/applicationCommon/BusinessUnit.1.3.cdm.json/BusinessUnit,"Business, division, or department in the Microsoft Dynamics 365 database.",supporting_entities,business_unit,businessUnitId
+Supporting Entities,Currency,/core/applicationCommon/Currency.1.3.cdm.json/Currency,Currency in which a financial transaction is carried out.,supporting_entities,currency,modifiedBy
+Supporting Entities,SLA,/core/applicationCommon/SLA.1.3.cdm.json/SLA,Contains information about the tracked service-level KPIs for cases that belong to different customers.,supporting_entities,sla,SLAId
+Supporting Entities,Team,/core/applicationCommon/Team.1.3.cdm.json/Team,Collection of system users that routinely collaborate. Teams can be used to simplify record sharing and provide team members with common access to organization data when team members belong to different Business Units.,supporting_entities,team,teamId
+Supporting Entities,Territory,/core/applicationCommon/Territory.1.3.cdm.json/Territory,Territory represents sales regions.,supporting_entities,territory,territoryId
+Supporting Entities,CampaignResponse,/core/applicationCommon/foundationCommon/crmCommon/CampaignResponse.1.4.cdm.json/CampaignResponse,Response from an existing or a potential new customer for a campaign.,supporting_entities,campaign_response,createdBy
+Supporting Entities,Case,/core/applicationCommon/foundationCommon/crmCommon/service/Case.1.4.cdm.json/Case,Service request case associated with a contract.,supporting_entities,case,createdBy
+Supporting Entities,FacilityEquipment,/core/applicationCommon/foundationCommon/crmCommon/service/FacilityEquipment.1.3.cdm.json/FacilityEquipment,Resource that can be scheduled.,supporting_entities,facility_equipment,equipmentId
+Supporting Entities,Service,/core/applicationCommon/foundationCommon/crmCommon/service/Service.1.3.cdm.json/Service,Activity that represents work done to satisfy a customer's need.,supporting_entities,service,serviceId

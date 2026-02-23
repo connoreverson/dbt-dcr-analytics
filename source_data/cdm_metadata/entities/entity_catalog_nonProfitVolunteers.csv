@@ -1,0 +1,5 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+nonProfitVolunteers,Account,Account.1.5.cdm.json/Account,Business that represents a customer or potential customer. The company that is billed in business transactions.,non_profit_volunteers,account,createdBy
+nonProfitVolunteers,Contact,Contact.1.5.cdm.json/Contact,"Person with whom a business unit has a relationship, such as customer, supplier, and colleague.",non_profit_volunteers,contact,createdBy
+nonProfitVolunteers,Project,Project.2.4.cdm.json/Project,Delivery entity in an engagement.,non_profit_volunteers,project,createdBy
+nonProfitVolunteers,Schedule,Schedule.2.4.cdm.json/Schedule,Entity to manage a volunteer time preference and/or a project team member work time.,non_profit_volunteers,schedule,createdBy

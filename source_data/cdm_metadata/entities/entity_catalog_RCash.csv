@@ -1,0 +1,2 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+RCash,DimAttributeRCashTable_RUEntity,DimAttributeRCashTable_RUEntity.1.2.cdm.json/DimAttributeRCashTable_RUEntity,,r_cash,dim_attribute_r_cash_table_ru_entity,Relationship_CurrencyRelationshipId

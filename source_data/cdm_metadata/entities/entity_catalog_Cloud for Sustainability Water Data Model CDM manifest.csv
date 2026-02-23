@@ -1,0 +1,21 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+Cloud for Sustainability Water Data Model CDM manifest,Facility,Facility.1.0.cdm.json/Facility,Base-level location to attribute activity data. May contain multiple buildings and organizational units.,cloudfor_sustainability_water_data_model_cd_mmanifest,facility,facilityId
+Cloud for Sustainability Water Data Model CDM manifest,StoredWater,StoredWater.1.0.cdm.json/StoredWater,The entity stores data related to the water stored within a facility.,cloudfor_sustainability_water_data_model_cd_mmanifest,stored_water,storedwaterId
+Cloud for Sustainability Water Data Model CDM manifest,WaterBasin,WaterBasin.1.0.cdm.json/WaterBasin,Describes the details of the basin from which water is being withdrawn by an entity.,cloudfor_sustainability_water_data_model_cd_mmanifest,water_basin,waterbasinId
+Cloud for Sustainability Water Data Model CDM manifest,WaterInstrument,WaterInstrument.1.0.cdm.json/WaterInstrument,Stores the information related to the devices or instruments tracking water in the organization.,cloudfor_sustainability_water_data_model_cd_mmanifest,water_instrument,waterinstrumentId
+Cloud for Sustainability Water Data Model CDM manifest,WaterQualityAnalysis,WaterQualityAnalysis.1.0.cdm.json/WaterQualityAnalysis,Describes the analysis performed to test a water sample for a certain characteristic.,cloudfor_sustainability_water_data_model_cd_mmanifest,water_quality_analysis,waterqualityanalysisId
+Cloud for Sustainability Water Data Model CDM manifest,WaterQualityCharacteristic,WaterQualityCharacteristic.1.0.cdm.json/WaterQualityCharacteristic,Describes the property being evaluated during the analysis of the water sample collected.,cloudfor_sustainability_water_data_model_cd_mmanifest,water_quality_characteristic,waterqualitycharacteristicId
+Cloud for Sustainability Water Data Model CDM manifest,WaterQualityCharacteristicType,WaterQualityCharacteristicType.1.0.cdm.json/WaterQualityCharacteristicType,Stores all the different classifications for the water quality characteristics.,cloudfor_sustainability_water_data_model_cd_mmanifest,water_quality_characteristic_type,waterqualitycharacteristictypeId
+Cloud for Sustainability Water Data Model CDM manifest,WaterQualityTestResult,WaterQualityTestResult.1.0.cdm.json/WaterQualityTestResult,Describes the results coming from the laboratory water quality test for a characteristic in the water sample.,cloudfor_sustainability_water_data_model_cd_mmanifest,water_quality_test_result,waterqualitytestresultId
+Cloud for Sustainability Water Data Model CDM manifest,WaterQuantity,WaterQuantity.1.0.cdm.json/WaterQuantity,Stores the actual quantity information from water transactions within the organization.,cloudfor_sustainability_water_data_model_cd_mmanifest,water_quantity,waterquantityId
+Cloud for Sustainability Water Data Model CDM manifest,WaterRiskIndex,WaterRiskIndex.1.0.cdm.json/WaterRiskIndex,"The overall water risk that measures all water-related risks, by aggregating all selected indicators from the Physical Quantity, Quality and Regulatory & Reputational Risk categories. Higher values indicate higher water risk.
+
+Ex:
+- Low
+- Low-medium
+- Medium
+- Medium-high
+- High
+- Extremely-high",cloudfor_sustainability_water_data_model_cd_mmanifest,water_risk_index,waterriskindexId
+Cloud for Sustainability Water Data Model CDM manifest,WaterSample,WaterSample.1.0.cdm.json/WaterSample,Stores the attributes of the water samples collected for testing water quality.,cloudfor_sustainability_water_data_model_cd_mmanifest,water_sample,watersampleId
+Cloud for Sustainability Water Data Model CDM manifest,WaterSource,WaterSource.1.0.cdm.json/WaterSource,Entity to store details of sources from/to which water gets withdrawn/discharged.,cloudfor_sustainability_water_data_model_cd_mmanifest,water_source,watersourceId

@@ -1,0 +1,7 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+HealthcareHomeHealth,BookedHomeVisit,BookedHomeVisit.1.1.cdm.json/BookedHomeVisit,,healthcare_home_health,booked_home_visit,patientId
+HealthcareHomeHealth,Contact,Contact.1.1.cdm.json/Contact,"Person with whom a business unit has a relationship, such as customer, supplier, and colleague.",healthcare_home_health,contact,createdBy
+HealthcareHomeHealth,Case,Case.1.2.cdm.json/Case,,healthcare_home_health,case,customerId
+HealthcareHomeHealth,HomeCare,HomeCare.1.0.cdm.json/HomeCare,"Home Care records store all information about the job performed for an account. Stores incident details, resource, expenses, tasks, communications, billing and more",healthcare_home_health,home_care,serviceAccountId
+HealthcareHomeHealth,CareTeamMemberBusinessProcessFlow,CareTeamMemberBusinessProcessFlow.1.1.cdm.json/CareTeamMemberBusinessProcessFlow,Base entity for process Care Team Member Business Process Flow,healthcare_home_health,care_team_member_business_process_flow,patientId
+HealthcareHomeHealth,SchedulerHomeHealthBusinessProcessFlow,SchedulerHomeHealthBusinessProcessFlow.1.2.cdm.json/SchedulerHomeHealthBusinessProcessFlow,Base entity for process Scheduler Home Health Business Process Flow,healthcare_home_health,scheduler_home_health_business_process_flow,customerId

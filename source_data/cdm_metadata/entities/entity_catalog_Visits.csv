@@ -1,0 +1,6 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+Visits,VisitActivityCancellationReason,VisitActivityCancellationReason.1.0.cdm.json/VisitActivityCancellationReason,Reasons for cancelling activities,visits,visit_activity_cancellation_reason,visitactivitycancellationreasonId
+Visits,VisitCancellationReason,VisitCancellationReason.1.0.cdm.json/VisitCancellationReason,Reasons for cancelling the visit,visits,visit_cancellation_reason,visitcancellationreasonId
+Visits,VisitFrequency,VisitFrequency.1.0.cdm.json/VisitFrequency,This is a periodic visit schedule configuration table maintained by BackOffice manager. This will tell how frequently the store/outlet needs to be visited by sales rep.,visits,visit_frequency,visitFrequencyId
+Visits,VisitReschedulingReason,VisitReschedulingReason.1.0.cdm.json/VisitReschedulingReason,Reasons for rescheduling the visit,visits,visit_rescheduling_reason,visitreschedulingreasonId
+Visits,VisitType,VisitType.1.0.cdm.json/VisitType,"Type of the visit. For example quick, normal etc",visits,visit_type,visittypeId

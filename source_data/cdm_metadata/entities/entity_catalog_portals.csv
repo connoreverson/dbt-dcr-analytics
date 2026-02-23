@@ -1,0 +1,40 @@
+cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
+portals,Account,Account.1.4.cdm.json/Account,Business that represents a customer or potential customer. The company that is billed in business transactions.,portals,account,createdBy
+portals,Ad,Ad.1.4.cdm.json/Ad,,portals,ad,createdBy
+portals,AdPlacement,AdPlacement.1.3.cdm.json/AdPlacement,,portals,ad_placement,createdBy
+portals,Article,Article.1.3.cdm.json/Article,Structured content that is part of the knowledge base.,portals,article,kbArticleId
+portals,Badge,Badge.1.4.cdm.json/Badge,,portals,badge,badgeId
+portals,BadgeType,BadgeType.1.3.cdm.json/BadgeType,,portals,badge_type,badgeTypeId
+portals,Blog,Blog.1.4.cdm.json/Blog,The root entity for a portal blog.,portals,blog,createdBy
+portals,BlogPost,BlogPost.1.4.cdm.json/BlogPost,A post belonging to a portal blog.,portals,blog_post,createdBy
+portals,Case,Case.1.4.cdm.json/Case,Service request case associated with a contract.,portals,case,createdBy
+portals,CaseDeflection,CaseDeflection.1.4.cdm.json/CaseDeflection,Captures the number of Found My Answer clicks in the portal.,portals,case_deflection,createdBy
+portals,Contact,Contact.1.4.cdm.json/Contact,"Person with whom a business unit has a relationship, such as customer, supplier, and colleague.",portals,contact,createdBy
+portals,ExternalIdentity,ExternalIdentity.1.4.cdm.json/ExternalIdentity,,portals,external_identity,externalIdentityId
+portals,Feedback,Feedback.1.4.cdm.json/Feedback,Container for feedback and ratings for knowledge articles.,portals,feedback,feedbackId
+portals,Forum,Forum.1.4.cdm.json/Forum,,portals,forum,createdBy
+portals,ForumPost,ForumPost.1.4.cdm.json/ForumPost,,portals,forum_post,createdBy
+portals,ForumThread,ForumThread.1.4.cdm.json/ForumThread,,portals,forum_thread,createdBy
+portals,ForumThreadType,ForumThreadType.1.3.cdm.json/ForumThreadType,,portals,forum_thread_type,createdBy
+portals,Idea,Idea.1.4.cdm.json/Idea,An idea belonging to a portal Idea Forum.,portals,idea,createdBy
+portals,IdeaForum,IdeaForum.1.3.cdm.json/IdeaForum,The root entity for portal Ideas.,portals,idea_forum,createdBy
+portals,Invitation,Invitation.1.4.cdm.json/Invitation,Send invitations to existing contacts or email addresses and assign them to web roles upon redemption.,portals,invitation,createdBy
+portals,InviteRedemption,InviteRedemption.1.4.cdm.json/InviteRedemption,Holds information about the redemption of an invite.,portals,invite_redemption,createdBy
+portals,KnowledgeArticleViews,KnowledgeArticleViews.1.3.cdm.json/KnowledgeArticleViews,No of times an article is viewed per day,portals,knowledge_article_views,knowledgeArticleViewsId
+portals,Opportunity,Opportunity.1.4.cdm.json/Opportunity,"Potential revenue-generating event, or sale to an account, which needs to be tracked through a sales process to completion.",portals,opportunity,createdBy
+portals,PageTemplate,PageTemplate.1.3.cdm.json/PageTemplate,URL of the .aspx page used to create new webpages.,portals,page_template,createdBy
+portals,Poll,Poll.1.3.cdm.json/Poll,,portals,poll,createdBy
+portals,PollOption,PollOption.1.3.cdm.json/PollOption,,portals,poll_option,createdBy
+portals,PollPlacement,PollPlacement.1.3.cdm.json/PollPlacement,,portals,poll_placement,createdBy
+portals,PollSubmission,PollSubmission.1.4.cdm.json/PollSubmission,,portals,poll_submission,createdBy
+portals,PortalLanguage,PortalLanguage.1.3.cdm.json/PortalLanguage,Lists the languages supported by the Portal,portals,portal_language,createdBy
+portals,PublishingState,PublishingState.1.3.cdm.json/PublishingState,,portals,publishing_state,createdBy
+portals,Tag,Tag.1.3.cdm.json/Tag,,portals,tag,createdBy
+portals,WebFile,WebFile.1.4.cdm.json/WebFile,Storage of files used in the web Portals.,portals,web_file,createdBy
+portals,WebFileLog,WebFileLog.1.4.cdm.json/WebFileLog,A record of the download of a web file,portals,web_file_log,createdBy
+portals,WebPage,WebPage.1.4.cdm.json/WebPage,Webpage,portals,web_page,createdBy
+portals,WebPageLog,WebPageLog.1.4.cdm.json/WebPageLog,A record of a user viewing a Web Page,portals,web_page_log,createdBy
+portals,WebRole,WebRole.1.3.cdm.json/WebRole,Sets the user's role for the Portal.,portals,web_role,createdBy
+portals,Website,Website.1.3.cdm.json/Website,Web Portal,portals,website,createdBy
+portals,WebsiteLanguage,WebsiteLanguage.1.3.cdm.json/WebsiteLanguage,Languages supported and publishing status for the portal,portals,website_language,createdBy
+portals,WebTemplate,WebTemplate.1.3.cdm.json/WebTemplate,,portals,web_template,webTemplateId
