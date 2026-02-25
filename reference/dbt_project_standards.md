@@ -354,13 +354,35 @@ The purpose of testing is not to check a box; it is to develop and demonstrate a
 
 Test expectations about inputs as early as possible (at the source or staging layer) and test expectations about outputs when they are delivered (at the marts layer). In intermediate layers, test the things most likely to create problems: business rules, complex joins, and any logic that has failed or surprised you before.
 
-#### **Rule: ALL-TST-02 Justify Your Testing Choices**
+#### **Rule: ALL-TST-02 Justify Your Testing Choices (in comments or meta tags, not descriptions)**
 
-The YAML description for each model must include a brief statement of what data quality risks the tests cover and why those tests were chosen — not a restatement of the test names, but an explanation of the analyst's reasoning about the data. A reviewer should be able to read the description and understand what the analyst verified and what assumptions remain.
+The rationale for why tests were chosen and what data quality risks they cover must be documented. However, this rationale must NOT be placed in the user-facing model or column `description` fields, as it clutters the document and buries the actual data definition. Instead, document testing rationale in a `meta` block within the YAML, or as an inline SQL comment within the model file itself. A reviewer should be able to find and understand what the analyst verified and what assumptions remain.
 
 ###### **Example**
 
-"This model unions award records from three source systems and deduplicates on award\_id. Tests verify that the primary key remains unique after the union (protecting against overlapping ID ranges across systems) and that foreign keys to the grants integration model have no orphans (confirming that every award maps to a known grant). Accepted values on status are tested against the CDM specification. Row-level accuracy of the deduplication logic is not tested here because the upstream staging models already enforce uniqueness within each source; the risk this model introduces is cross-source collision, which the PK test covers."
+"tests verify that the primary key remains unique after the union (protecting against overlapping ID ranges across systems)" belongs via a code comment or a meta tag. The YAML `description` should remain solely focused on defining the business entity and grain.
+
+###### **Red-flag words in descriptions**
+
+If a model or column description contains any of these words, the sentence almost certainly belongs in a `meta: testing_rationale:` block instead: `unique`, `not_null`, `fan-out`, `deduplication`, `protecting against`, `tests verify`, `collision`, `ensures that`, `guards against`. Descriptions should answer "what is this data?" — not "why did we test it?"
+
+###### **Good vs. bad description examples**
+
+```yaml
+# BAD — restates tests, explains pipeline mechanics
+description: >
+  Deduplicated customer records from VistaReserve. Tests verify
+  that the primary key is unique and strictly non-null, protecting
+  against duplicate dimension rows that would fan out downstream joins.
+  The base model's window function selects the most recent record.
+
+# GOOD — explains the business entity
+description: >
+  Known individuals who transact with DCR through reservations,
+  point-of-sale purchases, or pass registrations. One row per
+  distinct customer. Columns are renamed from VistaReserve's
+  internal conventions to CDM-adjacent business names.
+```
 
 #### **Rule: ALL-TST-03 Exploratory Data Profiling During Development**
 
@@ -576,6 +598,8 @@ Can remove duplicate records from source data when the deduplication logic is to
 #### **Purpose**
 
 Integration models harmonize and collate data across source systems into third-normal form models that represent organization-wide entities — producing one authoritative version of each business concept regardless of where the data originated.
+
+**An integration model that only renames columns from a single staging source is wrong.** If a model consumes one staging source and performs only column renames, it is functioning as a second staging model — not an integration model. Every integration model must perform at least one substantive transformation: unioning data across systems, joining to enrich records, deduplicating/harmonizing records, or generating surrogate keys. If the SPEC specifies multiple input sources for a model, all must be consumed.
 
 #### **Scope**
 
@@ -1005,6 +1029,16 @@ YAML property files are where the project defines what is true about each data a
 
 Applies to all Models, Sources, Seeds, Snapshots, and Macros defined in .yml files.
 
+### **YAML/SQL Consistency**
+
+#### **Rule: YML-SYNC-01 Columns Must Match SQL Output**
+
+Every column documented in a `_models.yml` file must exist in the SQL model's output. Conversely, every column in the SQL model's output should be documented in the YAML. A YAML column definition that the SQL does not produce will cause a contract error if contracts are enforced, and is misleading documentation regardless. Before saving a `_models.yml` file, verify column names against the model's final SELECT.
+
+#### **Rule: YML-SYNC-02 No Duplicate Model Entries**
+
+Each model must appear exactly once in its `_models.yml` file. Duplicate entries (e.g., defining `int_cdm_columns` twice in the same YAML) cause unpredictable behavior — dbt may silently use the last definition, masking the first. If a model definition needs to be updated, modify the existing entry rather than adding a second one.
+
 ### **Documentation Standards (All Layers)**
 
 These documentation rules apply to every YAML property file across all layers.
@@ -1084,22 +1118,32 @@ version: 2
 models:
   - name: stg_salesforce__accounts
     description: >
-      Standardized Salesforce account records, one row per account.
-      Tests verify PK uniqueness and completeness. The hash key
-      collision test is included because the account table exceeds
-      500k rows, making collision risk non-trivial.
+      Salesforce account records representing organizations that
+      interact with the agency. One row per account. Columns are
+      renamed from Salesforce internal conventions to
+      CDM-adjacent business names and recast to appropriate types.
+    meta:
+      testing_rationale: >
+        Hash key collision test included because the account table
+        exceeds 500k rows, making collision risk non-trivial.
     columns:
       - name: hk_accounts
-        description: Surrogate hash key from source_system + account_id.
+        description: >
+          Surrogate hash key derived from source_system and
+          account_id. Used as the primary key for downstream joins.
         tests:
           - unique
           - not_null
       - name: account_id
-        description: Natural key from Salesforce.
+        description: >
+          System-generated identifier assigned by Salesforce when
+          the account is created.
         tests:
           - not_null
       - name: account_name
-        description: Business name of the account.
+        description: >
+          Legal or operating name of the organization as recorded
+          in Salesforce.
 ```
 
 #### **Integration**
@@ -1175,23 +1219,33 @@ Must explicitly define data\_type for every column in a contracted model to prev
 models:
   - name: fct_award_disbursements
     description: >
-      One row per disbursement event. Tests verify PK integrity
-      and that the foreign key to dim_grants has no orphans.
-      Volumetric tests confirm row counts stay within historical
-      bounds to catch silent pipeline stalls.
+      Individual disbursement events against approved grant awards.
+      One row per disbursement. Each row captures the dollar amount
+      released, the date of release, and the grant it was drawn
+      against. Consumed by rpt_grant_performance and the finance
+      reconciliation dashboard.
+    meta:
+      testing_rationale: >
+        Volumetric tests confirm row counts stay within historical
+        bounds to catch silent pipeline stalls. FK test to
+        dim_grants protects against orphaned disbursements.
     config:
       contract:
         enforced: true
     columns:
       - name: disbursement_sk
         data_type: string
-        description: Surrogate key for the disbursement event.
+        description: >
+          Surrogate key uniquely identifying this disbursement
+          event across all source systems.
         tests:
           - unique
           - not_null
       - name: grant_sk
         data_type: string
-        description: Foreign key to dim_grants.
+        description: >
+          Reference to the grant award this disbursement was
+          drawn against. Links to dim_grants.
         tests:
           - not_null
           - relationships:
@@ -1199,10 +1253,13 @@ models:
               field: grant_sk
       - name: disbursed_amount
         data_type: numeric
-        description: Dollar amount disbursed.
+        description: >
+          Dollar amount released in this disbursement event.
       - name: disbursed_at
         data_type: timestamp
-        description: Timestamp of the disbursement.
+        description: >
+          Date and time the disbursement was processed by the
+          granting agency.
 ```
 
 ##### **Rule: MRT-YML-06 Downstream Exposure Definitions**

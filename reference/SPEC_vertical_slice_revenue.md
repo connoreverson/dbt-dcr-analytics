@@ -231,6 +231,8 @@ Every staging model documented with:
 
 Integration models harmonize data across source systems into CDM-conforming, third-normal-form representations. Each model's columns must conform to the mapped CDM entity definition per SQL-INT-05; non-CDM columns are dropped at this layer and can be joined back in the marts layer if needed.
 
+**Critical implementation constraint:** Integration models are NOT rename-only passthroughs. Every integration model in this spec must generate a surrogate key (`<entity>_sk`) using `dbt_utils.generate_surrogate_key()`, consume all listed input sources, and perform the transformations specified below. A model that only renames columns from a single staging source has not performed integration and must be reworked. The CDM entity mapping listed for each model is authoritative — do not substitute a different CDM entity without documenting the rationale and obtaining user approval.
+
 #### `models/integration/int_parks.sql`
 
 **CDM Entity:** Asset → FunctionalLocation (pending final mapping validation)
@@ -300,12 +302,14 @@ This is the most critical model in the slice — and arguably in the entire proj
 #### Integration YAML (`models/integration/_models.yml`)
 
 Every integration model documented with:
-- Description including business meaning, grain, CDM entity mapping, and testing rationale
+- Description including business meaning, grain, and CDM entity mapping. Descriptions must NOT contain test rationale — that belongs in `meta: testing_rationale:` blocks per ALL-TST-02
 - `unique` and `not_null` tests on surrogate key per INT-YML-03
-- `relationships` tests on foreign keys per INT-YML-04
+- `relationships` tests on foreign keys per INT-YML-04 — these are mandatory, not optional
 - Join cardinality validation per INT-YML-05 (using dbt_expectations row count comparison)
 - Business logic constraint tests per INT-YML-06 (e.g., reservation check_in_date <= check_out_date)
 - CDM accepted values tests per INT-YML-08 where CDM metadata provides them
+- Every column documented in the YAML must exist in the model's SQL output per YML-SYNC-01. No phantom columns
+- Each model must appear exactly once in the YAML — no duplicate entries per YML-SYNC-02
 
 ---
 
@@ -880,16 +884,27 @@ The following sequence respects the DAG's dependency order and front-loads the d
 
 1. **Project initialization** — virtual environment, dbt-core + dbt-duckdb, packages.yml, profiles.yml, dbt_project.yml, sqlfluff config, dbt-score config
 2. **Source definitions** — _sources.yml for vistareserve and geoparks; run `dbt source freshness` to validate connectivity
-3. **Seeds** — create all four seed CSVs and _seeds.yml; run `dbt seed`
+3. **Seeds** — create all four business-domain seed CSVs (reservation_status_codes, transaction_type_codes, park_region_mappings, source_system_registry) and _seeds.yml; run `dbt seed`. CDM infrastructure seeds (if used) are additional — they do not substitute for the four required seeds.
 4. **Base models** — base_vistareserve__customer_profiles and base_vistareserve__asset_crosswalks; profile to confirm deduplication behavior
 5. **Staging models** — all 8 staging models plus _models.yml with tests; run `dbt build -s tag:staging`; run sqlfluff; run dbt-score
-6. **Integration models** — starting with int_parks (resolve open question #1 first), then int_contacts, int_customer_assets, int_transactions, int_reservations; profile at each step per ALL-TST-03
-7. **Macros** — build as needed during staging/integration; document in _macros.yml
+6. **Integration models** — starting with int_parks (resolve open question #1 first), then int_contacts, int_customer_assets, int_transactions, int_reservations; profile at each step per ALL-TST-03. Before declaring integration complete, verify: all surrogate keys generated, all specified sources consumed, all FK joins implemented, all YAML columns match SQL output.
+7. **Macros** — build spec-required macros (generate_source_system_tag, clean_string, cast_park_id_to_varchar) plus any CDM infrastructure macros; document all in _macros.yml with argument validation per SQL-MAC-03
 8. **Mart models** — dim_parks, dim_customers, dim_reservation_inventory, then fct_reservations, fct_pos_transactions, then rpt_park_revenue_summary
 9. **Singular tests** — write after marts are stable; validate cross-layer reconciliation
 10. **Snapshot** — snp_vistareserve__inventory_assets
 11. **Analyses** — profile_customer_duplicate_rate, audit_park_id_crosswalk_coverage
 12. **Full validation** — `dbt build --full-refresh`; sqlfluff lint; dbt-score; dbt-project-evaluator
+
+### Phase Completion Checklist
+
+Before declaring any phase complete, verify against this spec:
+
+1. **All deliverables present** — every model, seed, macro, test, and YAML file listed in this spec for that phase exists
+2. **All inputs consumed** — if this spec says a model consumes multiple staging sources, all are consumed
+3. **All transformations applied** — surrogate keys, unions, joins, deduplication, CDM column mapping as specified
+4. **All YAML complete** — _models.yml, _sources.yml, _seeds.yml, _macros.yml with descriptions, tests, and type overrides as required
+5. **YAML/SQL consistency** — every column in YAML exists in SQL output; no duplicate model entries
+6. **No orphaned artifacts** — no unused macros, no dead code, no Python scripts that should be dbt macros
 
 ---
 
