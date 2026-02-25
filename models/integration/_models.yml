@@ -1,0 +1,187 @@
+version: 2
+
+models:
+  - name: int_cdm_columns
+    description: >
+      Consolidated catalog of authorized Microsoft Common Data Model attributes.
+      This model unions the raw CSV seeds into a single source of truth for the 
+      generate_cdm_projection macro.
+    meta:
+      testing_rationale: >
+        Tests protect against duplicate column definitions within the same entity using 
+        a composite check across entity name and dbt column name.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - cdm_entity_name
+            - dbt_column_name
+    columns:
+      - name: cdm_entity_name
+        description: The name of the CDM entity (e.g., Account, Contact, Visit).
+        meta:
+          testing_rationale: Must pair with the column name to form a unique composite key.
+        tests:
+          - not_null
+      - name: dbt_column_name
+        description: The snake_case converted name of the CDM column authorized for use in dbt.
+        meta:
+          testing_rationale: Identifies a catalog entry uniquely when combined with the entity name.
+        tests:
+          - not_null
+
+  - name: int_parks
+    description: >
+      Integration model harmonizing park records into the CDM Account entity.
+      Sourced from GeoParks and VistaReserve.
+      EXCEPTION: `total_acres`, `classification`, and `region_id` are passed through 
+      to support dim_parks enrichment without violating ALL-DAG-01.
+    meta:
+      testing_rationale: >
+        Tests protect against duplicate park accounts and ensure the primary key is never null.
+    columns:
+      - name: parks_sk
+        description: The canonical integration surrogate key for the park account.
+        meta:
+          testing_rationale: This business key must be unique across all parks to guarantee safe downstream joins.
+        tests:
+          - unique
+          - not_null
+      - name: accountnumber
+        description: The original business-recognized identifier of the park property.
+      - name: name
+        description: The business-recognized name of the park property.
+
+  - name: int_contacts
+    description: Harmonized customer profiles mapped to the CDM Contact entity.
+    meta:
+      testing_rationale: >
+        Tests protect against duplicate contacts emerging from the integration layer 
+        and guarantee downstream referential integrity.
+    columns:
+      - name: contacts_sk
+        description: The canonical integration surrogate key for the constituent contact.
+        meta:
+          testing_rationale: Duplicate contact IDs would cause fan-outs in fact tables.
+        tests:
+          - unique
+          - not_null
+      - name: contact_id
+        description: The original business-recognized identifier of the constituent contact.
+
+  - name: int_customer_assets
+    description: Harmonized bookable inventory assets (campsites, cabins) mapped to the CDM CustomerAsset entity.
+    meta:
+      testing_rationale: Tests protect referential alignment and ensure every asset is uniquely identifiable.
+    columns:
+      - name: customer_assets_sk
+        description: The canonical integration surrogate key for the inventory asset.
+        meta:
+          testing_rationale: Uniqueness is required to prevent reservation double-booking in analytics.
+        tests:
+          - unique
+          - not_null
+      - name: customerasset_id
+        description: The original business-recognized identifier for the inventory asset.
+      - name: _parent_park_sk
+        description: Foreign key linking the asset to its parent park.
+        meta:
+          testing_rationale: Assets must belong to a known park.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('int_parks')
+              field: parks_sk
+
+  - name: int_transactions
+    description: >
+      Harmonized financial transactions mapped to the CDM Transaction entity.
+      EXCEPTION: several non-CDM POS attributes are passed through to support fct_pos_transactions enrichment.
+    meta:
+      testing_rationale: >
+        Tests protect the financial ledger by guaranteeing every transaction is uniquely recorded without loss.
+        Cardinality testing ensures no row loss from the POS system staging.
+    tests:
+      - dbt_expectations.expect_table_row_count_to_equal_other_table:
+          compare_model: ref('stg_vistareserve__pos_transactions')
+    columns:
+      - name: transactions_sk
+        description: The canonical integration surrogate key for the financial transaction.
+        meta:
+          testing_rationale: Duplicate financial records would inflate revenue aggregations.
+        tests:
+          - unique
+          - not_null
+      - name: transaction_id
+        description: The original business-recognized identifier for the financial transaction.
+      - name: msnfp_amount_receipt
+        description: The monetary value of the transaction.
+        meta:
+          testing_rationale: Transactions must have a defined numeric value.
+        tests:
+          - not_null
+      - name: _contact_sk
+        description: Foreign key linking the transaction to the purchasing contact.
+        meta:
+          testing_rationale: Financial transactions should optionally be attributable to a known contact; POS transactions may be anonymous.
+        tests:
+          - relationships:
+              to: ref('int_contacts')
+              field: contacts_sk
+      - name: _park_sk
+        description: Foreign key linking the transaction to the park where it occurred.
+        meta:
+          testing_rationale: Transactions must originate from a known facility.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('int_parks')
+              field: parks_sk
+
+  - name: int_reservations
+    description: >
+      Harmonized reservation lifecycle events mapped to the CDM Visit entity.
+      EXCEPTION: several non-CDM reservation attributes and standard dimensions are passed through to support fct_reservations enrichment.
+    meta:
+      testing_rationale: >
+        Tests protect chronological integrity and guarantee reservations map cleanly to assets, contacts, and parks.
+    tests:
+      - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+          column_A: msnvo_scheduledend
+          column_B: msnvo_scheduledstart
+          or_equal: True
+    columns:
+      - name: reservations_sk
+        description: The canonical integration surrogate key for the visit/reservation.
+        meta:
+          testing_rationale: Duplicate visits would distort occupancy metrics.
+        tests:
+          - unique
+          - not_null
+      - name: visit_id
+        description: The original business-recognized identifier for the visit/reservation.
+      - name: msnvo_scheduledstart
+        description: The expected arrival date for the visit.
+        meta:
+          testing_rationale: Missing arrival dates break time-series reporting.
+        tests:
+          - not_null
+      - name: msnvo_scheduledend
+        description: The expected departure date for the visit.
+        meta:
+          testing_rationale: Missing departure dates prevent length-of-stay calculations.
+        tests:
+          - not_null
+      - name: _contact_sk
+        description: Foreign key linking the reservation to the booking contact.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('int_contacts')
+              field: contacts_sk
+      - name: _asset_sk
+        description: Foreign key linking the reservation to the booked asset.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('int_customer_assets')
+              field: customer_assets_sk

@@ -1,0 +1,338 @@
+version: 2
+
+models:
+  - name: dim_parks
+    description: >
+      Dimension model representing parks, combining authoritative data from GeoParks
+      and VistaReserve. Grain: One row per unique park.
+    meta:
+      testing_rationale: Duplicate park records would cause fan-outs in revenue aggregation and misstate physical inventory counts.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: parks_sk
+        data_type: varchar
+        description: Surrogate key for the park.
+        tests:
+          - unique
+          - not_null
+      - name: park_name
+        data_type: varchar
+        description: The business name of the park.
+      - name: region
+        data_type: varchar
+        description: The organizational region the park belongs to.
+      - name: acreage
+        data_type: decimal(10,2)
+        description: Total acres covered by the park.
+      - name: park_type
+        data_type: varchar
+        description: Classification or type of park.
+      - name: operational_status
+        data_type: varchar
+        description: Derived operational status based on verification.
+      - name: address1_city
+        data_type: varchar
+        description: City of the park address.
+      - name: address1_stateorprovince
+        data_type: varchar
+        description: State of the park address.
+      - name: address1_postalcode
+        data_type: varchar
+        description: Postal code of the park address.
+      - name: address1_latitude
+        data_type: decimal(10,6)
+        description: Latitude coordinate of the park.
+      - name: address1_longitude
+        data_type: decimal(10,6)
+        description: Longitude coordinate of the park.
+      - name: acreage_size_tier
+        data_type: varchar
+        description: Categorical grouping of park size.
+
+  - name: dim_customers
+    description: >
+      Dimension model representing customers derived from VistaReserve profiles.
+      Grain: One row per unique customer contact.
+    meta:
+      testing_rationale: Duplicate customer records would cause fan-outs in fact tables and distort lifetime value (LTV) or loyalty program metrics.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: contacts_sk
+        data_type: varchar
+        description: Surrogate key for the customer.
+        tests:
+          - unique
+          - not_null
+      - name: customer_name
+        data_type: varchar
+        description: Full name of the customer.
+      - name: email
+        data_type: varchar
+        description: Email address of the customer.
+      - name: phone
+        data_type: varchar
+        description: Phone number of the customer.
+      - name: address_state
+        data_type: varchar
+        description: The customer's registered state of residence.
+      - name: customer_since_date
+        data_type: timestamp
+        description: Date the customer's account was created.
+      - name: geographic_region
+        data_type: varchar
+        description: Grouped region derived from address.
+      - name: customer_tenure_tier
+        data_type: varchar
+        description: Categorical tier based on the length of time since account creation.
+      - name: has_annual_pass
+        data_type: boolean
+        description: Indicates whether the customer holds an active annual pass.
+      - name: is_senior
+        data_type: boolean
+        description: Indicates whether the customer is classified as a senior.
+      - name: is_veteran
+        data_type: boolean
+        description: Indicates whether the customer is a military veteran.
+
+  - name: dim_reservation_inventory
+    description: >
+      Dimension model representing the bookable locations (assets) such as campsites.
+      Grain: One row per unique customer asset.
+    meta:
+      testing_rationale: Duplicated bookable assets would artificially inflate total park capacity metrics and cause double-counting in utilization reports.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: customer_assets_sk
+        data_type: varchar
+        description: Surrogate key for the bookable inventory asset.
+        tests:
+          - unique
+          - not_null
+      - name: parks_sk
+        data_type: varchar
+        description: Foreign key to the parent park.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_parks')
+              field: parks_sk
+      - name: asset_name
+        data_type: varchar
+        description: Specific name or designation of the asset.
+      - name: asset_type
+        data_type: varchar
+        description: Detailed type of the asset such as yurt or tent site.
+      - name: park_assignment
+        data_type: varchar
+        description: The name of the park where the asset is located.
+      - name: capacity
+        data_type: integer
+        description: Maximum occupancy number for the given asset.
+      - name: accessibility_status
+        data_type: varchar
+        description: Human-readable flag indicating if asset is ADA accessible.
+      - name: amenities
+        data_type: varchar
+        description: Comma-separated list of amenities such as pets, utility hookups.
+      - name: asset_type_group
+        data_type: varchar
+        description: Rolled-up categorization for asset types.
+      - name: capacity_tier
+        data_type: varchar
+        description: Categorical tier based on max occupancy capacity.
+
+  - name: fct_reservations
+    description: >
+      Fact model capturing the lifecycle of reservations and visits.
+      Grain: One row per unique reservation/visit event.
+    meta:
+      testing_rationale: Volumetric testing ensures reservation counts align with expected bounds.
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 0
+          max_value: 1000000
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: reservations_sk
+        data_type: varchar
+        description: Surrogate key for the reservation.
+        tests:
+          - unique
+          - not_null
+      - name: contacts_sk
+        data_type: varchar
+        description: Foreign key to dim_customers.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_customers')
+              field: contacts_sk
+      - name: customer_assets_sk
+        data_type: varchar
+        description: Foreign key to dim_reservation_inventory.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_reservation_inventory')
+              field: customer_assets_sk
+      - name: parks_sk
+        data_type: varchar
+        description: Foreign key to dim_parks.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_parks')
+              field: parks_sk
+      - name: reservation_status
+        data_type: varchar
+        description: Current status of the reservation.
+      - name: reservation_amount
+        data_type: decimal(10,2)
+        description: The total monetary value attached to the reservation.
+      - name: check_in_date
+        data_type: date
+        description: Arrival date of the reservation.
+      - name: check_out_date
+        data_type: date
+        description: Departure date of the reservation.
+      - name: reservation_created_at
+        data_type: timestamp
+        description: The timestamp when the booking was initiated.
+      - name: nights_stayed
+        data_type: integer
+        description: Derived number of nights between check-in and check-out.
+      - name: booking_source
+        data_type: varchar
+        description: Source or channel through which booking occurred.
+      - name: promo_code
+        data_type: varchar
+        description: Promotional code applied to the reservation.
+      - name: number_of_guests
+        data_type: integer
+        description: The number of guests included in the reservation.
+
+  - name: fct_pos_transactions
+    description: >
+      Fact model representing individual point-of-sale financial transactions.
+      Grain: One row per transaction.
+    meta:
+      testing_rationale: Volumetric testing ensures POS counts align with expected bounds.
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 0
+          max_value: 1000000
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: transactions_sk
+        data_type: varchar
+        description: Surrogate key for the transaction.
+        tests:
+          - unique
+          - not_null
+      - name: contacts_sk
+        data_type: varchar
+        description: Foreign key to dim_customers (may be null for anonymous).
+        tests:
+          - relationships:
+              to: ref('dim_customers')
+              field: contacts_sk
+      - name: parks_sk
+        data_type: varchar
+        description: Foreign key to dim_parks.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_parks')
+              field: parks_sk
+      - name: transaction_amount
+        data_type: decimal(10,2)
+        description: The monetary value of the transaction.
+      - name: quantity
+        data_type: integer
+        description: Item quantity of the transaction (defaulted to 1).
+        meta:
+          testing_rationale: Point of sale raw data from VistaReserve does not supply line-item quantities; each row represents exactly one transaction line, thus quantity is hardcoded to 1.
+      - name: revenue_category
+        data_type: varchar
+        description: Analytical classification of the revenue.
+      - name: transaction_created_at
+        data_type: timestamp
+        description: Timestamp when the transaction happened.
+      - name: is_kiosk_entry
+        data_type: boolean
+        description: Indicates whether the transaction occurred at an unstaffed kiosk.
+
+  - name: rpt_park_revenue_summary
+    description: >
+      Summary report aggregating total reservations and POS revenue by park and month.
+      Grain: One row per park per month.
+    meta:
+      testing_rationale: Verifies uniqueness on the composite grain of park and month.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - parks_sk
+            - report_month
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: parks_sk
+        data_type: varchar
+        description: Surrogate key for the park.
+        tests:
+          - not_null
+      - name: report_month
+        data_type: date
+        description: The start date of the reporting month.
+        tests:
+          - not_null
+      - name: park_name
+        data_type: varchar
+        description: Name of the park.
+      - name: region
+        data_type: varchar
+        description: The organizational region of the park.
+      - name: park_type
+        data_type: varchar
+        description: The classification of the park.
+      - name: total_reservations
+        data_type: integer
+        description: Total number of reservations checking in during this month.
+      - name: total_reservation_revenue
+        data_type: decimal(14,2)
+        description: Total revenue mapped from reservations in this month.
+      - name: avg_reservation_value
+        data_type: decimal(14,2)
+        description: Average value of reservations.
+      - name: total_nights_stayed
+        data_type: integer
+        description: Total number of nights stayed across all reservations.
+      - name: avg_nights_per_reservation
+        data_type: decimal(10,2)
+        description: Average duration of reservations.
+      - name: total_pos_transactions
+        data_type: integer
+        description: Total count of point-of-sale transactions.
+      - name: total_pos_revenue
+        data_type: decimal(14,2)
+        description: Total POS revenue mapped collected this month.
+      - name: avg_pos_transaction_value
+        data_type: decimal(14,2)
+        description: Average value of a POS transaction.
+      - name: total_pos_items_sold
+        data_type: integer
+        description: Total count of combined items sold across POS.
+      - name: total_combined_revenue
+        data_type: decimal(14,2)
+        description: The sum of total reservation and POS revenue.
