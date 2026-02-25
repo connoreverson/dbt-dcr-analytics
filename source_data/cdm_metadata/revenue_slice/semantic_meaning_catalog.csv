@@ -1,344 +1,344 @@
-cdm_semantic_meaning,description,extends_trait,parameters,dbt_labels
-means.calendar,,means,,category:calendar|role:dimension
-means.calendar.fiscal,,means.calendar,,category:calendar|subcategory:fiscal|role:dimension
-means.calendar.ISO8601,,means.calendar,,category:calendar|subcategory:ISO8601|standard:iso|role:dimension
-means.calendar.manufacturing,,means.calendar,,category:calendar|subcategory:manufacturing|role:dimension
-means.calendar.reporting,,means.calendar,,category:calendar|subcategory:reporting|role:dimension
-means.calendar.day,,means.calendar,,category:calendar|subcategory:day|role:dimension
-means.calendar.dayOfWeek,,means.calendar.day,,category:calendar|subcategory:dayOfWeek|role:dimension
-means.calendar.dayOfTendays,,means.calendar.day,,category:calendar|subcategory:dayOfTendays|role:dimension
-means.calendar.dayOfMonth,,means.calendar.day,,category:calendar|subcategory:dayOfMonth|role:dimension
-means.calendar.dayOfMonthOrPeriod,,means.calendar.day,,category:calendar|subcategory:dayOfMonthOrPeriod|role:dimension
-means.calendar.dayOfQuarter,,means.calendar.day,,category:calendar|subcategory:dayOfQuarter|role:dimension
-means.calendar.dayOfTrimester,,means.calendar.day,,category:calendar|subcategory:dayOfTrimester|role:dimension
-means.calendar.dayOfHalfyear,,means.calendar.day,,category:calendar|subcategory:dayOfHalfyear|role:dimension
-means.calendar.dayOfYear,,means.calendar.day,,category:calendar|subcategory:dayOfYear|role:dimension
-means.calendar.week,,means.calendar,,category:calendar|subcategory:week|role:dimension
-means.calendar.weekOfMonth,,means.calendar.week,,category:calendar|subcategory:weekOfMonth|role:dimension
-means.calendar.weekOfQuarter,,means.calendar.week,,category:calendar|subcategory:weekOfQuarter|role:dimension
-means.calendar.weekOfTrimester,,means.calendar.week,,category:calendar|subcategory:weekOfTrimester|role:dimension
-means.calendar.weekOfHalfyear,,means.calendar.week,,category:calendar|subcategory:weekOfHalfyear|role:dimension
-means.calendar.weekOfYear,,means.calendar.week,,category:calendar|subcategory:weekOfYear|role:dimension
-means.calendar.tenday,,means.calendar,,category:calendar|subcategory:tenday|role:dimension
-means.calendar.tendayOfMonth,,means.calendar.tenday,,category:calendar|subcategory:tendayOfMonth|role:dimension
-means.calendar.tendayOfQuarter,,means.calendar.tenday,,category:calendar|subcategory:tendayOfQuarter|role:dimension
-means.calendar.tendayOfTrimester,,means.calendar.tenday,,category:calendar|subcategory:tendayOfTrimester|role:dimension
-means.calendar.tendayOfHalfyear,,means.calendar.tenday,,category:calendar|subcategory:tendayOfHalfyear|role:dimension
-means.calendar.tendayOfYear,,means.calendar.tenday,,category:calendar|subcategory:tendayOfYear|role:dimension
-means.calendar.month,,means.calendar,,category:calendar|subcategory:month|role:dimension
-means.calendar.monthOfQuarter,,means.calendar.month,,category:calendar|subcategory:monthOfQuarter|role:dimension
-means.calendar.monthOfTrimester,,means.calendar.month,,category:calendar|subcategory:monthOfTrimester|role:dimension
-means.calendar.monthOfHalfyear,,means.calendar.month,,category:calendar|subcategory:monthOfHalfyear|role:dimension
-means.calendar.monthOfYear,,means.calendar.month,,category:calendar|subcategory:monthOfYear|role:dimension
-means.calendar.quarter,,means.calendar,,category:calendar|subcategory:quarter|role:dimension
-means.calendar.quarterOfHalfyear,,means.calendar.quarter,,category:calendar|subcategory:quarterOfHalfyear|role:dimension
-means.calendar.quarterOfYear,,means.calendar.quarter,,category:calendar|subcategory:quarterOfYear|role:dimension
-means.calendar.trimester,,means.calendar,,category:calendar|subcategory:trimester|role:dimension
-means.calendar.trimesterOfYear,,means.calendar.trimester,,category:calendar|subcategory:trimesterOfYear|role:dimension
-means.calendar.year,,means.calendar,,category:calendar|subcategory:year|role:dimension
-means.demographic,,means,,category:demographic|data_class:confidential|pii:possible|role:dimension
-means.demographic.age,,means.demographic,,category:demographic|subcategory:age|data_class:confidential|pii:possible|role:dimension
-means.demographic.gender,,means.demographic,,category:demographic|subcategory:gender|data_class:confidential|pii:possible|role:dimension
-means.demographic.ethnicity,,means.demographic,,category:demographic|subcategory:ethnicity|data_class:confidential|pii:possible|role:dimension
-means.demographic.maritalStatus,,means.demographic,,category:demographic|subcategory:maritalStatus|data_class:confidential|pii:possible|role:dimension
-means.formatting,,means,,category:formatting|role:dimension
-means.formatting.color,,means.formatting,,category:formatting|subcategory:color|role:dimension
-means.formatting.font,,means.formatting,,category:formatting|subcategory:font|role:dimension
-means.formatting.font.size,,means.formatting.font,,category:formatting|subcategory:font|type:size|role:dimension
-means.formatting.font.effects,,means.formatting.font,,category:formatting|subcategory:font|type:effects|role:dimension
-means.formatting.heading,,means.formatting,,category:formatting|subcategory:heading|role:dimension
-means.formatting.order,,means.formatting,,category:formatting|subcategory:order|role:dimension
-means.idea,,means,,category:idea|role:dimension
-means.idea.account,,means.idea,,category:idea|subcategory:account|role:dimension
-means.idea.channel,,means.idea,,category:idea|subcategory:channel|role:dimension
-means.idea.company,,means.idea,,category:idea|subcategory:company|role:dimension
-means.idea.customer,,means.idea,,category:idea|subcategory:customer|role:dimension
-means.idea.person,,means.idea,,category:idea|subcategory:person|role:dimension
-means.idea.person.contact,,means.idea.person,,category:idea|subcategory:person|type:contact|role:dimension
-means.idea.person.employee,,means.idea.person,,category:idea|subcategory:person|type:employee|role:dimension
-means.idea.person.representative,,means.idea.person,,category:idea|subcategory:person|type:representative|role:dimension
-means.idea.organization,,means.idea,,category:idea|subcategory:organization|role:dimension
-means.idea.organization.unit,,means.idea,,category:idea|subcategory:organization|type:unit|role:dimension
-means.idea.product,,means.idea,,category:idea|subcategory:product|role:dimension
-means.idea.project,,means.idea,,category:idea|subcategory:project|role:dimension
-means.idea.promotion,,means.idea,,category:idea|subcategory:promotion|role:dimension
-means.idea.scenario,,means.idea,,category:idea|subcategory:scenario|role:dimension
-means.idea.schedule,,means.idea,,category:idea|subcategory:schedule|role:dimension
-means.idea.service ,,means.idea,,category:idea|subcategory:service |role:dimension
-means.idea.utility,,means.idea,,category:idea|subcategory:utility|role:dimension
-means.location,,means,,category:location|role:dimension
-means.location.address,,means.location,,category:location|subcategory:address|role:dimension
-means.location.address.building,,means.location.address,,category:location|subcategory:address|type:building|role:dimension
-means.location.address.floor,,means.location.address,,category:location|subcategory:address|type:floor|role:dimension
-means.location.address.house,,means.location.address,,category:location|subcategory:address|type:house|role:dimension
-means.location.address.room,,means.location.address,,category:location|subcategory:address|type:room|role:dimension
-means.location.address.street,,means.location.address,,category:location|subcategory:address|type:street|role:dimension
-means.location.city,,means.location,,category:location|subcategory:city|role:dimension
-means.location.continent,,means.location,,category:location|subcategory:continent|role:dimension
-means.location.country,,means.location,,category:location|subcategory:country|role:dimension
-means.location.county,,means.location.address,,category:location|subcategory:county|role:dimension
-means.location.latitude,,means.location,,category:location|subcategory:latitude|role:dimension
-means.location.longitude,,means.location,,category:location|subcategory:longitude|role:dimension
-means.location.point,,means.location,,category:location|subcategory:point|role:dimension
-means.location.postalCode,,means.location,,category:location|subcategory:postalCode|role:dimension
-means.location.province,,means.location,,category:location|subcategory:province|role:dimension
-means.location.region,,means.location,,category:location|subcategory:region|role:dimension
-means.location.stateOrProvince,,means.location,,category:location|subcategory:stateOrProvince|role:dimension
-means.location.timezone,,means.location,,category:location|subcategory:timezone|role:dimension
-means.location.geo,,means.location,,category:location|subcategory:geo|role:dimension
-means.location.geo.boundary,,means.location.geo,,category:location|subcategory:geo|type:boundary|role:dimension
-means.location.geo.boundary.bottom,,means.location.geo.boundary,,category:location|subcategory:geo|type:boundary|role:dimension
-means.location.geo.boundary.front,,means.location.geo.boundary,,category:location|subcategory:geo|type:boundary|role:dimension
-means.location.geo.boundary.left,,means.location.geo.boundary,,category:location|subcategory:geo|type:boundary|role:dimension
-means.location.geo.boundary.polygon,,means.location.geo.boundary,,category:location|subcategory:geo|type:boundary|role:dimension
-means.location.geo.boundary.rear,,means.location.geo.boundary,,category:location|subcategory:geo|type:boundary|role:dimension
-means.location.geo.boundary.right,,means.location.geo.boundary,,category:location|subcategory:geo|type:boundary|role:dimension
-means.location.geo.boundary.top,,means.location.geo.boundary,,category:location|subcategory:geo|type:boundary|role:dimension
-means.location.geo.centroid,,means.location.geo,,category:location|subcategory:geo|type:centroid|role:dimension
-means.location.geo.centroid.X,,means.location.geo.centroid,,category:location|subcategory:geo|type:centroid|role:dimension
-means.location.geo.centroid.y,,means.location.geo.centroid,,category:location|subcategory:geo|type:centroid|role:dimension
-means.location.geo.centroid.z,,means.location.geo.centroid,,category:location|subcategory:geo|type:centroid|role:dimension
-means.measurement,,means,,category:measurement|role:measure|default_aggregation:sum
-means.measurement.age,,means.measurement,,category:measurement|subcategory:age|role:measure|default_aggregation:sum
-means.measurement.code,,means.measurement,,category:measurement|subcategory:code|role:dimension
-means.measurement.color,,means.measurement,,category:measurement|subcategory:color|role:measure|default_aggregation:sum
-means.measurement.density,,means.measurement,,category:measurement|subcategory:density|role:measure|default_aggregation:average
-means.measurement.distance,,means.measurement,,category:measurement|subcategory:distance|role:measure|default_aggregation:sum
-means.measurement.sequence,,means.measurement,,category:measurement|subcategory:sequence|role:measure|default_aggregation:sum
-means.measurement.temperature,,means.measurement,,category:measurement|subcategory:temperature|role:measure|default_aggregation:average
-means.measurement.version,,means.measurement,,category:measurement|subcategory:version|role:dimension
-means.measurement.weight,,means.measurement,,category:measurement|subcategory:weight|role:measure|default_aggregation:sum
-means.measurement.currency,,means.measurement,,category:measurement|subcategory:currency|role:measure|default_aggregation:sum
-means.measurement.currency.cost,,means.measurement.currency,,category:measurement|subcategory:currency|type:cost|role:measure|default_aggregation:sum
-means.measurement.currency.iSOCode,,means.measurement,,category:measurement|subcategory:currency|type:iSOCode|standard:iso|role:dimension
-means.measurement.currency.price,,means.measurement.currency,,category:measurement|subcategory:currency|type:price|role:measure|default_aggregation:sum
-means.measurement.currency.type,,means.measurement,,category:measurement|subcategory:currency|type:type|role:dimension
-means.measurement.currency.type.destination,,means.measurement.currency.type,,category:measurement|subcategory:currency|type:type|role:dimension
-means.measurement.currency.type.source,,means.measurement.currency.type,,category:measurement|subcategory:currency|type:type|role:dimension
-means.measurement.time,,means.measurement,,category:measurement|subcategory:time|role:dimension
-means.measurement.date,,means.measurement,,category:measurement|subcategory:date|role:dimension
-means.measurement.date.completion,,means.measurement.date,,category:measurement|subcategory:date|type:completion|role:dimension
-means.measurement.date.creation,,means.measurement.date,,category:measurement|subcategory:date|type:creation|role:dimension
-means.measurement.date.end,,means.measurement.date,,category:measurement|subcategory:date|type:end|role:dimension
-means.measurement.date.end.scd,,means.measurement.date,,category:measurement|subcategory:date|type:end|role:dimension
-means.measurement.date.modify,,means.measurement.date,,category:measurement|subcategory:date|type:modify|role:dimension
-means.measurement.date.occurrence,,means.measurement.date,,category:measurement|subcategory:date|type:occurrence|role:dimension
-means.measurement.date.remove,,means.measurement.date,,category:measurement|subcategory:date|type:remove|role:dimension
-means.measurement.date.start,,means.measurement.date,,category:measurement|subcategory:date|type:start|role:dimension
-means.measurement.date.start.scd,,means.measurement.date,,category:measurement|subcategory:date|type:start|role:dimension
-means.measurement.date.target,,means.measurement.date,,category:measurement|subcategory:date|type:target|role:dimension
-means.measurement.duration,,means.measurement,,category:measurement|subcategory:duration|role:measure|default_aggregation:sum
-means.measurement.duration.seconds,,means.measurement.duration,,category:measurement|subcategory:duration|type:seconds|role:measure|default_aggregation:sum
-means.measurement.duration.minutes,,means.measurement.duration,,category:measurement|subcategory:duration|type:minutes|role:measure|default_aggregation:sum
-means.measurement.duration.hours,,means.measurement.duration,,category:measurement|subcategory:duration|type:hours|role:measure|default_aggregation:sum
-means.measurement.duration.days,,means.measurement.duration,,category:measurement|subcategory:duration|type:days|role:measure|default_aggregation:sum
-means.measurement.duration.months,,means.measurement.duration,,category:measurement|subcategory:duration|type:months|role:measure|default_aggregation:sum
-means.measurement.duration.weeks,,means.measurement.duration,,category:measurement|subcategory:duration|type:weeks|role:measure|default_aggregation:sum
-means.measurement.duration.quarters,,means.measurement.duration,,category:measurement|subcategory:duration|type:quarters|role:measure|default_aggregation:sum
-means.measurement.duration.trimesters,,means.measurement.duration,,category:measurement|subcategory:duration|type:trimesters|role:measure|default_aggregation:sum
-means.measurement.duration.years,,means.measurement.duration,,category:measurement|subcategory:duration|type:years|role:measure|default_aggregation:sum
-means.measurement.percent,,means.measurement,,category:measurement|subcategory:percent|role:measure|default_aggregation:sum
-means.measurement.percent.ownership,,means.measurement,,category:measurement|subcategory:percent|type:ownership|role:measure|default_aggregation:sum
-means.measurement.percent.voterright,,means.measurement,,category:measurement|subcategory:percent|type:voterright|role:measure|default_aggregation:sum
-means.measurement.range,,means.measurement,,category:measurement|subcategory:range|role:measure|default_aggregation:sum
-means.measurement.range.high,,means.measurement.range,,category:measurement|subcategory:range|type:high|role:measure|default_aggregation:sum
-means.measurement.range.low,,means.measurement.range,,category:measurement|subcategory:range|type:low|role:measure|default_aggregation:sum
-means.measurement.rate,,means.measurement,,category:measurement|subcategory:rate|role:measure|default_aggregation:average
-means.measurement.rate.type,,means.measurement,,category:measurement|subcategory:rate|type:type|role:measure|default_aggregation:average
-means.measurement.size,,means.measurement,,category:measurement|subcategory:size|role:measure|default_aggregation:sum
-means.measurement.size.depth,,means.measurement.size,,category:measurement|subcategory:size|type:depth|role:measure|default_aggregation:sum
-means.measurement.size.height,,means.measurement.size,,category:measurement|subcategory:size|type:height|role:measure|default_aggregation:sum
-means.measurement.size.volume,,means.measurement.size,,category:measurement|subcategory:size|type:volume|role:measure|default_aggregation:sum
-means.measurement.size.width,,means.measurement.size,,category:measurement|subcategory:size|type:width|role:measure|default_aggregation:sum
-means.category,,means,,category:category|role:dimension
-means.content,,means,,category:content|role:dimension
-means.content.text,,means.content,,category:content|subcategory:text|role:dimension
-means.content.text.HTML,,means.content.text,,category:content|subcategory:text|type:HTML|role:dimension
-means.content.text.JSON,,means.content.text,,category:content|subcategory:text|type:JSON|role:dimension
-means.content.text.XML,,means.content.text,,category:content|subcategory:text|type:XML|role:dimension
-means.content.text.CSV,,means.content.text,,category:content|subcategory:text|type:CSV|role:dimension
-means.content.binary,,means.content,,category:content|subcategory:binary|role:dimension
-means.content.binary.image,,means.content.binary,,category:content|subcategory:binary|type:image|role:dimension
-means.content.binary.image.BMP,,means.content.binary.image,,category:content|subcategory:binary|type:image|role:dimension
-means.content.binary.image.GIF,,means.content.binary.image,,category:content|subcategory:binary|type:image|role:dimension
-means.content.binary.image.JPG,,means.content.binary.image,,category:content|subcategory:binary|type:image|role:dimension
-means.content.binary.image.PNG,,means.content.binary.image,,category:content|subcategory:binary|type:image|role:dimension
-means.content.binary.image.TIFF,,means.content.binary.image,,category:content|subcategory:binary|type:image|role:dimension
-means.identity,,means,,category:identity|role:dimension
-means.identity.entityId,,means.identity,,category:identity|subcategory:entityId|role:dimension
-means.identity.barCode,,means.identity,,category:identity|subcategory:barCode|role:dimension
-means.identity.brand,,means.identity,,category:identity|subcategory:brand|role:dimension
-means.identity.governmentID,,means.identity,,category:identity|subcategory:governmentID|pii:true|role:dimension
-means.identity.name,,means.identity,,category:identity|subcategory:name|role:dimension
-means.identity.person.firstName,,means.identity,,category:identity|subcategory:person|type:firstName|pii:true|role:dimension
-means.identity.person.fullName,,means.identity,,category:identity|subcategory:person|type:fullName|pii:true|role:dimension
-means.identity.person.lastName,,means.identity,,category:identity|subcategory:person|type:lastName|pii:true|role:dimension
-means.identity.person.middleName,,means.identity,,category:identity|subcategory:person|type:middleName|pii:true|role:dimension
-means.identity.rowNumber,,means.identity,,category:identity|subcategory:rowNumber|role:dimension
-means.identity.scd.originalIdentity,,means.identity,,category:identity|subcategory:scd|type:originalIdentity|role:dimension
-means.identity.scd.surogateIdentity,,means.identity,,category:identity|subcategory:scd|type:surogateIdentity|role:dimension
-means.identity.service,,means.identity,,category:identity|subcategory:service|role:dimension
-means.identity.service.email,,means.identity,,category:identity|subcategory:service|type:email|pii:true|role:dimension
-means.identity.service.facebook,,means.identity,,category:identity|subcategory:service|type:facebook|role:dimension
-means.identity.service.phone,,means.identity,,category:identity|subcategory:service|type:phone|pii:true|role:dimension
-means.identity.service.phone.cell,,means.identity,,category:identity|subcategory:service|type:phone|pii:true|role:dimension
-means.identity.service.phone.fax,,means.identity,,category:identity|subcategory:service|type:phone|role:dimension
-means.identity.service.twitter,,means.identity,,category:identity|subcategory:service|type:twitter|role:dimension
-means.identity.SKU,,means.identity,,category:identity|subcategory:SKU|role:dimension
-means.identity.tickerSymbol,,means.identity,,category:identity|subcategory:tickerSymbol|role:dimension
-means.identity.title,,means.identity,,category:identity|subcategory:title|role:dimension
-means.relationship,,means,,category:relationship|role:dimension
-means.relationship.parent,,means.relationship,,category:relationship|subcategory:parent|role:dimension
-means.relationship.child,,means.relationship,,category:relationship|subcategory:child|role:dimension
-means.reference,,means,,category:reference|role:dimension
-means.reference.caption,,means.reference,,category:reference|subcategory:caption|role:dimension
-means.reference.displayText,,means.reference,,category:reference|subcategory:displayText|role:dimension
-means.reference.description,,means.reference,,category:reference|subcategory:description|role:dimension
-means.reference.definition,,means.reference,,category:reference|subcategory:definition|role:dimension
-means.reference.phonetic,,means.reference,,category:reference|subcategory:phonetic|role:dimension
-means.reference.regarding,,means.reference,,category:reference|subcategory:regarding|role:dimension
-means.reference.URL,,means.reference,,category:reference|subcategory:URL|role:dimension
-means.reference.URL.image,,means.reference.URL,,category:reference|subcategory:URL|type:image|role:dimension
-means.reference.language,,means.reference,,category:reference|subcategory:language|role:dimension
-means.reference.language.tag,,means.reference.language,,category:reference|subcategory:language|type:tag|role:dimension
-means.location.address.street.line1,,means.location.address.street,,category:location|subcategory:address|type:street|role:dimension
-means.location.address.street.line2,,means.location.address.street,,category:location|subcategory:address|type:street|role:dimension
-means.location.address.street.line3,,means.location.address.street,,category:location|subcategory:address|type:street|role:dimension
-means.measurement.distance.inches,,means.measurement.distance,,category:measurement|subcategory:distance|type:inches|role:measure|default_aggregation:sum
-means.measurement.distance.cm,,means.measurement.distance,,category:measurement|subcategory:distance|type:cm|role:measure|default_aggregation:sum
-means.identity.company.name,,means.identity.name,,category:identity|subcategory:company|type:name|role:dimension
-means.userId,contains a userId,,,category:userId|role:dimension
-means.idea.accountLeads,,means.idea,,category:idea|subcategory:accountLeads|role:dimension
-means.idea.activityParty,,means.idea,,category:idea|subcategory:activityParty|role:dimension
-means.idea.activityPointer,,means.idea,,category:idea|subcategory:activityPointer|role:dimension
-means.idea.annotation,,means.idea,,category:idea|subcategory:annotation|role:dimension
-means.idea.appointment,,means.idea,,category:idea|subcategory:appointment|role:dimension
-means.idea.brand,,means.idea,,category:idea|subcategory:brand|role:dimension
-means.idea.businessUnit,,means.idea,,category:idea|subcategory:businessUnit|role:dimension
-means.idea.campaign,,means.idea,,category:idea|subcategory:campaign|role:dimension
-means.idea.campaignActivity,,means.idea,,category:idea|subcategory:campaignActivity|role:dimension
-means.idea.campaignItem,,means.idea,,category:idea|subcategory:campaignItem|role:dimension
-means.idea.campaignResponse,,means.idea,,category:idea|subcategory:campaignResponse|role:dimension
-means.idea.characteristic,,means.idea,,category:idea|subcategory:characteristic|role:dimension
-means.idea.competitor,,means.idea,,category:idea|subcategory:competitor|role:dimension
-means.idea.competitorAddress,,means.idea,,category:idea|subcategory:competitorAddress|role:dimension
-means.idea.competitorProduct,,means.idea,,category:idea|subcategory:competitorProduct|role:dimension
-means.idea.connection,,means.idea,,category:idea|subcategory:connection|role:dimension
-means.idea.connectionRole,,means.idea,,category:idea|subcategory:connectionRole|role:dimension
-means.idea.contract,,means.idea,,category:idea|subcategory:contract|role:dimension
-means.idea.contractDetail,,means.idea,,category:idea|subcategory:contractDetail|role:dimension
-means.idea.customerAddress,,means.idea,,category:idea|subcategory:customerAddress|role:dimension
-means.idea.customerRelationship,,means.idea,,category:idea|subcategory:customerRelationship|role:dimension
-means.idea.discount,,means.idea,,category:idea|subcategory:discount|role:dimension
-means.idea.discountType,,means.idea,,category:idea|subcategory:discountType|role:dimension
-means.idea.email,,means.idea,,category:idea|subcategory:email|role:dimension
-means.idea.entitlement,,means.idea,,category:idea|subcategory:entitlement|role:dimension
-means.idea.equipment,,means.idea,,category:idea|subcategory:equipment|role:dimension
-means.idea.fax,,means.idea,,category:idea|subcategory:fax|role:dimension
-means.idea.feedback,,means.idea,,category:idea|subcategory:feedback|role:dimension
-means.idea.goal,,means.idea,,category:idea|subcategory:goal|role:dimension
-means.idea.incident,,means.idea,,category:idea|subcategory:incident|role:dimension
-means.idea.invoice,,means.idea,,category:idea|subcategory:invoice|role:dimension
-means.idea.invoiceDetail,,means.idea,,category:idea|subcategory:invoiceDetail|role:dimension
-means.idea.KbArticle,,means.idea,,category:idea|subcategory:KbArticle|role:dimension
-means.idea.knowledgeArticle,,means.idea,,category:idea|subcategory:knowledgeArticle|role:dimension
-means.idea.lead,,means.idea,,category:idea|subcategory:lead|role:dimension
-means.idea.leadAddress,,means.idea,,category:idea|subcategory:leadAddress|role:dimension
-means.idea.letter,,means.idea,,category:idea|subcategory:letter|role:dimension
-means.idea.metric,,means.idea,,category:idea|subcategory:metric|role:dimension
-means.idea.opportunity,,means.idea,,category:idea|subcategory:opportunity|role:dimension
-means.idea.owner,,means.idea,,category:idea|subcategory:owner|role:dimension
-means.idea.phoneCall,,means.idea,,category:idea|subcategory:phoneCall|role:dimension
-means.idea.place,,means.idea,,category:idea|subcategory:place|role:dimension
-means.idea.position,,means.idea,,category:idea|subcategory:position|role:dimension
-means.idea.priceLevel,,means.idea,,category:idea|subcategory:priceLevel|role:dimension
-means.idea.productGroup,,means.idea,,category:idea|subcategory:productGroup|role:dimension
-means.idea.quote,,means.idea,,category:idea|subcategory:quote|role:dimension
-means.idea.ratingModel,,means.idea,,category:idea|subcategory:ratingModel|role:dimension
-means.idea.resource,,means.idea,,category:idea|subcategory:resource|role:dimension
-means.idea.resourceGroup,,means.idea,,category:idea|subcategory:resourceGroup|role:dimension
-means.idea.salesLiterature,,means.idea,,category:idea|subcategory:salesLiterature|role:dimension
-means.idea.salesOrder,,means.idea,,category:idea|subcategory:salesOrder|role:dimension
-means.idea.service,,means.idea,,category:idea|subcategory:service|role:dimension
-means.idea.serviceAppointment,,means.idea,,category:idea|subcategory:serviceAppointment|role:dimension
-means.idea.site,,means.idea,,category:idea|subcategory:site|role:dimension
-means.idea.SLA,A Service Level Agreement,means.idea,,category:idea|subcategory:SLA|role:dimension
-means.idea.socialActivity,,means.idea,,category:idea|subcategory:socialActivity|role:dimension
-means.idea.socialProfile,,means.idea,,category:idea|subcategory:socialProfile|role:dimension
-means.idea.systemUser,,means.idea,,category:idea|subcategory:systemUser|role:dimension
-means.idea.task,,means.idea,,category:idea|subcategory:task|role:dimension
-means.idea.team,,means.idea,,category:idea|subcategory:team|role:dimension
-means.idea.territory,,means.idea,,category:idea|subcategory:territory|role:dimension
-means.idea.UoM,,means.idea,,category:idea|subcategory:UoM|role:dimension
-means.reference.documentation,,means.reference,,category:reference|subcategory:documentation|role:dimension
-means.reference.URI,A Uniform Resource Identifier,means.reference,,category:reference|subcategory:URI|role:dimension
-means.reference.culture,,means.reference,,category:reference|subcategory:culture|role:dimension
-means.reference.culture.tag,,means.reference.culture,,category:reference|subcategory:culture|type:tag|role:dimension
-means.idea.employer,,means.idea,,category:idea|subcategory:employer|role:dimension
-means.demographic.birthDate,,means.demographic,,category:demographic|subcategory:birthDate|data_class:confidential|pii:possible|role:dimension
-means.demographic.income,,means.demographic,,category:demographic|subcategory:income|data_class:confidential|pii:possible|role:dimension
-means.demographic.education,,means.demographic,,category:demographic|subcategory:education|data_class:confidential|pii:possible|role:dimension
-means.formatting.stringFormat,indicates this value represents the format of a string,means.formatting,,category:formatting|subcategory:stringFormat|role:dimension
-means.identity.person.prefix,"A salutation such as a title, rank or honorific to place before a person's name",means.identity.name,,category:identity|subcategory:person|type:prefix|pii:true|role:dimension
-means.identity.person.suffix,"Follows a person's name and provides additional information about their position, education or honorific",means.identity.name,,category:identity|subcategory:person|type:suffix|pii:true|role:dimension
-means.identity.IP4Address,Internet Protocol V4 Address,means.identity,,category:identity|subcategory:IP4Address|role:dimension
-means.identity.IP6Address,Internet Protocol V6 Address,means.identity,,category:identity|subcategory:IP6Address|role:dimension
-means.measurement.currency.revenue,,means.measurement.currency,,category:measurement|subcategory:currency|type:revenue|role:measure|default_aggregation:sum
-means.measurement.probability,,means.measurement,,category:measurement|subcategory:probability|role:measure|default_aggregation:average
-means.measurement.count,,means.measurement,,category:measurement|subcategory:count|role:measure|default_aggregation:sum
-means.measurement.dimension,measurement of some physical dimension,means.measurement,dimension,category:measurement|subcategory:dimension|role:measure|default_aggregation:sum
-means.measurement.dimension.time,measurement of time,means.measurement.dimension,,category:measurement|subcategory:dimension|type:time|role:dimension
-means.measurement.dimension.length,measurement of length,means.measurement.dimension,,category:measurement|subcategory:dimension|type:length|role:measure|default_aggregation:sum
-means.measurement.dimension.mass,measurement of mass,means.measurement.dimension,,category:measurement|subcategory:dimension|type:mass|role:measure|default_aggregation:sum
-means.measurement.dimension.electricCurrent,measurement of electic current,means.measurement.dimension,,category:measurement|subcategory:dimension|type:electricCurrent|role:measure|default_aggregation:sum
-means.measurement.dimension.temperature,measurement of thermodynamic temperature,means.measurement.dimension,,category:measurement|subcategory:dimension|type:temperature|role:measure|default_aggregation:average
-means.measurement.dimension.amount,measurement of amount of substance,means.measurement.dimension,,category:measurement|subcategory:dimension|type:amount|role:measure|default_aggregation:sum
-means.measurement.dimension.luminousIntensity,measurement of electic current,means.measurement.dimension,,category:measurement|subcategory:dimension|type:luminousIntensity|role:measure|default_aggregation:sum
-means.measurement.dimension.frequency,measurement of frequency,means.measurement.dimension,,category:measurement|subcategory:dimension|type:frequency|role:measure|default_aggregation:sum
-means.measurement.dimension.angle,measurement of geometric angle,means.measurement.dimension,,category:measurement|subcategory:dimension|type:angle|role:measure|default_aggregation:sum
-means.measurement.dimension.force,measurement of force,means.measurement.dimension,,category:measurement|subcategory:dimension|type:force|role:measure|default_aggregation:sum
-means.measurement.dimension.pressure,measurement of pressure or stress,means.measurement.dimension,,category:measurement|subcategory:dimension|type:pressure|role:measure|default_aggregation:sum
-means.measurement.dimension.energy,"measurement of energy, work, heat",means.measurement.dimension,,category:measurement|subcategory:dimension|type:energy|role:measure|default_aggregation:sum
-means.measurement.dimension.power,"measurement of power, radiant flex",means.measurement.dimension,,category:measurement|subcategory:dimension|type:power|role:measure|default_aggregation:sum
-means.measurement.dimension.electricCharge,"measurement of electric charge, quantity of electricity",means.measurement.dimension,,category:measurement|subcategory:dimension|type:electricCharge|role:measure|default_aggregation:sum
-means.measurement.dimension.electromotiveForce,"measurement of volatage, EMF, electrical potential difference",means.measurement.dimension,,category:measurement|subcategory:dimension|type:electromotiveForce|role:measure|default_aggregation:sum
-means.measurement.dimension.capacitance,measurement of electical capacitance,means.measurement.dimension,,category:measurement|subcategory:dimension|type:capacitance|role:measure|default_aggregation:sum
-means.measurement.dimension.resistance,"measurement of electrical resistance, impedance, reactance",means.measurement.dimension,,category:measurement|subcategory:dimension|type:resistance|role:measure|default_aggregation:sum
-means.measurement.dimension.dataRate,measurement of data rate,means.measurement.dimension,,category:measurement|subcategory:dimension|type:dataRate|role:measure|default_aggregation:sum
-means.measurement.units.si,measurments in international system of units,means,unit|dimension|symbol,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.second,measurement of time in seconds,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.meter,measurement of length in meters,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.kilogram,measurement of mass in kilogram,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.ampere,measurement of electric current in amperes,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.kelvin,measurement of thermodynamic temperature in degrees kelvin,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.mole,measurement of amount in moles,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.candela,measurement of luminous intensity in candelas,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.hertz,measurement of frequency in hertz,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.radian,measurement of angle in radians,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.newton,measurement of force or weight in newtons,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.pascal,measurement of pressure or stress in pascals,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.joule,"measurement of energy, work or heat in joules",means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.watt,measurement of power or radiant flux in watts,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.coulomb,measurement of electric charge or amount of electricity in coulombs,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.volt,"measurement of voltage, EMF, electrical potantial difference in volts",means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.farad,measurement of electric capacitance in farads,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.ohm,"measurement of electrical resistance, impedance, reactance in ohms",means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.celsius,measurement of temperature in degrees celsius,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.gram,measurement of mass in grams,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.units.si.bitPerSecond,measurement of data rate in bits per second,means.measurement.units.si,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.measurement.prefix,unit prefixes denoting a factor of one thousandth,means.measurement,scaleExponent,category:measurement|subcategory:prefix|role:measure|default_aggregation:sum
-means.measurement.prefix.giga,denotes one thousanth of the unit; 10E9,means.measurement.prefix,,category:measurement|subcategory:prefix|type:giga|role:measure|default_aggregation:sum
-means.measurement.prefix.mega,denotes one thousanth of the unit; 10E6,means.measurement.prefix,,category:measurement|subcategory:prefix|type:mega|role:measure|default_aggregation:sum
-means.measurement.prefix.kilo,denotes one thousanth of the unit; 10E3,means.measurement.prefix,,category:measurement|subcategory:prefix|type:kilo|role:measure|default_aggregation:sum
-means.measurement.prefix.centi,denotes one thousanth of the unit; 10E-2,means.measurement.prefix,,category:measurement|subcategory:prefix|type:centi|role:measure|default_aggregation:sum
-means.measurement.prefix.milli,denotes one thousanth of the unit; 10E-3,means.measurement.prefix,,category:measurement|subcategory:prefix|type:milli|role:measure|default_aggregation:sum
-means.measurement.prefix.micro,denotes one thousanth of the unit; 10E-6,means.measurement.prefix,,category:measurement|subcategory:prefix|type:micro|role:measure|default_aggregation:sum
-means.measurement.prefix.nano,denotes one thousanth of the unit; 10E-9,means.measurement.prefix,,category:measurement|subcategory:prefix|type:nano|role:measure|default_aggregation:sum
-means.measurement.prefix.pico,denotes one thousanth of the unit; 10E-12,means.measurement.prefix,,category:measurement|subcategory:prefix|type:pico|role:measure|default_aggregation:sum
-means.measurement.units.degree,,means.measurement,,category:measurement|subcategory:units|type:degree|role:measure|default_aggregation:sum
-means.measurement.currencyCode,indicates this value represents an ISO 4217 currency code,means.measurement,,category:measurement|subcategory:currencyCode|role:measure|default_aggregation:sum
-means.qualification,augments the meaning of entities or attributes with a qualification,means,,category:qualification|role:dimension
-means.qualification.estimate,values are an estimate only.,means.qualification,,category:qualification|subcategory:estimate|role:dimension
-means.measurement.units.si.liter,si unit of measurement for volume in liters,measurement.unit.volume,,category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum
-means.qualification.expected,old version of this trait for compat.,qualification.expected,,category:qualification|subcategory:expected|role:dimension
-means.qualification.observed,old version of this trait for compat.,qualification.observed,,category:qualification|subcategory:observed|role:dimension
+"cdm_semantic_meaning","description","extends_trait","parameters","dbt_labels"
+"means.calendar","","means","","category:calendar|role:dimension"
+"means.calendar.fiscal","","means.calendar","","category:calendar|subcategory:fiscal|role:dimension"
+"means.calendar.ISO8601","","means.calendar","","category:calendar|subcategory:ISO8601|standard:iso|role:dimension"
+"means.calendar.manufacturing","","means.calendar","","category:calendar|subcategory:manufacturing|role:dimension"
+"means.calendar.reporting","","means.calendar","","category:calendar|subcategory:reporting|role:dimension"
+"means.calendar.day","","means.calendar","","category:calendar|subcategory:day|role:dimension"
+"means.calendar.dayOfWeek","","means.calendar.day","","category:calendar|subcategory:dayOfWeek|role:dimension"
+"means.calendar.dayOfTendays","","means.calendar.day","","category:calendar|subcategory:dayOfTendays|role:dimension"
+"means.calendar.dayOfMonth","","means.calendar.day","","category:calendar|subcategory:dayOfMonth|role:dimension"
+"means.calendar.dayOfMonthOrPeriod","","means.calendar.day","","category:calendar|subcategory:dayOfMonthOrPeriod|role:dimension"
+"means.calendar.dayOfQuarter","","means.calendar.day","","category:calendar|subcategory:dayOfQuarter|role:dimension"
+"means.calendar.dayOfTrimester","","means.calendar.day","","category:calendar|subcategory:dayOfTrimester|role:dimension"
+"means.calendar.dayOfHalfyear","","means.calendar.day","","category:calendar|subcategory:dayOfHalfyear|role:dimension"
+"means.calendar.dayOfYear","","means.calendar.day","","category:calendar|subcategory:dayOfYear|role:dimension"
+"means.calendar.week","","means.calendar","","category:calendar|subcategory:week|role:dimension"
+"means.calendar.weekOfMonth","","means.calendar.week","","category:calendar|subcategory:weekOfMonth|role:dimension"
+"means.calendar.weekOfQuarter","","means.calendar.week","","category:calendar|subcategory:weekOfQuarter|role:dimension"
+"means.calendar.weekOfTrimester","","means.calendar.week","","category:calendar|subcategory:weekOfTrimester|role:dimension"
+"means.calendar.weekOfHalfyear","","means.calendar.week","","category:calendar|subcategory:weekOfHalfyear|role:dimension"
+"means.calendar.weekOfYear","","means.calendar.week","","category:calendar|subcategory:weekOfYear|role:dimension"
+"means.calendar.tenday","","means.calendar","","category:calendar|subcategory:tenday|role:dimension"
+"means.calendar.tendayOfMonth","","means.calendar.tenday","","category:calendar|subcategory:tendayOfMonth|role:dimension"
+"means.calendar.tendayOfQuarter","","means.calendar.tenday","","category:calendar|subcategory:tendayOfQuarter|role:dimension"
+"means.calendar.tendayOfTrimester","","means.calendar.tenday","","category:calendar|subcategory:tendayOfTrimester|role:dimension"
+"means.calendar.tendayOfHalfyear","","means.calendar.tenday","","category:calendar|subcategory:tendayOfHalfyear|role:dimension"
+"means.calendar.tendayOfYear","","means.calendar.tenday","","category:calendar|subcategory:tendayOfYear|role:dimension"
+"means.calendar.month","","means.calendar","","category:calendar|subcategory:month|role:dimension"
+"means.calendar.monthOfQuarter","","means.calendar.month","","category:calendar|subcategory:monthOfQuarter|role:dimension"
+"means.calendar.monthOfTrimester","","means.calendar.month","","category:calendar|subcategory:monthOfTrimester|role:dimension"
+"means.calendar.monthOfHalfyear","","means.calendar.month","","category:calendar|subcategory:monthOfHalfyear|role:dimension"
+"means.calendar.monthOfYear","","means.calendar.month","","category:calendar|subcategory:monthOfYear|role:dimension"
+"means.calendar.quarter","","means.calendar","","category:calendar|subcategory:quarter|role:dimension"
+"means.calendar.quarterOfHalfyear","","means.calendar.quarter","","category:calendar|subcategory:quarterOfHalfyear|role:dimension"
+"means.calendar.quarterOfYear","","means.calendar.quarter","","category:calendar|subcategory:quarterOfYear|role:dimension"
+"means.calendar.trimester","","means.calendar","","category:calendar|subcategory:trimester|role:dimension"
+"means.calendar.trimesterOfYear","","means.calendar.trimester","","category:calendar|subcategory:trimesterOfYear|role:dimension"
+"means.calendar.year","","means.calendar","","category:calendar|subcategory:year|role:dimension"
+"means.demographic","","means","","category:demographic|data_class:confidential|pii:possible|role:dimension"
+"means.demographic.age","","means.demographic","","category:demographic|subcategory:age|data_class:confidential|pii:possible|role:dimension"
+"means.demographic.gender","","means.demographic","","category:demographic|subcategory:gender|data_class:confidential|pii:possible|role:dimension"
+"means.demographic.ethnicity","","means.demographic","","category:demographic|subcategory:ethnicity|data_class:confidential|pii:possible|role:dimension"
+"means.demographic.maritalStatus","","means.demographic","","category:demographic|subcategory:maritalStatus|data_class:confidential|pii:possible|role:dimension"
+"means.formatting","","means","","category:formatting|role:dimension"
+"means.formatting.color","","means.formatting","","category:formatting|subcategory:color|role:dimension"
+"means.formatting.font","","means.formatting","","category:formatting|subcategory:font|role:dimension"
+"means.formatting.font.size","","means.formatting.font","","category:formatting|subcategory:font|type:size|role:dimension"
+"means.formatting.font.effects","","means.formatting.font","","category:formatting|subcategory:font|type:effects|role:dimension"
+"means.formatting.heading","","means.formatting","","category:formatting|subcategory:heading|role:dimension"
+"means.formatting.order","","means.formatting","","category:formatting|subcategory:order|role:dimension"
+"means.idea","","means","","category:idea|role:dimension"
+"means.idea.account","","means.idea","","category:idea|subcategory:account|role:dimension"
+"means.idea.channel","","means.idea","","category:idea|subcategory:channel|role:dimension"
+"means.idea.company","","means.idea","","category:idea|subcategory:company|role:dimension"
+"means.idea.customer","","means.idea","","category:idea|subcategory:customer|role:dimension"
+"means.idea.person","","means.idea","","category:idea|subcategory:person|role:dimension"
+"means.idea.person.contact","","means.idea.person","","category:idea|subcategory:person|type:contact|role:dimension"
+"means.idea.person.employee","","means.idea.person","","category:idea|subcategory:person|type:employee|role:dimension"
+"means.idea.person.representative","","means.idea.person","","category:idea|subcategory:person|type:representative|role:dimension"
+"means.idea.organization","","means.idea","","category:idea|subcategory:organization|role:dimension"
+"means.idea.organization.unit","","means.idea","","category:idea|subcategory:organization|type:unit|role:dimension"
+"means.idea.product","","means.idea","","category:idea|subcategory:product|role:dimension"
+"means.idea.project","","means.idea","","category:idea|subcategory:project|role:dimension"
+"means.idea.promotion","","means.idea","","category:idea|subcategory:promotion|role:dimension"
+"means.idea.scenario","","means.idea","","category:idea|subcategory:scenario|role:dimension"
+"means.idea.schedule","","means.idea","","category:idea|subcategory:schedule|role:dimension"
+"means.idea.service ","","means.idea","","category:idea|subcategory:service |role:dimension"
+"means.idea.utility","","means.idea","","category:idea|subcategory:utility|role:dimension"
+"means.location","","means","","category:location|role:dimension"
+"means.location.address","","means.location","","category:location|subcategory:address|role:dimension"
+"means.location.address.building","","means.location.address","","category:location|subcategory:address|type:building|role:dimension"
+"means.location.address.floor","","means.location.address","","category:location|subcategory:address|type:floor|role:dimension"
+"means.location.address.house","","means.location.address","","category:location|subcategory:address|type:house|role:dimension"
+"means.location.address.room","","means.location.address","","category:location|subcategory:address|type:room|role:dimension"
+"means.location.address.street","","means.location.address","","category:location|subcategory:address|type:street|role:dimension"
+"means.location.city","","means.location","","category:location|subcategory:city|role:dimension"
+"means.location.continent","","means.location","","category:location|subcategory:continent|role:dimension"
+"means.location.country","","means.location","","category:location|subcategory:country|role:dimension"
+"means.location.county","","means.location.address","","category:location|subcategory:county|role:dimension"
+"means.location.latitude","","means.location","","category:location|subcategory:latitude|role:dimension"
+"means.location.longitude","","means.location","","category:location|subcategory:longitude|role:dimension"
+"means.location.point","","means.location","","category:location|subcategory:point|role:dimension"
+"means.location.postalCode","","means.location","","category:location|subcategory:postalCode|role:dimension"
+"means.location.province","","means.location","","category:location|subcategory:province|role:dimension"
+"means.location.region","","means.location","","category:location|subcategory:region|role:dimension"
+"means.location.stateOrProvince","","means.location","","category:location|subcategory:stateOrProvince|role:dimension"
+"means.location.timezone","","means.location","","category:location|subcategory:timezone|role:dimension"
+"means.location.geo","","means.location","","category:location|subcategory:geo|role:dimension"
+"means.location.geo.boundary","","means.location.geo","","category:location|subcategory:geo|type:boundary|role:dimension"
+"means.location.geo.boundary.bottom","","means.location.geo.boundary","","category:location|subcategory:geo|type:boundary|role:dimension"
+"means.location.geo.boundary.front","","means.location.geo.boundary","","category:location|subcategory:geo|type:boundary|role:dimension"
+"means.location.geo.boundary.left","","means.location.geo.boundary","","category:location|subcategory:geo|type:boundary|role:dimension"
+"means.location.geo.boundary.polygon","","means.location.geo.boundary","","category:location|subcategory:geo|type:boundary|role:dimension"
+"means.location.geo.boundary.rear","","means.location.geo.boundary","","category:location|subcategory:geo|type:boundary|role:dimension"
+"means.location.geo.boundary.right","","means.location.geo.boundary","","category:location|subcategory:geo|type:boundary|role:dimension"
+"means.location.geo.boundary.top","","means.location.geo.boundary","","category:location|subcategory:geo|type:boundary|role:dimension"
+"means.location.geo.centroid","","means.location.geo","","category:location|subcategory:geo|type:centroid|role:dimension"
+"means.location.geo.centroid.X","","means.location.geo.centroid","","category:location|subcategory:geo|type:centroid|role:dimension"
+"means.location.geo.centroid.y","","means.location.geo.centroid","","category:location|subcategory:geo|type:centroid|role:dimension"
+"means.location.geo.centroid.z","","means.location.geo.centroid","","category:location|subcategory:geo|type:centroid|role:dimension"
+"means.measurement","","means","","category:measurement|role:measure|default_aggregation:sum"
+"means.measurement.age","","means.measurement","","category:measurement|subcategory:age|role:measure|default_aggregation:sum"
+"means.measurement.code","","means.measurement","","category:measurement|subcategory:code|role:dimension"
+"means.measurement.color","","means.measurement","","category:measurement|subcategory:color|role:measure|default_aggregation:sum"
+"means.measurement.density","","means.measurement","","category:measurement|subcategory:density|role:measure|default_aggregation:average"
+"means.measurement.distance","","means.measurement","","category:measurement|subcategory:distance|role:measure|default_aggregation:sum"
+"means.measurement.sequence","","means.measurement","","category:measurement|subcategory:sequence|role:measure|default_aggregation:sum"
+"means.measurement.temperature","","means.measurement","","category:measurement|subcategory:temperature|role:measure|default_aggregation:average"
+"means.measurement.version","","means.measurement","","category:measurement|subcategory:version|role:dimension"
+"means.measurement.weight","","means.measurement","","category:measurement|subcategory:weight|role:measure|default_aggregation:sum"
+"means.measurement.currency","","means.measurement","","category:measurement|subcategory:currency|role:measure|default_aggregation:sum"
+"means.measurement.currency.cost","","means.measurement.currency","","category:measurement|subcategory:currency|type:cost|role:measure|default_aggregation:sum"
+"means.measurement.currency.iSOCode","","means.measurement","","category:measurement|subcategory:currency|type:iSOCode|standard:iso|role:dimension"
+"means.measurement.currency.price","","means.measurement.currency","","category:measurement|subcategory:currency|type:price|role:measure|default_aggregation:sum"
+"means.measurement.currency.type","","means.measurement","","category:measurement|subcategory:currency|type:type|role:dimension"
+"means.measurement.currency.type.destination","","means.measurement.currency.type","","category:measurement|subcategory:currency|type:type|role:dimension"
+"means.measurement.currency.type.source","","means.measurement.currency.type","","category:measurement|subcategory:currency|type:type|role:dimension"
+"means.measurement.time","","means.measurement","","category:measurement|subcategory:time|role:dimension"
+"means.measurement.date","","means.measurement","","category:measurement|subcategory:date|role:dimension"
+"means.measurement.date.completion","","means.measurement.date","","category:measurement|subcategory:date|type:completion|role:dimension"
+"means.measurement.date.creation","","means.measurement.date","","category:measurement|subcategory:date|type:creation|role:dimension"
+"means.measurement.date.end","","means.measurement.date","","category:measurement|subcategory:date|type:end|role:dimension"
+"means.measurement.date.end.scd","","means.measurement.date","","category:measurement|subcategory:date|type:end|role:dimension"
+"means.measurement.date.modify","","means.measurement.date","","category:measurement|subcategory:date|type:modify|role:dimension"
+"means.measurement.date.occurrence","","means.measurement.date","","category:measurement|subcategory:date|type:occurrence|role:dimension"
+"means.measurement.date.remove","","means.measurement.date","","category:measurement|subcategory:date|type:remove|role:dimension"
+"means.measurement.date.start","","means.measurement.date","","category:measurement|subcategory:date|type:start|role:dimension"
+"means.measurement.date.start.scd","","means.measurement.date","","category:measurement|subcategory:date|type:start|role:dimension"
+"means.measurement.date.target","","means.measurement.date","","category:measurement|subcategory:date|type:target|role:dimension"
+"means.measurement.duration","","means.measurement","","category:measurement|subcategory:duration|role:measure|default_aggregation:sum"
+"means.measurement.duration.seconds","","means.measurement.duration","","category:measurement|subcategory:duration|type:seconds|role:measure|default_aggregation:sum"
+"means.measurement.duration.minutes","","means.measurement.duration","","category:measurement|subcategory:duration|type:minutes|role:measure|default_aggregation:sum"
+"means.measurement.duration.hours","","means.measurement.duration","","category:measurement|subcategory:duration|type:hours|role:measure|default_aggregation:sum"
+"means.measurement.duration.days","","means.measurement.duration","","category:measurement|subcategory:duration|type:days|role:measure|default_aggregation:sum"
+"means.measurement.duration.months","","means.measurement.duration","","category:measurement|subcategory:duration|type:months|role:measure|default_aggregation:sum"
+"means.measurement.duration.weeks","","means.measurement.duration","","category:measurement|subcategory:duration|type:weeks|role:measure|default_aggregation:sum"
+"means.measurement.duration.quarters","","means.measurement.duration","","category:measurement|subcategory:duration|type:quarters|role:measure|default_aggregation:sum"
+"means.measurement.duration.trimesters","","means.measurement.duration","","category:measurement|subcategory:duration|type:trimesters|role:measure|default_aggregation:sum"
+"means.measurement.duration.years","","means.measurement.duration","","category:measurement|subcategory:duration|type:years|role:measure|default_aggregation:sum"
+"means.measurement.percent","","means.measurement","","category:measurement|subcategory:percent|role:measure|default_aggregation:sum"
+"means.measurement.percent.ownership","","means.measurement","","category:measurement|subcategory:percent|type:ownership|role:measure|default_aggregation:sum"
+"means.measurement.percent.voterright","","means.measurement","","category:measurement|subcategory:percent|type:voterright|role:measure|default_aggregation:sum"
+"means.measurement.range","","means.measurement","","category:measurement|subcategory:range|role:measure|default_aggregation:sum"
+"means.measurement.range.high","","means.measurement.range","","category:measurement|subcategory:range|type:high|role:measure|default_aggregation:sum"
+"means.measurement.range.low","","means.measurement.range","","category:measurement|subcategory:range|type:low|role:measure|default_aggregation:sum"
+"means.measurement.rate","","means.measurement","","category:measurement|subcategory:rate|role:measure|default_aggregation:average"
+"means.measurement.rate.type","","means.measurement","","category:measurement|subcategory:rate|type:type|role:measure|default_aggregation:average"
+"means.measurement.size","","means.measurement","","category:measurement|subcategory:size|role:measure|default_aggregation:sum"
+"means.measurement.size.depth","","means.measurement.size","","category:measurement|subcategory:size|type:depth|role:measure|default_aggregation:sum"
+"means.measurement.size.height","","means.measurement.size","","category:measurement|subcategory:size|type:height|role:measure|default_aggregation:sum"
+"means.measurement.size.volume","","means.measurement.size","","category:measurement|subcategory:size|type:volume|role:measure|default_aggregation:sum"
+"means.measurement.size.width","","means.measurement.size","","category:measurement|subcategory:size|type:width|role:measure|default_aggregation:sum"
+"means.category","","means","","category:category|role:dimension"
+"means.content","","means","","category:content|role:dimension"
+"means.content.text","","means.content","","category:content|subcategory:text|role:dimension"
+"means.content.text.HTML","","means.content.text","","category:content|subcategory:text|type:HTML|role:dimension"
+"means.content.text.JSON","","means.content.text","","category:content|subcategory:text|type:JSON|role:dimension"
+"means.content.text.XML","","means.content.text","","category:content|subcategory:text|type:XML|role:dimension"
+"means.content.text.CSV","","means.content.text","","category:content|subcategory:text|type:CSV|role:dimension"
+"means.content.binary","","means.content","","category:content|subcategory:binary|role:dimension"
+"means.content.binary.image","","means.content.binary","","category:content|subcategory:binary|type:image|role:dimension"
+"means.content.binary.image.BMP","","means.content.binary.image","","category:content|subcategory:binary|type:image|role:dimension"
+"means.content.binary.image.GIF","","means.content.binary.image","","category:content|subcategory:binary|type:image|role:dimension"
+"means.content.binary.image.JPG","","means.content.binary.image","","category:content|subcategory:binary|type:image|role:dimension"
+"means.content.binary.image.PNG","","means.content.binary.image","","category:content|subcategory:binary|type:image|role:dimension"
+"means.content.binary.image.TIFF","","means.content.binary.image","","category:content|subcategory:binary|type:image|role:dimension"
+"means.identity","","means","","category:identity|role:dimension"
+"means.identity.entityId","","means.identity","","category:identity|subcategory:entityId|role:dimension"
+"means.identity.barCode","","means.identity","","category:identity|subcategory:barCode|role:dimension"
+"means.identity.brand","","means.identity","","category:identity|subcategory:brand|role:dimension"
+"means.identity.governmentID","","means.identity","","category:identity|subcategory:governmentID|pii:true|role:dimension"
+"means.identity.name","","means.identity","","category:identity|subcategory:name|role:dimension"
+"means.identity.person.firstName","","means.identity","","category:identity|subcategory:person|type:firstName|pii:true|role:dimension"
+"means.identity.person.fullName","","means.identity","","category:identity|subcategory:person|type:fullName|pii:true|role:dimension"
+"means.identity.person.lastName","","means.identity","","category:identity|subcategory:person|type:lastName|pii:true|role:dimension"
+"means.identity.person.middleName","","means.identity","","category:identity|subcategory:person|type:middleName|pii:true|role:dimension"
+"means.identity.rowNumber","","means.identity","","category:identity|subcategory:rowNumber|role:dimension"
+"means.identity.scd.originalIdentity","","means.identity","","category:identity|subcategory:scd|type:originalIdentity|role:dimension"
+"means.identity.scd.surogateIdentity","","means.identity","","category:identity|subcategory:scd|type:surogateIdentity|role:dimension"
+"means.identity.service","","means.identity","","category:identity|subcategory:service|role:dimension"
+"means.identity.service.email","","means.identity","","category:identity|subcategory:service|type:email|pii:true|role:dimension"
+"means.identity.service.facebook","","means.identity","","category:identity|subcategory:service|type:facebook|role:dimension"
+"means.identity.service.phone","","means.identity","","category:identity|subcategory:service|type:phone|pii:true|role:dimension"
+"means.identity.service.phone.cell","","means.identity","","category:identity|subcategory:service|type:phone|pii:true|role:dimension"
+"means.identity.service.phone.fax","","means.identity","","category:identity|subcategory:service|type:phone|role:dimension"
+"means.identity.service.twitter","","means.identity","","category:identity|subcategory:service|type:twitter|role:dimension"
+"means.identity.SKU","","means.identity","","category:identity|subcategory:SKU|role:dimension"
+"means.identity.tickerSymbol","","means.identity","","category:identity|subcategory:tickerSymbol|role:dimension"
+"means.identity.title","","means.identity","","category:identity|subcategory:title|role:dimension"
+"means.relationship","","means","","category:relationship|role:dimension"
+"means.relationship.parent","","means.relationship","","category:relationship|subcategory:parent|role:dimension"
+"means.relationship.child","","means.relationship","","category:relationship|subcategory:child|role:dimension"
+"means.reference","","means","","category:reference|role:dimension"
+"means.reference.caption","","means.reference","","category:reference|subcategory:caption|role:dimension"
+"means.reference.displayText","","means.reference","","category:reference|subcategory:displayText|role:dimension"
+"means.reference.description","","means.reference","","category:reference|subcategory:description|role:dimension"
+"means.reference.definition","","means.reference","","category:reference|subcategory:definition|role:dimension"
+"means.reference.phonetic","","means.reference","","category:reference|subcategory:phonetic|role:dimension"
+"means.reference.regarding","","means.reference","","category:reference|subcategory:regarding|role:dimension"
+"means.reference.URL","","means.reference","","category:reference|subcategory:URL|role:dimension"
+"means.reference.URL.image","","means.reference.URL","","category:reference|subcategory:URL|type:image|role:dimension"
+"means.reference.language","","means.reference","","category:reference|subcategory:language|role:dimension"
+"means.reference.language.tag","","means.reference.language","","category:reference|subcategory:language|type:tag|role:dimension"
+"means.location.address.street.line1","","means.location.address.street","","category:location|subcategory:address|type:street|role:dimension"
+"means.location.address.street.line2","","means.location.address.street","","category:location|subcategory:address|type:street|role:dimension"
+"means.location.address.street.line3","","means.location.address.street","","category:location|subcategory:address|type:street|role:dimension"
+"means.measurement.distance.inches","","means.measurement.distance","","category:measurement|subcategory:distance|type:inches|role:measure|default_aggregation:sum"
+"means.measurement.distance.cm","","means.measurement.distance","","category:measurement|subcategory:distance|type:cm|role:measure|default_aggregation:sum"
+"means.identity.company.name","","means.identity.name","","category:identity|subcategory:company|type:name|role:dimension"
+"means.userId","contains a userId","","","category:userId|role:dimension"
+"means.idea.accountLeads","","means.idea","","category:idea|subcategory:accountLeads|role:dimension"
+"means.idea.activityParty","","means.idea","","category:idea|subcategory:activityParty|role:dimension"
+"means.idea.activityPointer","","means.idea","","category:idea|subcategory:activityPointer|role:dimension"
+"means.idea.annotation","","means.idea","","category:idea|subcategory:annotation|role:dimension"
+"means.idea.appointment","","means.idea","","category:idea|subcategory:appointment|role:dimension"
+"means.idea.brand","","means.idea","","category:idea|subcategory:brand|role:dimension"
+"means.idea.businessUnit","","means.idea","","category:idea|subcategory:businessUnit|role:dimension"
+"means.idea.campaign","","means.idea","","category:idea|subcategory:campaign|role:dimension"
+"means.idea.campaignActivity","","means.idea","","category:idea|subcategory:campaignActivity|role:dimension"
+"means.idea.campaignItem","","means.idea","","category:idea|subcategory:campaignItem|role:dimension"
+"means.idea.campaignResponse","","means.idea","","category:idea|subcategory:campaignResponse|role:dimension"
+"means.idea.characteristic","","means.idea","","category:idea|subcategory:characteristic|role:dimension"
+"means.idea.competitor","","means.idea","","category:idea|subcategory:competitor|role:dimension"
+"means.idea.competitorAddress","","means.idea","","category:idea|subcategory:competitorAddress|role:dimension"
+"means.idea.competitorProduct","","means.idea","","category:idea|subcategory:competitorProduct|role:dimension"
+"means.idea.connection","","means.idea","","category:idea|subcategory:connection|role:dimension"
+"means.idea.connectionRole","","means.idea","","category:idea|subcategory:connectionRole|role:dimension"
+"means.idea.contract","","means.idea","","category:idea|subcategory:contract|role:dimension"
+"means.idea.contractDetail","","means.idea","","category:idea|subcategory:contractDetail|role:dimension"
+"means.idea.customerAddress","","means.idea","","category:idea|subcategory:customerAddress|role:dimension"
+"means.idea.customerRelationship","","means.idea","","category:idea|subcategory:customerRelationship|role:dimension"
+"means.idea.discount","","means.idea","","category:idea|subcategory:discount|role:dimension"
+"means.idea.discountType","","means.idea","","category:idea|subcategory:discountType|role:dimension"
+"means.idea.email","","means.idea","","category:idea|subcategory:email|role:dimension"
+"means.idea.entitlement","","means.idea","","category:idea|subcategory:entitlement|role:dimension"
+"means.idea.equipment","","means.idea","","category:idea|subcategory:equipment|role:dimension"
+"means.idea.fax","","means.idea","","category:idea|subcategory:fax|role:dimension"
+"means.idea.feedback","","means.idea","","category:idea|subcategory:feedback|role:dimension"
+"means.idea.goal","","means.idea","","category:idea|subcategory:goal|role:dimension"
+"means.idea.incident","","means.idea","","category:idea|subcategory:incident|role:dimension"
+"means.idea.invoice","","means.idea","","category:idea|subcategory:invoice|role:dimension"
+"means.idea.invoiceDetail","","means.idea","","category:idea|subcategory:invoiceDetail|role:dimension"
+"means.idea.KbArticle","","means.idea","","category:idea|subcategory:KbArticle|role:dimension"
+"means.idea.knowledgeArticle","","means.idea","","category:idea|subcategory:knowledgeArticle|role:dimension"
+"means.idea.lead","","means.idea","","category:idea|subcategory:lead|role:dimension"
+"means.idea.leadAddress","","means.idea","","category:idea|subcategory:leadAddress|role:dimension"
+"means.idea.letter","","means.idea","","category:idea|subcategory:letter|role:dimension"
+"means.idea.metric","","means.idea","","category:idea|subcategory:metric|role:dimension"
+"means.idea.opportunity","","means.idea","","category:idea|subcategory:opportunity|role:dimension"
+"means.idea.owner","","means.idea","","category:idea|subcategory:owner|role:dimension"
+"means.idea.phoneCall","","means.idea","","category:idea|subcategory:phoneCall|role:dimension"
+"means.idea.place","","means.idea","","category:idea|subcategory:place|role:dimension"
+"means.idea.position","","means.idea","","category:idea|subcategory:position|role:dimension"
+"means.idea.priceLevel","","means.idea","","category:idea|subcategory:priceLevel|role:dimension"
+"means.idea.productGroup","","means.idea","","category:idea|subcategory:productGroup|role:dimension"
+"means.idea.quote","","means.idea","","category:idea|subcategory:quote|role:dimension"
+"means.idea.ratingModel","","means.idea","","category:idea|subcategory:ratingModel|role:dimension"
+"means.idea.resource","","means.idea","","category:idea|subcategory:resource|role:dimension"
+"means.idea.resourceGroup","","means.idea","","category:idea|subcategory:resourceGroup|role:dimension"
+"means.idea.salesLiterature","","means.idea","","category:idea|subcategory:salesLiterature|role:dimension"
+"means.idea.salesOrder","","means.idea","","category:idea|subcategory:salesOrder|role:dimension"
+"means.idea.service","","means.idea","","category:idea|subcategory:service|role:dimension"
+"means.idea.serviceAppointment","","means.idea","","category:idea|subcategory:serviceAppointment|role:dimension"
+"means.idea.site","","means.idea","","category:idea|subcategory:site|role:dimension"
+"means.idea.SLA","A Service Level Agreement","means.idea","","category:idea|subcategory:SLA|role:dimension"
+"means.idea.socialActivity","","means.idea","","category:idea|subcategory:socialActivity|role:dimension"
+"means.idea.socialProfile","","means.idea","","category:idea|subcategory:socialProfile|role:dimension"
+"means.idea.systemUser","","means.idea","","category:idea|subcategory:systemUser|role:dimension"
+"means.idea.task","","means.idea","","category:idea|subcategory:task|role:dimension"
+"means.idea.team","","means.idea","","category:idea|subcategory:team|role:dimension"
+"means.idea.territory","","means.idea","","category:idea|subcategory:territory|role:dimension"
+"means.idea.UoM","","means.idea","","category:idea|subcategory:UoM|role:dimension"
+"means.reference.documentation","","means.reference","","category:reference|subcategory:documentation|role:dimension"
+"means.reference.URI","A Uniform Resource Identifier","means.reference","","category:reference|subcategory:URI|role:dimension"
+"means.reference.culture","","means.reference","","category:reference|subcategory:culture|role:dimension"
+"means.reference.culture.tag","","means.reference.culture","","category:reference|subcategory:culture|type:tag|role:dimension"
+"means.idea.employer","","means.idea","","category:idea|subcategory:employer|role:dimension"
+"means.demographic.birthDate","","means.demographic","","category:demographic|subcategory:birthDate|data_class:confidential|pii:possible|role:dimension"
+"means.demographic.income","","means.demographic","","category:demographic|subcategory:income|data_class:confidential|pii:possible|role:dimension"
+"means.demographic.education","","means.demographic","","category:demographic|subcategory:education|data_class:confidential|pii:possible|role:dimension"
+"means.formatting.stringFormat","indicates this value represents the format of a string","means.formatting","","category:formatting|subcategory:stringFormat|role:dimension"
+"means.identity.person.prefix","A salutation such as a title, rank or honorific to place before a person's name","means.identity.name","","category:identity|subcategory:person|type:prefix|pii:true|role:dimension"
+"means.identity.person.suffix","Follows a person's name and provides additional information about their position, education or honorific","means.identity.name","","category:identity|subcategory:person|type:suffix|pii:true|role:dimension"
+"means.identity.IP4Address","Internet Protocol V4 Address","means.identity","","category:identity|subcategory:IP4Address|role:dimension"
+"means.identity.IP6Address","Internet Protocol V6 Address","means.identity","","category:identity|subcategory:IP6Address|role:dimension"
+"means.measurement.currency.revenue","","means.measurement.currency","","category:measurement|subcategory:currency|type:revenue|role:measure|default_aggregation:sum"
+"means.measurement.probability","","means.measurement","","category:measurement|subcategory:probability|role:measure|default_aggregation:average"
+"means.measurement.count","","means.measurement","","category:measurement|subcategory:count|role:measure|default_aggregation:sum"
+"means.measurement.dimension","measurement of some physical dimension","means.measurement","dimension","category:measurement|subcategory:dimension|role:measure|default_aggregation:sum"
+"means.measurement.dimension.time","measurement of time","means.measurement.dimension","","category:measurement|subcategory:dimension|type:time|role:dimension"
+"means.measurement.dimension.length","measurement of length","means.measurement.dimension","","category:measurement|subcategory:dimension|type:length|role:measure|default_aggregation:sum"
+"means.measurement.dimension.mass","measurement of mass","means.measurement.dimension","","category:measurement|subcategory:dimension|type:mass|role:measure|default_aggregation:sum"
+"means.measurement.dimension.electricCurrent","measurement of electic current","means.measurement.dimension","","category:measurement|subcategory:dimension|type:electricCurrent|role:measure|default_aggregation:sum"
+"means.measurement.dimension.temperature","measurement of thermodynamic temperature","means.measurement.dimension","","category:measurement|subcategory:dimension|type:temperature|role:measure|default_aggregation:average"
+"means.measurement.dimension.amount","measurement of amount of substance","means.measurement.dimension","","category:measurement|subcategory:dimension|type:amount|role:measure|default_aggregation:sum"
+"means.measurement.dimension.luminousIntensity","measurement of electic current","means.measurement.dimension","","category:measurement|subcategory:dimension|type:luminousIntensity|role:measure|default_aggregation:sum"
+"means.measurement.dimension.frequency","measurement of frequency","means.measurement.dimension","","category:measurement|subcategory:dimension|type:frequency|role:measure|default_aggregation:sum"
+"means.measurement.dimension.angle","measurement of geometric angle","means.measurement.dimension","","category:measurement|subcategory:dimension|type:angle|role:measure|default_aggregation:sum"
+"means.measurement.dimension.force","measurement of force","means.measurement.dimension","","category:measurement|subcategory:dimension|type:force|role:measure|default_aggregation:sum"
+"means.measurement.dimension.pressure","measurement of pressure or stress","means.measurement.dimension","","category:measurement|subcategory:dimension|type:pressure|role:measure|default_aggregation:sum"
+"means.measurement.dimension.energy","measurement of energy, work, heat","means.measurement.dimension","","category:measurement|subcategory:dimension|type:energy|role:measure|default_aggregation:sum"
+"means.measurement.dimension.power","measurement of power, radiant flex","means.measurement.dimension","","category:measurement|subcategory:dimension|type:power|role:measure|default_aggregation:sum"
+"means.measurement.dimension.electricCharge","measurement of electric charge, quantity of electricity","means.measurement.dimension","","category:measurement|subcategory:dimension|type:electricCharge|role:measure|default_aggregation:sum"
+"means.measurement.dimension.electromotiveForce","measurement of volatage, EMF, electrical potential difference","means.measurement.dimension","","category:measurement|subcategory:dimension|type:electromotiveForce|role:measure|default_aggregation:sum"
+"means.measurement.dimension.capacitance","measurement of electical capacitance","means.measurement.dimension","","category:measurement|subcategory:dimension|type:capacitance|role:measure|default_aggregation:sum"
+"means.measurement.dimension.resistance","measurement of electrical resistance, impedance, reactance","means.measurement.dimension","","category:measurement|subcategory:dimension|type:resistance|role:measure|default_aggregation:sum"
+"means.measurement.dimension.dataRate","measurement of data rate","means.measurement.dimension","","category:measurement|subcategory:dimension|type:dataRate|role:measure|default_aggregation:sum"
+"means.measurement.units.si","measurments in international system of units","means","unit|dimension|symbol","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.second","measurement of time in seconds","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.meter","measurement of length in meters","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.kilogram","measurement of mass in kilogram","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.ampere","measurement of electric current in amperes","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.kelvin","measurement of thermodynamic temperature in degrees kelvin","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.mole","measurement of amount in moles","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.candela","measurement of luminous intensity in candelas","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.hertz","measurement of frequency in hertz","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.radian","measurement of angle in radians","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.newton","measurement of force or weight in newtons","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.pascal","measurement of pressure or stress in pascals","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.joule","measurement of energy, work or heat in joules","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.watt","measurement of power or radiant flux in watts","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.coulomb","measurement of electric charge or amount of electricity in coulombs","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.volt","measurement of voltage, EMF, electrical potantial difference in volts","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.farad","measurement of electric capacitance in farads","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.ohm","measurement of electrical resistance, impedance, reactance in ohms","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.celsius","measurement of temperature in degrees celsius","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.gram","measurement of mass in grams","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.units.si.bitPerSecond","measurement of data rate in bits per second","means.measurement.units.si","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.measurement.prefix","unit prefixes denoting a factor of one thousandth","means.measurement","scaleExponent","category:measurement|subcategory:prefix|role:measure|default_aggregation:sum"
+"means.measurement.prefix.giga","denotes one thousanth of the unit; 10E9","means.measurement.prefix","","category:measurement|subcategory:prefix|type:giga|role:measure|default_aggregation:sum"
+"means.measurement.prefix.mega","denotes one thousanth of the unit; 10E6","means.measurement.prefix","","category:measurement|subcategory:prefix|type:mega|role:measure|default_aggregation:sum"
+"means.measurement.prefix.kilo","denotes one thousanth of the unit; 10E3","means.measurement.prefix","","category:measurement|subcategory:prefix|type:kilo|role:measure|default_aggregation:sum"
+"means.measurement.prefix.centi","denotes one thousanth of the unit; 10E-2","means.measurement.prefix","","category:measurement|subcategory:prefix|type:centi|role:measure|default_aggregation:sum"
+"means.measurement.prefix.milli","denotes one thousanth of the unit; 10E-3","means.measurement.prefix","","category:measurement|subcategory:prefix|type:milli|role:measure|default_aggregation:sum"
+"means.measurement.prefix.micro","denotes one thousanth of the unit; 10E-6","means.measurement.prefix","","category:measurement|subcategory:prefix|type:micro|role:measure|default_aggregation:sum"
+"means.measurement.prefix.nano","denotes one thousanth of the unit; 10E-9","means.measurement.prefix","","category:measurement|subcategory:prefix|type:nano|role:measure|default_aggregation:sum"
+"means.measurement.prefix.pico","denotes one thousanth of the unit; 10E-12","means.measurement.prefix","","category:measurement|subcategory:prefix|type:pico|role:measure|default_aggregation:sum"
+"means.measurement.units.degree","","means.measurement","","category:measurement|subcategory:units|type:degree|role:measure|default_aggregation:sum"
+"means.measurement.currencyCode","indicates this value represents an ISO 4217 currency code","means.measurement","","category:measurement|subcategory:currencyCode|role:measure|default_aggregation:sum"
+"means.qualification","augments the meaning of entities or attributes with a qualification","means","","category:qualification|role:dimension"
+"means.qualification.estimate","values are an estimate only.","means.qualification","","category:qualification|subcategory:estimate|role:dimension"
+"means.measurement.units.si.liter","si unit of measurement for volume in liters","measurement.unit.volume","","category:measurement|subcategory:units|type:si|role:measure|default_aggregation:sum"
+"means.qualification.expected","old version of this trait for compat.","qualification.expected","","category:qualification|subcategory:expected|role:dimension"
+"means.qualification.observed","old version of this trait for compat.","qualification.observed","","category:qualification|subcategory:observed|role:dimension"

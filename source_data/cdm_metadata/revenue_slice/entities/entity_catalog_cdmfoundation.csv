@@ -1,13 +1,13 @@
-cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
-cdmfoundation,CdmEntity,foundations.3.0.cdm.json/CdmEntity,,cdmfoundation,cdm_entity,
-cdmfoundation,attributeGroupSet,foundations.3.0.cdm.json/attributeGroupSet,a set of references to attributeGroups,cdmfoundation,attribute_group_set,
-cdmfoundation,entityGroupSet,foundations.3.0.cdm.json/entityGroupSet,The 'old' name for this entity before it was fixed to make it type specific,cdmfoundation,entity_group_set,
-cdmfoundation,entitySet,foundations.3.0.cdm.json/entitySet,holds a list of entity references,cdmfoundation,entity_set,
-cdmfoundation,localizedTable,foundations.3.0.cdm.json/localizedTable,localized text,cdmfoundation,localized_table,
-cdmfoundation,listLookupValues,foundations.3.0.cdm.json/listLookupValues,a localized list of descriptions for possible values in a listLookup type attribute,cdmfoundation,list_lookup_values,
-cdmfoundation,listLookupCorrelatedValues,foundations.3.0.cdm.json/listLookupCorrelatedValues,a localized list of descriptions for possible values in a listLookupCorrelated type attribute,cdmfoundation,list_lookup_correlated_values,
-cdmfoundation,listLookupStringValues,foundations.3.0.cdm.json/listLookupStringValues,a localized list of descriptions for possible values in a listLookupString type attribute,cdmfoundation,list_lookup_string_values,
-cdmfoundation,listLookupWellKnownValues,foundations.3.0.cdm.json/listLookupWellKnownValues,a localized list of descriptions for possible values in a listLookupWellKnown type attribute,cdmfoundation,list_lookup_well_known_values,
-cdmfoundation,reference,primitives.2.0.cdm.json/reference,a root entity for constant reference tables,cdmfoundation,reference,
-cdmfoundation,defaultArtifacts,primitives.2.0.cdm.json/defaultArtifacts,default definitions for attributes that are generated and added during resolution,cdmfoundation,default_artifacts,id
-cdmfoundation,FileInfo,primitives.2.0.cdm.json/FileInfo,An entity that contains file information.,cdmfoundation,file_info,
+"cdm_manifest","cdm_entity_name","cdm_source_file","description","dbt_schema_name","dbt_model_name","primary_key"
+"cdmfoundation","CdmEntity","foundations.3.0.cdm.json/CdmEntity","","cdmfoundation","cdm_entity",""
+"cdmfoundation","attributeGroupSet","foundations.3.0.cdm.json/attributeGroupSet","a set of references to attributeGroups","cdmfoundation","attribute_group_set",""
+"cdmfoundation","entityGroupSet","foundations.3.0.cdm.json/entityGroupSet","The 'old' name for this entity before it was fixed to make it type specific","cdmfoundation","entity_group_set",""
+"cdmfoundation","entitySet","foundations.3.0.cdm.json/entitySet","holds a list of entity references","cdmfoundation","entity_set",""
+"cdmfoundation","localizedTable","foundations.3.0.cdm.json/localizedTable","localized text","cdmfoundation","localized_table",""
+"cdmfoundation","listLookupValues","foundations.3.0.cdm.json/listLookupValues","a localized list of descriptions for possible values in a listLookup type attribute","cdmfoundation","list_lookup_values",""
+"cdmfoundation","listLookupCorrelatedValues","foundations.3.0.cdm.json/listLookupCorrelatedValues","a localized list of descriptions for possible values in a listLookupCorrelated type attribute","cdmfoundation","list_lookup_correlated_values",""
+"cdmfoundation","listLookupStringValues","foundations.3.0.cdm.json/listLookupStringValues","a localized list of descriptions for possible values in a listLookupString type attribute","cdmfoundation","list_lookup_string_values",""
+"cdmfoundation","listLookupWellKnownValues","foundations.3.0.cdm.json/listLookupWellKnownValues","a localized list of descriptions for possible values in a listLookupWellKnown type attribute","cdmfoundation","list_lookup_well_known_values",""
+"cdmfoundation","reference","primitives.2.0.cdm.json/reference","a root entity for constant reference tables","cdmfoundation","reference",""
+"cdmfoundation","defaultArtifacts","primitives.2.0.cdm.json/defaultArtifacts","default definitions for attributes that are generated and added during resolution","cdmfoundation","default_artifacts","id"
+"cdmfoundation","FileInfo","primitives.2.0.cdm.json/FileInfo","An entity that contains file information.","cdmfoundation","file_info",""

@@ -1,7 +1,7 @@
-cdm_manifest,cdm_entity_name,cdm_source_file,description,dbt_schema_name,dbt_model_name,primary_key
-Asset,Case,Case.1.0.cdm.json/Case,Service request case associated with a contract.,asset,case,incidentId
-Asset,CustomerAsset,CustomerAsset.1.0.cdm.json/CustomerAsset,Specify Customer Asset.,asset,customer_asset,customerassetId
-Asset,CustomerAssetCategory,CustomerAssetCategory.1.0.cdm.json/CustomerAssetCategory,The Category of Customer Asset.,asset,customer_asset_category,customerassetcategoryId
-Asset,FunctionalLocation,FunctionalLocation.1.0.cdm.json/FunctionalLocation,Functional location,asset,functional_location,functionalLocationId
-Asset,Visit,Visit.1.0.cdm.json/Visit,,asset,visit,visitId
-Asset,Product,Product.1.0.cdm.json/Product,Information about products and their pricing information.,asset,product,productId
+"cdm_manifest","cdm_entity_name","cdm_source_file","description","dbt_schema_name","dbt_model_name","primary_key"
+"Asset","Case","Case.1.0.cdm.json/Case","Service request case associated with a contract.","asset","case","incidentId"
+"Asset","CustomerAsset","CustomerAsset.1.0.cdm.json/CustomerAsset","Specify Customer Asset.","asset","customer_asset","customerassetId"
+"Asset","CustomerAssetCategory","CustomerAssetCategory.1.0.cdm.json/CustomerAssetCategory","The Category of Customer Asset.","asset","customer_asset_category","customerassetcategoryId"
+"Asset","FunctionalLocation","FunctionalLocation.1.0.cdm.json/FunctionalLocation","Functional location","asset","functional_location","functionalLocationId"
+"Asset","Visit","Visit.1.0.cdm.json/Visit","","asset","visit","visitId"
+"Asset","Product","Product.1.0.cdm.json/Product","Information about products and their pricing information.","asset","product","productId"
