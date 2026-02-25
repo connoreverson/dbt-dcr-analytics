@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: stg_geoparks__parks_master
+    description: >
+      The authoritative, legal definition of all 50 state park boundaries managed in the Enterprise GIS.
+      This model serves as the ground-truth dimension for park existence and acreage.
+      Grain: One row per geo_park_id.
+    columns:
+      - name: geo_park_id
+        description: Master identifying key for the park within the state's geographic information system.
+        tests:
+          - unique
+          - not_null
+      - name: gis_steward
+        description: The specific regional office or staff member responsible for maintaining this boundary's accuracy.
+      - name: park_name
+        description: The official, legally recognized name of the park unit.
+      - name: total_acres
+        description: The officially calculated geographic area within the park's legal boundary.

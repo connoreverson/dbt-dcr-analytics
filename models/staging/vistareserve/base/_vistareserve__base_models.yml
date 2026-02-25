@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: base_vistareserve__customer_profiles
+    description: >
+      Pre-processes the VistaReserve customer profiles to deduplicate profiles heavily affected by point-of-sale collisions.
+      Utilizes a window function to isolate and retain only the most recently updated version of each profile.
+      Grain: One row per customer_id.
+    columns:
+      - name: customer_id
+        description: System-generated identifier for the customer.
+        tests:
+          - unique
+          - not_null
+
+  - name: base_vistareserve__asset_crosswalks
+    description: >
+      Calculates business logic on the crosswalk mapping, primarily determining how long it has been
+      since each row was manually verified by comparing the verified date to current_date.
+      Grain: One row per vista_asset_id.
+    columns:
+      - name: vista_asset_id
+        description: Foreign key identifying the asset within VistaReserve.
+        tests:
+          - unique
+          - not_null

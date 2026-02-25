@@ -1,0 +1,177 @@
+version: 2
+
+models:
+  - name: stg_vistareserve__parks
+    description: >
+      Park records from the VistaReserve system.
+      Represents the core organizational units where reservations and transactions occur.
+      Grain: One row per park_id.
+    columns:
+      - name: park_id
+        description: System-generated identifier assigned by VistaReserve when a park is registered.
+        tests:
+          - unique
+          - not_null
+      - name: park_name
+        description: The common name of the park.
+      - name: region_id
+        description: Identifier for the geographic or administrative region managing the park.
+      - name: classification
+        description: Category of the park (e.g., State Park, Recreation Area).
+      - name: has_unstaffed_kiosk
+        description: Indicates if the park utilizes automated kiosks for fee collection instead of a staffed gatehouse.
+
+  - name: stg_vistareserve__customer_profiles
+    description: >
+      Registered guests and passholders who have interacted with VistaReserve.
+      This model flattens JSON preference data into discrete columns.
+      Grain: One row per customer_id.
+    columns:
+      - name: customer_id
+        description: System-generated identifier for the customer profile.
+        tests:
+          - unique
+          - not_null
+      - name: merged_into_customer_id
+        description: Identifier of the surviving profile if this record was merged due to duplication.
+      - name: address_state
+        description: The state of residence provided by the customer.
+      - name: email
+        description: Customer's email address.
+      - name: first_name
+        description: Customer's given name.
+      - name: last_name
+        description: Customer's surname.
+      - name: phone
+        description: Customer's primary contact phone number.
+      - name: has_annual_pass
+        description: Flag indicating if the customer holds a valid annual parks pass.
+      - name: is_senior
+        description: Flag indicating if the customer qualifies for senior discounts.
+      - name: is_veteran
+        description: Flag indicating if the customer qualifies for veteran discounts.
+      - name: account_created_at
+        description: Timestamp when the profile was first registered in VistaReserve.
+      - name: equipment_preference
+        description: Derived from preferences_json. The typical camping equipment used (e.g., RV, Tent).
+      - name: accessibility_needs
+        description: Derived from preferences_json. Specific ADA or physical accommodations requested by the user.
+
+  - name: stg_vistareserve__inventory_assets
+    description: >
+      Bookable physical assets within the parks, such as campsites, cabins, and picnic shelters.
+      Grain: One row per asset_id.
+    columns:
+      - name: asset_id
+        description: System-generated internal identifier for the specific bookable site or structure.
+        tests:
+          - unique
+          - not_null
+      - name: park_id
+        description: Foreign key to the parent park where this asset is located.
+      - name: asset_type
+        description: The category of the inventory item (e.g., Campsite, Cabin, Yurt).
+      - name: pet_policy
+        description: Rules governing whether pets are allowed in or at the asset.
+      - name: utility_hookup
+        description: Type of utility connections available (e.g., Full, Electric Only, None).
+      - name: max_occupancy
+        description: The maximum number of individuals legally permitted at the asset.
+      - name: is_ada_accessible
+        description: Indicates if the site meets Americans with Disabilities Act standards.
+
+  - name: stg_vistareserve__asset_crosswalks
+    description: >
+      Manually maintained mapping table connecting VistaReserve assets to their equivalents in GeoParks and InfraTrak.
+      Grain: One row per vista_asset_id.
+    columns:
+      - name: vista_asset_id
+        description: Foreign key identifying the asset within VistaReserve.
+        tests:
+          - unique
+          - not_null
+      - name: geoparks_feature_id
+        description: Corresponding identifier for this asset in the GeoParks GIS system.
+      - name: infratrak_asset_tag
+        description: Corresponding physical tag identifier in the InfraTrak maintenance system.
+      - name: source_system
+        description: Identifies which system originated this mapping record.
+      - name: days_since_last_update
+        description: Represents how many days have passed since the mapping was verified.
+      - name: last_verified_date
+        description: Date when a staff member last confirmed these IDs accurately map to the same physical location.
+
+  - name: stg_vistareserve__pos_transactions
+    description: >
+      Point-of-sale activities for immediate, walk-up purchases like day passes, firewood, and retail merchandise.
+      Grain: One row per transaction_id.
+    columns:
+      - name: transaction_id
+        description: Unique identifier for the individual retail or day-use sale.
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: Foreign key to the customer profile, if the purchaser was logged in or identified at the register.
+      - name: park_id
+        description: Foreign key to the park where the transaction occurred.
+      - name: revenue_category
+        description: The accounting classification for the funds collected (e.g., Day Use, Retail, Firewood).
+      - name: transaction_amount
+        description: The total gross dollars collected for this single transaction.
+      - name: is_kiosk_entry
+        description: Flag indicating if the payment was collected by an automated, unstaffed terminal.
+      - name: transaction_created_at
+        description: Timestamp of when the payment was finalized.
+
+  - name: stg_vistareserve__reservations
+    description: >
+      Advance bookings for physical assets, primarily overnight stays in campsites and cabins.
+      Extracts granular metadata like promo codes from a nested JSON payload.
+      Grain: One row per reservation_id.
+    columns:
+      - name: reservation_id
+        description: Unique identifier for the booking itinerary.
+        tests:
+          - unique
+          - not_null
+      - name: asset_id
+        description: Foreign key identifying the specific site or structure booked.
+      - name: customer_id
+        description: Foreign key identifying the user who made the reservation.
+      - name: reservation_status
+        description: Current state of the booking (e.g., Confirmed, Cancelled, Completed).
+      - name: total_amount
+        description: Gross dollar value of the entire reservation, including fees and taxes.
+      - name: arrival_date
+        description: The date the guest is scheduled to check in.
+      - name: departure_date
+        description: The date the guest is scheduled to check out.
+      - name: reservation_created_at
+        description: Timestamp of when the customer secured the reservation.
+      - name: booking_source
+        description: Derived from booking_metadata. Indicates where the reservation originated (e.g., Web, Call Center).
+      - name: promo_code
+        description: Derived from booking_metadata. The specific discount code applied to this booking, if any.
+
+  - name: stg_vistareserve__revenue_batch
+    description: >
+      Pre-aggregated daily financial summaries generated by the VistaReserve accounting module.
+      Contains rolled-up revenue figures intended for reconciliation against the individual transaction tables.
+      Grain: One row per batch_id (typically represents one park per category per day).
+    columns:
+      - name: batch_id
+        description: System-generated identifier for the summarized accounting batch.
+        tests:
+          - unique
+          - not_null
+      - name: park_id
+        description: Foreign key indicating which park collected these funds.
+      - name: revenue_category
+        description: The accounting bucket these aggregated funds belong to.
+      - name: gross_revenue
+        description: Total dollar amount recorded in this batch before refunds or adjustments.
+      - name: transaction_count
+        description: The number of individual sales or bookings that were rolled up into this single batch.
+      - name: batch_date
+        description: The calendar date on which the underlying transactions occurred.
