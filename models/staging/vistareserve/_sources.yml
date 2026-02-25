@@ -1,0 +1,146 @@
+version: 2
+
+sources:
+  - name: vistareserve
+    description: >
+      Enterprise SaaS system managing reservations, revenue, and customer 
+      relationships for all 50 parks. Contains rich transactional data but 
+      suffers from high customer duplicate rates (18-22%) and a stale asset 
+      crosswalk (unmaintained since 2022). Customer profiles contain PII.
+    database: vistareserve
+    schema: main
+
+    tables:
+      - name: parks
+        description: >
+          Core park entities in VistaReserve. Lacks geospatial boundaries but 
+          acts as the parent foreign key for all transactions and assets.
+        columns:
+          - name: park_id
+            description: Primary key for the park in VistaReserve.
+            tests:
+              - unique
+              - not_null
+
+      - name: customer_profiles
+        description: >
+          Registered guests and passholders. Contains PII. Known data quality 
+          issue: 18-22% duplicate rate due to lack of strict identity resolution 
+          during online checkout. Contains JSON metadata for preferences.
+        loaded_at_field: created_at
+        freshness:
+          warn_after: {count: 24, period: hour}
+          error_after: {count: 48, period: hour}
+        columns:
+          - name: customer_id
+            description: Primary key for the customer profile.
+            tests:
+              - unique
+              - not_null
+          - name: preferences_json
+            description: JSON block containing customer preferences and equipment types.
+
+      - name: inventory_assets
+        description: >
+          Bookable assets (campsites, cabins, shelters) at each park. 
+          Asset types and ADA features are tracked here.
+        columns:
+          - name: asset_id
+            description: Primary key for the bookable asset.
+            tests:
+              - unique
+              - not_null
+          - name: park_id
+            description: Foreign key to the parent park.
+            tests:
+              - not_null
+              - relationships:
+                  to: source('vistareserve', 'parks')
+                  field: park_id
+
+      - name: asset_crosswalk
+        description: >
+          Mapping table between VistaReserve, GeoParks, and InfraTrak IDs.
+          WARNING: Unmaintained since 2022. Use with caution for joining 
+          across systems. Last verified date is severely lagging.
+        columns:
+          - name: vista_asset_id
+            description: Primary key and foreign key to VistaReserve assets.
+            tests:
+              - unique
+              - not_null
+
+      - name: pos_transactions
+        description: >
+          Point of sale transactions for walk-up sales, day passes, and retail.
+          Kiosk revenue is sometimes entered manually with a lag.
+        loaded_at_field: transaction_date
+        freshness:
+          warn_after: {count: 48, period: hour}
+          error_after: {count: 72, period: hour}
+        columns:
+          - name: transaction_id
+            description: Primary key for the POS transaction.
+            tests:
+              - unique
+              - not_null
+          - name: park_id
+            description: Foreign key to the parent park.
+            tests:
+              - not_null
+              - relationships:
+                  to: source('vistareserve', 'parks')
+                  field: park_id
+          - name: customer_id
+            description: Optional foreign key to registered customer profile.
+
+      - name: reservations
+        description: >
+          Advance bookings for campsites and cabins. Includes json metadata 
+          for booking source and promos. ~5% of metadata blocks are malformed.
+        loaded_at_field: booking_date
+        freshness:
+          warn_after: {count: 24, period: hour}
+          error_after: {count: 48, period: hour}
+        columns:
+          - name: reservation_id
+            description: Primary key for the reservation.
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            description: Foreign key to the customer profile.
+            tests:
+              - not_null
+              - relationships:
+                  to: source('vistareserve', 'customer_profiles')
+                  field: customer_id
+          - name: asset_id
+            description: Foreign key to the booked asset.
+            tests:
+              - not_null
+              - relationships:
+                  to: source('vistareserve', 'inventory_assets')
+                  field: asset_id
+
+      - name: revenue_batch
+        description: >
+          Daily summaries of revenue by category and park. 
+          To be profiled for grain compatibility with pos_transactions.
+        loaded_at_field: batch_date
+        freshness:
+          warn_after: {count: 24, period: hour}
+          error_after: {count: 48, period: hour}
+        columns:
+          - name: batch_id
+            description: Primary key for the revenue batch.
+            tests:
+              - unique
+              - not_null
+          - name: park_id
+            description: Foreign key to the parent park.
+            tests:
+              - not_null
+              - relationships:
+                  to: source('vistareserve', 'parks')
+                  field: park_id

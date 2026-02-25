@@ -1,0 +1,29 @@
+version: 2
+
+sources:
+  - name: geoparks
+    description: >
+      ArcGIS geospatial server managing legal boundaries and master asset definitions.
+      Serves as the authoritative source for park locations and acreage, though 
+      updates can lag 1-3 years behind operational reality.
+    database: geoparks
+    schema: main
+
+    tables:
+      - name: parks_master
+        description: >
+          Master list of 50 legal park boundaries and their total acreage.
+          The primary key (geo_park_id) is the authoritative identifier for 
+          downstream integration models. NOTE: This table does not contain a 
+          timestamp column, so automated freshness constraints are omitted, 
+          but manual verification should accommodate a 1-3 year update lag.
+        columns:
+          - name: geo_park_id
+            description: Primary key and authoritative park identifier.
+            tests:
+              - unique
+              - not_null
+          - name: park_name
+            description: Official legal name of the park unit.
+          - name: total_acres
+            description: GIS-calculated acreage of the park boundary.

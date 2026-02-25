@@ -1,0 +1,7 @@
+[tool.dbt-score]
+# Enforce description presence for models and columns
+rule_severity_dbt_score_has_description = "warning"
+rule_severity_dbt_score_has_model_description = "warn"
+
+# Minimum assertions for models
+rule_severity_dbt_score_has_unique_test = "error"

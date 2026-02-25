@@ -1,0 +1,12 @@
+dcr_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: 'target/dcr_analytics.duckdb'
+      schema: main
+      attach:
+        - path: 'source_data/duckdb/dcr_rev_01_vistareserve.duckdb'
+          alias: vistareserve
+        - path: 'source_data/duckdb/dcr_geo_01_geoparks.duckdb'
+          alias: geoparks
