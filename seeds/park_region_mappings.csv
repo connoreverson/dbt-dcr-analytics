@@ -1,0 +1,5 @@
+region_code,region_name,region_description
+R1,Western Region,Western properties including mountain and lake districts
+R2,Central Region,Central operations and state forest lands
+R3,Northeastern Region,Coastal properties north of Boston
+R4,Southeastern Region,Coastal properties south of Boston and Cape Cod

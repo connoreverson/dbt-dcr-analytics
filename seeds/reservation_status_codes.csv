@@ -1,0 +1,6 @@
+status_code,status_label,is_active,sort_order
+CONFIRMED,Confirmed,true,1
+PENDING,Pending Payment,true,2
+CANCELLED,Cancelled,false,3
+COMPLETED,Visit Completed,false,4
+NO_SHOW,Customer No-Show,false,5

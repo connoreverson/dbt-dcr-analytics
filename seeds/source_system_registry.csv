@@ -1,0 +1,6 @@
+source_system_code,source_system_name,system_type,operational_status
+DCR-REV-01,VistaReserve,SaaS Subscription,Active
+DCR-GEO-01,GeoParks,ArcGIS Enterprise,Active
+DCR-FIN-01,StateGov Financials,On-Premises ERP,Active
+DCR-FIN-02,GrantTrack,Excel Master,Active
+DCR-HR-01,PeopleFirst,SaaS HCM,Active

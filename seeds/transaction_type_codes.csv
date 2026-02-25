@@ -1,0 +1,7 @@
+type_code,type_label,revenue_category
+POS_FIREWOOD,Firewood Sales,Retail
+POS_ICE,Ice Sales,Retail
+POS_ANNUAL_PASS,Annual Pass Sales,Passes
+POS_DAY_PASS,Day Use Pass Sales,Passes
+POS_MERCH,Merchandise Sales,Retail
+POS_RENTAL,Equipment Rental,Rentals

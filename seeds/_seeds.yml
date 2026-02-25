@@ -1,0 +1,65 @@
+version: 2
+
+seeds:
+  - name: column_catalog_asset
+    description: >
+      Microsoft Common Data Model column catalog for the Asset definition manifest.
+      Contains the authorized metadata dictionary for mapping physical assets.
+  - name: column_catalog_visits
+    description: >
+      Microsoft Common Data Model column catalog for the Visits definition manifest.
+      Contains the authorized metadata dictionary for mapping reservations and visitation events.
+  - name: column_catalog_application_common
+    description: >
+      Microsoft Common Data Model column catalog for the Application Common definition manifest.
+      Contains shared metadata structures utilized across multiple entity groups.
+  - name: column_catalog_cdmfoundation
+    description: >
+      Microsoft Common Data Model column catalog for the CDM Foundation definition manifest.
+      Contains the core data types and foundational traits required by the schema.
+  - name: column_catalog_non_profit_core
+    description: >
+      Microsoft Common Data Model column catalog for the Non-Profit Core definition manifest.
+      Contains the authorized metadata dictionary for mapping contacts, accounts, and transactions.
+
+  - name: reservation_status_codes
+    description: >
+      Reference mapping table translating system reservation status codes to human-readable labels.
+      Used to enrich downstream dimensions and facts with standardized descriptions.
+    config:
+      column_types:
+        status_code: varchar
+        status_label: varchar
+        is_active: boolean
+        sort_order: integer
+
+  - name: transaction_type_codes
+    description: >
+      Reference mapping table translating POS transaction type codes to their corresponding revenue categories.
+      Crucial for grouping granular transactions into aggregate reporting buckets.
+    config:
+      column_types:
+        type_code: varchar
+        type_label: varchar
+        revenue_category: varchar
+
+  - name: park_region_mappings
+    description: >
+      Reference mapping table defining the canonical regions assigned to DCR park properties.
+      Used to align the authoritative organizational hierarchy within the data mart layer.
+    config:
+      column_types:
+        region_code: varchar
+        region_name: varchar
+        region_description: varchar
+
+  - name: source_system_registry
+    description: >
+      Registry mapping active upstream source systems connecting their codes to descriptive names.
+      Enables enterprise-wide lineage tagging within data objects across varying domains.
+    config:
+      column_types:
+        source_system_code: varchar
+        source_system_name: varchar
+        system_type: varchar
+        operational_status: varchar
