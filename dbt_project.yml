@@ -38,7 +38,19 @@ models:
     marts:
       +materialized: table
 
+vars:
+  # dbt-project-evaluator: teach the evaluator that base_ is a valid prefix
+  # for base models that live in the staging layer subdirectories.
+  model_types: ['staging', 'intermediate', 'marts', 'other', 'base']
+  base_prefixes: ['base_']
+  base_folder_name: 'staging'
+
 seeds:
+  # Disable the package's default empty exceptions seed so the project's
+  # custom version (seeds/dbt_project_evaluator_exceptions.csv) takes effect.
+  dbt_project_evaluator:
+    dbt_project_evaluator_exceptions:
+      +enabled: false
   dcr_analytics:
     cdm_catalogs:
       +column_types:

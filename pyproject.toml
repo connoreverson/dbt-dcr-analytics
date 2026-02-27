@@ -1,7 +1,28 @@
 [tool.dbt-score]
-# Enforce description presence for models and columns
-rule_severity_dbt_score_has_description = "warning"
-rule_severity_dbt_score_has_model_description = "warn"
+# Fail any model whose score drops below this threshold
+fail_any_model_under = 5.0
+inject_paths = ["."]
+namespaces = ["dbt_score.rules.generic", "scripts.dbt_score_rules"]
 
-# Minimum assertions for models
-rule_severity_dbt_score_has_unique_test = "error"
+# Enforce description presence on models and columns — high severity
+[tool.dbt-score.rules."dbt_score.rules.generic.has_description"]
+severity = 3
+
+[tool.dbt-score.rules."dbt_score.rules.generic.columns_have_description"]
+severity = 3
+
+# Owner assignment — low severity for local development (no team assignments yet)
+[tool.dbt-score.rules."dbt_score.rules.generic.has_owner"]
+severity = 1
+
+[tool.dbt-score.rules."scripts.dbt_score_rules.no_test_rationale_in_description"]
+severity = 3
+
+[tool.dbt-score.rules."scripts.dbt_score_rules.mart_contract_enforced"]
+severity = 3
+
+[tool.dbt-score.rules."scripts.dbt_score_rules.mart_columns_have_data_type"]
+severity = 3
+
+[tool.dbt-score.rules."scripts.dbt_score_rules.no_per_model_yaml"]
+severity = 2
