@@ -197,6 +197,12 @@ models:
       - name: reservation_amount
         data_type: decimal(10,2)
         description: The total monetary value attached to the reservation.
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100000
+              config:
+                severity: warn
       - name: check_in_date
         data_type: date
         description: Arrival date of the reservation.
@@ -257,6 +263,13 @@ models:
       - name: transaction_amount
         data_type: decimal(10,2)
         description: The monetary value of the transaction.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 10000
+              config:
+                severity: warn
       - name: quantity
         data_type: integer
         description: Item quantity of the transaction (defaulted to 1).
@@ -292,6 +305,9 @@ models:
         description: Surrogate key for the park.
         tests:
           - not_null
+          - relationships:
+              to: ref('dim_parks')
+              field: parks_sk
       - name: report_month
         data_type: date
         description: The start date of the reporting month.
