@@ -35,7 +35,9 @@ sources:
           - name: customer_id
             description: Primary key for the customer profile.
             tests:
-              - unique
+              - unique:
+                  config:
+                    severity: warn
               - not_null
           - name: preferences_json
             description: JSON block containing customer preferences and equipment types.

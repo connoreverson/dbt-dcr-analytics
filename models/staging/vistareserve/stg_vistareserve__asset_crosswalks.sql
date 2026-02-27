@@ -7,6 +7,8 @@ source as (
 final as (
 
     select
+        --  hash key
+        {{ dbt_utils.generate_surrogate_key(['source.vista_asset_id']) }} as hk_asset_crosswalks,
         --  ids
         cast(source.geoparks_feature_id as varchar) as geoparks_feature_id,
         cast(source.vista_asset_id as varchar) as vista_asset_id,

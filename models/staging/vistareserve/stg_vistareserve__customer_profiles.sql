@@ -7,6 +7,8 @@ source as (
 final as (
 
     select
+        --  hash key
+        {{ dbt_utils.generate_surrogate_key(['source.customer_id']) }} as hk_customer_profiles,
         --  ids
         cast(source.customer_id as varchar) as customer_id,
         cast(source.merged_into_customer_id as varchar)

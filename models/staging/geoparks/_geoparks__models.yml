@@ -7,6 +7,11 @@ models:
       This model serves as the ground-truth dimension for park existence and acreage.
       Grain: One row per geo_park_id.
     columns:
+      - name: hk_parks_master
+        description: Surrogate hash key derived from geo_park_id. Uniquely identifies a park record from GeoParks.
+        tests:
+          - unique
+          - not_null
       - name: geo_park_id
         description: Master identifying key for the park within the state's geographic information system.
         tests:
