@@ -23,8 +23,16 @@ joined_reservations as (
         source_assets._parent_park_sk as _park_sk,
         {{ generate_source_system_tag('DCR-REV-01') }} as source_system
     from source
-    left join source_contacts on cast(source.customer_id as varchar) = cast(source_contacts.contactid as varchar)
-    left join source_assets on cast(source.asset_id as varchar) = cast(source_assets.customerassetid as varchar)
+    left join
+        source_contacts
+        on
+            cast(source.customer_id as varchar)
+            = cast(source_contacts.contactid as varchar)
+    left join
+        source_assets
+        on
+            cast(source.asset_id as varchar)
+            = cast(source_assets.customerassetid as varchar)
 ),
 
 final as (

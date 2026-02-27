@@ -12,13 +12,15 @@ source_assets as (
 ),
 
 joined_assets as (
-    select 
+    select
         source_assets.*,
-        source_assets.asset_id as name,
+        source_assets.asset_id as name,  -- noqa: RF04
         source_parks.parks_sk as _parent_park_sk,
         {{ generate_source_system_tag('DCR-REV-01') }} as source_system
     from source_assets
-    left join source_parks on cast(source_assets.park_id as varchar) = source_parks.accountnumber
+    left join
+        source_parks
+        on {{ get_geoparks_account_number('source_assets.park_id') }} = source_parks.accountnumber
 ),
 
 final as (

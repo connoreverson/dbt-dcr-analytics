@@ -20,18 +20,25 @@ joined_transactions as (
         source.*,
         source_contacts.contacts_sk as _contact_sk,
         source_parks.parks_sk as _park_sk,
-        {{ generate_source_system_tag('DCR-REV-01') }} as source_system 
+        {{ generate_source_system_tag('DCR-REV-01') }} as source_system
     from source
-    left join source_contacts on cast(source.customer_id as varchar) = cast(source_contacts.contactid as varchar)
-    left join source_parks on cast(source.park_id as varchar) = source_parks.accountnumber
+    left join
+        source_contacts
+        on
+            cast(source.customer_id as varchar)
+            = cast(source_contacts.contactid as varchar)
+    left join
+        source_parks
+        on {{ get_geoparks_account_number('source.park_id') }} = source_parks.accountnumber
 ),
 
 /*
     Open Question #2: Revenue Batch Integration
-    'revenue_batch' records represent aggregated daily batches rather than individual 
-    customer-level point-of-sale transactions. Unioning them here would mix grains 
-    and distort transaction counts. Therefore, revenue batches are excluded from this 
-    model and will be modeled separately (e.g., int_revenue_batches) per the spec.
+    'revenue_batch' records represent aggregated daily batches rather
+    than individual customer-level point-of-sale transactions. Unioning
+    them here would mix grains and distort transaction counts. Revenue
+    batches are excluded from this model and will be modeled separately
+    (e.g., int_revenue_batches) per the spec.
 */
 final as (
     {{ generate_cdm_projection(

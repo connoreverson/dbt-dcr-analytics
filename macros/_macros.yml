@@ -1,6 +1,18 @@
 version: 2
 
 macros:
+  - name: cast_park_id_to_varchar
+    description: >
+      Casts a VistaReserve park identifier from its native integer representation
+      to varchar, aligning it with the GeoParks string-typed park ID so that both
+      sources can be unioned in int_parks without implicit type coercions.
+    arguments:
+      - name: column_name
+        type: string
+        description: >
+          The column expression to cast (e.g. 'source.park_id'). Must resolve
+          to a value coercible to varchar.
+
   - name: generate_source_system_tag
     description: >
       Generates the standardized `source_system` literal column identifying 
@@ -19,29 +31,37 @@ macros:
         type: string
         description: The target column to cleanse.
 
-  - name: cast_park_id_to_varchar
-    description: >
-      Safely casts varying historical and system representations of Park numerical 
-      identifiers down to a baseline consistent VARCHAR definition for cross-system usage.
-    arguments:
-      - name: column_name
-        type: string
-        description: The literal identifier column containing integer or mixed-type park references.
-
   - name: generate_staging_model
     description: >
-      A utility macro to quickly scaffold staging block boilerplate for newly discovered raw tables.
+      Codegen utility for scaffolding staging model boilerplate. Invoke via
+      `dbt run-operation generate_staging_model --args '{source_schema: <schema>, source_table: <table>}'`
+      to print a categorized SELECT with explicit casts for every column in the source relation.
+      The output is a starting point — rename columns to business names, add a surrogate key,
+      and remove unused columns before committing the file. Not called at model runtime.
     arguments:
-      - name: source_name
+      - name: source_schema
         type: string
-        description: The catalog name of the originating system.
-      - name: table_name
+        description: The dbt source schema name (e.g. vistareserve). Mutually exclusive with relation.
+      - name: source_table
         type: string
-        description: The table containing the unformatted record objects.
+        description: The raw table name within source_schema to scaffold. Mutually exclusive with relation.
+      - name: relation
+        type: string
+        description: An existing ref() target to scaffold from, instead of a source. Mutually exclusive with source_schema/source_table.
+
+  - name: get_geoparks_account_number
+    description: >
+      Formats a VistaReserve integer park_id into the GeoParks account number format
+      (e.g., park_id 41 → 'GP-041'). Centralizes the ID crosswalk format string so
+      that int_transactions and int_customer_assets both use the same logic.
+    arguments:
+      - name: park_id_column
+        type: string
+        description: The column expression referencing the VistaReserve integer park_id.
 
   - name: get_cdm_columns
     description: >
-      Queries the consolidated int_cdm_columns model at compile time to retrieve an array 
+      Queries the consolidated int_cdm_columns model at compile time to retrieve an array
       of authorized column definitions for a given CDM entity.
     arguments:
       - name: entity

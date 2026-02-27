@@ -4,7 +4,7 @@
 with
 
 source as (
-    select 
+    select
         *,
         first_name as firstname,
         last_name as lastname,

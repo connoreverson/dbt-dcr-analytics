@@ -10,6 +10,7 @@ source_geo as (
 source_vista as (
     select * from {{ ref('stg_vistareserve__parks') }}
 ),
+
 cdm_geo as (
     {{ generate_cdm_projection(
         integration_model='int_parks',
@@ -37,10 +38,10 @@ cdm_vista as (
         cte_name='source_vista',
         sk_source_columns=['park_id'],
         pass_through_columns=[
+            'null as description',
             'cast(null as decimal(10, 2)) as total_acres',
             'classification',
             'region_id',
-            'null as description',
             'null as address1_city',
             'null as address1_stateorprovince',
             'null as address1_postalcode',
@@ -59,10 +60,11 @@ union_sources as (
 
 /*
     Open Question #1: Park ID Reconciliation
-    Due to the lack of a unified crosswalk ID between GeoParks and VistaReserve, 
-    we are heuristically deduplicating based on fuzzy string matching of the park 
-    names (stripping punctuation/casing). GeoParks is designated the system of 
-    record, so its attributes win in the event of a tie.
+    Due to the lack of a unified crosswalk ID between GeoParks and
+    VistaReserve, we are heuristically deduplicating based on fuzzy
+    string matching of the park names (stripping punctuation/casing).
+    GeoParks is designated the system of record, so its attributes win
+    in the event of a tie.
 */
 dedup_sources as (
     select
@@ -77,9 +79,10 @@ dedup_sources as (
             partition by {{ clean_string('name') }}
         ) as combined_region_id,
         row_number() over (
-            partition by {{ clean_string('name') }} 
-            order by 
-                case when source_system = 'DCR-GEO-01' then 1 else 2 end
+            partition by {{ clean_string('name') }}
+            order by
+                case when source_system = 'DCR-GEO-01' then 1 else 2 end,
+                parks_sk
         ) as rn
     from union_sources
 ),

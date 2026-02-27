@@ -29,7 +29,7 @@ deduped as (
 ),
 
 final as (
-    select 
+    select
         cdm_entity_name,
         dbt_column_name,
         dbt_data_type,

@@ -22,8 +22,11 @@
     
     {% if execute %}
         {% if crosswalk_results|length == 0 %}
-            {{ log("No crosswalk entries found for " ~ integration_model ~ " and " ~ source_model, info=True) }}
-            {{ return('') }}
+            {% do exceptions.raise_compiler_error(
+                "generate_cdm_projection: no crosswalk entries found for integration_model='"
+                ~ integration_model ~ "' and source_model='" ~ source_model
+                ~ "'. Add the mapping to seeds/cdm_crosswalk.csv and re-run dbt seed."
+            ) %}
         {% endif %}
         
         {% set cdm_entity = crosswalk_results.columns[0].values()[0] %}
