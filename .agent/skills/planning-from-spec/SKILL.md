@@ -17,8 +17,7 @@ Before writing the plan, read and internalize:
 
 1. The SPEC document (e.g., `reference/SPEC_vertical_slice_revenue.md`)
 2. `reference/dbt_project_standards.md` — the 103 governance rules
-3. `reference/project.md` — project framing and design decisions
-4. `.agent/rules/dbt-project-governance.md` — layer discipline, naming, testing, CDM requirements
+3. `.agent/rules/dbt-project-governance.md` — layer discipline, naming, testing, CDM requirements
 5. Relevant CDM metadata in `source_data/cdm_metadata/` for entity mapping
 
 ## Plan Structure

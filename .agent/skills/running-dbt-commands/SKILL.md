@@ -15,9 +15,15 @@ metadata:
 3. **Always use `--quiet`** with `--warn-error-options '{"error": ["NoNodesForSelectionCriteria"]}'` to reduce output while catching selector typos
 4. **Always use `--select`** - never run the entire project without explicit user approval
 
-## PowerShell Virtual Environment (CRITICAL)
+## Virtual Environment Activation (Shell-Aware)
 
-This project runs dbt from a Python virtual environment on Windows PowerShell. **Every dbt command must be prefixed with dot-sourced activation:**
+This project runs in **Git Bash** (`/usr/bin/bash`). Activate the venv with:
+
+```bash
+source .venv/Scripts/activate
+```
+
+If running in PowerShell (not this project's default), use dot-sourcing instead:
 
 ```powershell
 . .\.venv\Scripts\Activate.ps1; dbt build --select my_model
@@ -27,6 +33,7 @@ Do NOT use any of these alternatives — they have all failed in practice:
 - `& .\.venv\Scripts\Activate.ps1` (call operator — drops env vars)
 - `.venv\Scripts\dbt.exe` (direct invocation — missing PATH context)
 - `$env:PATH += ...` (PATH manipulation — unreliable)
+- Using the `.ps1` form in Git Bash — Bash strips backslashes; fails silently if dbt is already on PATH
 
 For `dbt init`, always use `--skip-profile-setup` (not `--no-interactive`, which does not exist).
 
@@ -172,14 +179,19 @@ dbt run --static-analysis=unsafe
 
 ## Redirecting dbt Output on Windows
 
-dbt output sometimes contains characters that PowerShell cannot display. When you need to capture output for debugging:
+dbt output sometimes contains characters the terminal cannot display. When you need to capture output for debugging:
+
+```bash
+# Git Bash: redirect to file
+dbt build --select my_model > tmp/output.txt 2>&1
+```
 
 ```powershell
-# Redirect to file, then convert to UTF-8 for reading
+# PowerShell: redirect and re-encode to UTF-8
 . .\.venv\Scripts\Activate.ps1; dbt build --select my_model > tmp_output.txt; Get-Content tmp_output.txt | Out-File -Encoding utf8 tmp_output_utf8.txt
 ```
 
-Always read the UTF-8 version. Clean up tmp files when done.
+Always clean up tmp files when done.
 
 ## Seed Operations
 
@@ -192,12 +204,12 @@ Always read the UTF-8 version. Clean up tmp files when done.
 
 Before writing a mart model that consumes an integration model, always inspect the integration model's actual output first. This prevents column name mismatches and contract errors.
 
-```powershell
+```bash
 # Inspect column names and sample data from an integration model
-. .\.venv\Scripts\Activate.ps1; dbt show --select int_parks --limit 1
+dbt show --select int_parks --limit 1
 
 # Inspect multiple upstream models in JSON for easier column name extraction
-. .\.venv\Scripts\Activate.ps1; dbt show --select int_contacts --limit 1 --output json
+dbt show --select int_contacts --limit 1 --output json
 ```
 
 **Do NOT use Python one-liners** (`python -c "import duckdb; ..."`) to inspect model schemas. Use `dbt show` — it runs the model through dbt's compilation and gives you the actual output columns. If you need source table schemas, use the `codegen` package's `generate_source` or `generate_base_model` macros.
@@ -214,7 +226,8 @@ Before writing a mart model that consumes an integration model, always inspect t
 | Running `dbt` expecting Fusion when we are in a venv | Use `dbtf` or `~/.local/bin/dbt` |
 | Adding LIMIT to SQL in `dbt_show` | Use `limit` parameter instead |
 | Vars with special characters | Pass as simple string, no `\` or `\n` |
-| Running dbt in PowerShell virtual env with `&` | Use dot-sourcing: `. .\.venv\Scripts\Activate.ps1; dbt ...` to preserve the PATH |
+| Activating venv in Git Bash with `.ps1` syntax | Use `source .venv/Scripts/activate` — Bash cannot execute `.ps1` files; failure is silent if dbt is on PATH |
+| Running dbt in PowerShell with `&` operator | Use dot-sourcing: `. .\.venv\Scripts\Activate.ps1; dbt ...` to preserve the PATH |
 | Initializing a dbt project programmatically | Use `dbt init <project_name> --skip-profile-setup` to avoid interactive prompts hanging the terminal |
 | Retrying the same failing command 3+ times | Stop after 2 failures. Re-read the relevant operating principle or skill doc. If no principle covers the situation, ask the user |
 | Using Python scripts to bulk-modify SQL/YAML files | Never open a file for writing before reading all contents into memory. Prefer dbt macros, analysis files, or editor operations instead |
@@ -222,3 +235,35 @@ Before writing a mart model that consumes an integration model, always inspect t
 | Using grep/Python to query CDM metadata | Load CDM metadata as dbt seeds and query via SQL or macros within the dbt framework |
 | Using `python -c "import duckdb; ..."` to inspect schemas | Use `dbt show --select <model> --limit 1` instead. It compiles through dbt and shows actual output columns |
 | Writing YAML columns without verifying SQL output | Run `dbt show` on the model first, then write YAML columns to match the observed output |
+
+## Governance Tools
+
+For full workflows and Windows-specific workarounds, see `.agent/skills/linting-and-governance-verification/SKILL.md`. Quick reference:
+
+### sqlfluff
+
+```bash
+# Run fix first (auto-remediates most violations), then lint to see residuals
+sqlfluff fix models/ --dialect duckdb --templater dbt
+sqlfluff lint models/ --dialect duckdb --templater dbt
+```
+
+Unfixable residuals requiring manual attention: RF04 (keyword identifiers — add `-- noqa: RF04`), LT05 (comment lines over 80 chars — rewrap manually).
+
+### dbt-score
+
+```bash
+# Correct command is "lint", not "score" (v0.6.0)
+dbt-score lint
+
+# Windows UnicodeEncodeError workaround (emoji output + cp1252 terminal)
+PYTHONIOENCODING=utf-8 python -m dbt_score lint
+```
+
+### dbt-project-evaluator
+
+```bash
+dbt build --select package:dbt_project_evaluator --quiet
+```
+
+Windows false positive: on Git Bash, `HOME` has no backslashes, so `get_directory_pattern()` returns `/` while the manifest uses `\`. This empties `child_directory_path` and triggers false directory violations for all staging models/sources. Fix via `seeds/dbt_project_evaluator_exceptions.csv`.
