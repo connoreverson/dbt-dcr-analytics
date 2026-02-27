@@ -1,6 +1,6 @@
 ---
-activation: always_on
-description: Relational schema design constraints and patterns for DCR DuckDB databases. Applied when creating or modifying schema DDL.
+activation: on_demand
+description: Relational schema design constraints and patterns for DCR DuckDB databases. Use when designing schemas or writing DDL.
 ---
 
 # Schema Design Rules

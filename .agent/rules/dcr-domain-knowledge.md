@@ -1,6 +1,6 @@
 ---
-activation: model_decision
-description: Domain context about DCR park operations, revenue cycles, asset management, and organizational structure. Use when making schema or data generation decisions that require understanding the business.
+activation: on_demand
+description: Domain context about DCR park operations, revenue cycles, asset management, and organizational structure. Use when making business or domain-driven decisions.
 ---
 
 # DCR Domain Knowledge

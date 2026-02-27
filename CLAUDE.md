@@ -1,4 +1,4 @@
-# DCR Analytics — Project Instructions for Gemini
+# DCR Analytics — Project Instructions for Claude Code
 
 You are a data engineering agent working on the DCR Analytics project for the Department of Conservation and Recreation. This project has two phases: (1) synthetic source data generation using Python/DuckDB, and (2) a dbt analytical pipeline that transforms those sources into governed, CDM-conforming models.
 
@@ -9,8 +9,10 @@ dbt-public-sector-example/
 ├── .agent/                    # Agent skills and rules (cross-compatible SSoT)
 │   ├── rules/                 # Always-on and model-decision rules
 │   └── skills/                # On-demand skill packages
-├── .ai/                       # Shared prompts (SSoT for cross-agent system prompts)
+├── .ai/                       # Shared prompts for cross-compatible agents
 │   └── prompts/               # Agent system prompts (used by both Claude and Antigravity)
+├── .claude/                   # Claude Code configuration
+│   └── agents/                # Claude Code subagent definitions
 ├── .gemini/                   # Gemini CLI and Antigravity configuration
 │   └── settings.json
 ├── reference/                 # All project documentation (not dbt docs/)
@@ -31,16 +33,64 @@ dbt-public-sector-example/
         └── revenue_slice/     # Curated subset for this vertical slice
 ```
 
+## Rules
+
+Before writing code, read the relevant rule files from `.agent/rules/`. These are the project's SSoT for governance — shared across Claude Code and Antigravity.
+
+| Rule File | Activation | When to Read |
+|---|---|---|
+| `.agent/rules/dbt-project-governance.md` | **Always-on** | All dbt work: layer discipline, naming, testing, CDM requirements |
+| `.agent/rules/coding-standards.md` | On-demand | Writing Python or making general code convention decisions |
+| `.agent/rules/schema-design.md` | On-demand | Designing schemas or writing DDL |
+| `.agent/rules/data-generation.md` | On-demand | Generating synthetic source data |
+| `.agent/rules/dcr-domain-knowledge.md` | On-demand | Business or domain-driven decisions |
+
+Read `.agent/rules/dbt-project-governance.md` at the start of every session before touching any model, test, seed, or YAML file.
+
+## Skills
+
+On-demand skill packages live in `.agent/skills/`. Each skill directory contains a `SKILL.md` with step-by-step instructions. When a task matches a skill description, read the corresponding `SKILL.md` before proceeding.
+
+| Skill | Directory | When to Use |
+|---|---|---|
+| Running dbt commands | `.agent/skills/running-dbt-commands/` | Any dbt CLI invocation |
+| Planning from spec | `.agent/skills/planning-from-spec/` | Creating project plans from SPEC docs |
+| Using dbt for analytics | `.agent/skills/using-dbt-for-analytics-engineering/` | General dbt model building |
+| Adding dbt unit tests | `.agent/skills/adding-dbt-unit-test/` | Writing unit tests for models |
+| Systematic debugging | `.agent/skills/systematic-debugging/` | Diagnosing failures |
+| Troubleshooting dbt errors | `.agent/skills/troubleshooting-dbt-job-errors/` | dbt command failures |
+| Building semantic layer | `.agent/skills/building-dbt-semantic-layer/` | Semantic layer configuration |
+| Test-driven development | `.agent/skills/test-driven-development/` | TDD workflows |
+| Writing plans | `.agent/skills/writing-plans/` | Writing structured execution plans |
+| Executing plans | `.agent/skills/executing-plans/` | Following a plan step by step |
+| Brainstorming | `.agent/skills/brainstorming/` | Design and ideation |
+| Writing skills | `.agent/skills/writing-skills/` | Creating new skill packages |
+| Writing system prompts | `.agent/skills/writing-system-prompts/` | Authoring agent instructions |
+| Bootstrapping workspace | `.agent/skills/bootstrapping-agent-workspace/` | Setting up agent environments |
+| Answering NL questions | `.agent/skills/answering-natural-language-questions-with-dbt/` | Business user queries |
+| Configuring dbt MCP | `.agent/skills/configuring-dbt-mcp-server/` | MCP server setup |
+| Fetching dbt docs | `.agent/skills/fetching-dbt-docs/` | Documentation retrieval |
+| Linting and governance verification | `.agent/skills/linting-and-governance-verification/` | Phase 7: sqlfluff, dbt-score, dbt-project-evaluator |
+
+## Subagents
+
+Specialized subagents are defined in `.claude/agents/`. Their core system prompts live in `.ai/prompts/` as the SSoT shared with Antigravity.
+
+| Agent | File | Purpose |
+|---|---|---|
+| dbt Implementer | `.claude/agents/dbt-implementer.md` | Build dbt models per the SPEC, layer by layer |
+| Spec Planner | `.claude/agents/spec-planner.md` | Convert SPEC documents into ordered project plans |
+
 ## Key References
 
 Read these before making substantive decisions:
 
-- @reference/business_artifacts/DCR Data Inventory.md — Authoritative source for all 10 systems, their schemas, quality issues, and integration dependencies
-- @reference/data_inventory_summary.md — Condensed quick-reference for all 10 source systems
-- @reference/dbt_project_standards.md — 103 rules governing every layer of the dbt project
-- @reference/SPEC_vertical_slice_revenue.md — Complete specification for the first vertical slice (Revenue & Reservations)
-- @source_data/cdm_metadata/revenue_slice/ — Curated CDM entity and column schemas for this slice (Asset, nonProfitCore, applicationCommon, Visits, cdmfoundation). Full library available in parent directory if needed.
-- @reference/VOICE_PROFILE_Connor.md — Writing conventions for project documentation
+- `reference/business_artifacts/DCR Data Inventory.md` — Authoritative source for all 10 systems, their schemas, quality issues, and integration dependencies
+- `reference/data_inventory_summary.md` — Condensed quick-reference for all 10 source systems
+- `reference/dbt_project_standards.md` — 103 rules governing every layer of the dbt project
+- `reference/SPEC_vertical_slice_revenue.md` — Complete specification for the first vertical slice (Revenue & Reservations)
+- `source_data/cdm_metadata/revenue_slice/` — Curated CDM entity and column schemas for this slice (Asset, nonProfitCore, applicationCommon, Visits, cdmfoundation). Full library available in parent directory if needed.
+- `reference/VOICE_PROFILE_Connor.md` — Writing conventions for project documentation
 
 ## Authority and Guardrails
 
@@ -95,10 +145,6 @@ Read these before making substantive decisions:
 | DAG validation | dbt-project-evaluator | Enforces naming and dependency rules |
 | Testing | dbt build (schema + data tests) | Plus singular tests for reconciliation |
 | Packages | dbt_utils, dbt_expectations, audit_helper, codegen | All version-pinned |
-
-## Current Phase
-
-The Revenue & Reservations vertical slice is in **active implementation**. Staging, integration, and mart models have been built across two source systems (VistaReserve and GeoParks). The execution plan lives at `reference/plans/2026-02-23-revenue-reservations-project-plan.md`. Consult the SPEC (`reference/SPEC_vertical_slice_revenue.md`) for remaining deliverables and CDM conformance requirements before making any changes.
 
 ## Writing Style
 

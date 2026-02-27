@@ -617,7 +617,7 @@ Phrased like 'int\_\<entity\>.sql'
 
 ##### **Rule: SQL-INT-03 Entity Name Word Choice**
 
-Must be an entity from the Microsoft Common Data Model.
+Must exactly match the name of the assigned Microsoft Common Data Model entity, converted to snake_case and pluralized. For example, if the CDM entity is `CustomerAsset`, the model must be named `int_customer_assets`.
 
 ##### **Rule: SQL-INT-04 File Name Underscore Delimitation**
 

@@ -1,6 +1,6 @@
 ---
-activation: always_on
-description: Python and SQL coding conventions for the DCR data generation project. Applied to all code files.
+activation: on_demand
+description: Python and SQL coding conventions for the DCR data generation project. Use when writing Python scripts or making general code convention decisions.
 ---
 
 # Coding Standards

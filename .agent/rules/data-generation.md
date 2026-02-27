@@ -1,6 +1,6 @@
 ---
-activation: always_on
-description: Patterns and constraints for generating realistic fake data with mimesis and DuckDB. Applied during all data generation work.
+activation: on_demand
+description: Patterns and constraints for generating realistic fake data with mimesis and DuckDB. Use when generating synthetic source data.
 ---
 
 # Data Generation Rules
