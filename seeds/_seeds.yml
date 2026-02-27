@@ -3,24 +3,72 @@ version: 2
 seeds:
   - name: column_catalog_asset
     description: >
-      Microsoft Common Data Model column catalog for the Asset definition manifest.
-      Contains the authorized metadata dictionary for mapping physical assets.
+      One row per CDM attribute in the Asset entity group (CustomerAsset, Case, and related entities).
+      Sourced from the Microsoft Common Data Model Asset manifest. Consumed by int_cdm_columns and the
+      get_cdm_columns macro to validate that integration model column names are authorized CDM fields.
+    config:
+      column_types:
+        is_primary_key: boolean
+        is_nullable: boolean
+        is_foreign_key: boolean
+
   - name: column_catalog_visits
     description: >
-      Microsoft Common Data Model column catalog for the Visits definition manifest.
-      Contains the authorized metadata dictionary for mapping reservations and visitation events.
+      One row per CDM attribute in the Visits entity group (Visit and related scheduling entities).
+      Sourced from the Microsoft Common Data Model Visits manifest. Consumed by int_cdm_columns and the
+      get_cdm_columns macro to validate int_reservations column mappings against the Visit entity.
+    config:
+      column_types:
+        is_primary_key: boolean
+        is_nullable: boolean
+        is_foreign_key: boolean
+
   - name: column_catalog_application_common
     description: >
-      Microsoft Common Data Model column catalog for the Application Common definition manifest.
-      Contains shared metadata structures utilized across multiple entity groups.
+      One row per CDM attribute in the Application Common entity group (shared cross-domain structures
+      including currency, address, and annotation entities). Sourced from the Microsoft Common Data Model
+      applicationCommon manifest. Consumed by int_cdm_columns to provide shared attribute definitions.
+    config:
+      column_types:
+        is_primary_key: boolean
+        is_nullable: boolean
+        is_foreign_key: boolean
+
   - name: column_catalog_cdmfoundation
     description: >
-      Microsoft Common Data Model column catalog for the CDM Foundation definition manifest.
-      Contains the core data types and foundational traits required by the schema.
+      One row per CDM attribute in the CDM Foundation entity group (foundational traits, data types, and
+      base entity definitions shared across all CDM manifests). Sourced from the Microsoft Common Data Model
+      cdmfoundation manifest. Consumed by int_cdm_columns as the base layer for column authorization.
+    config:
+      column_types:
+        is_primary_key: boolean
+        is_nullable: boolean
+        is_foreign_key: boolean
+
   - name: column_catalog_non_profit_core
     description: >
-      Microsoft Common Data Model column catalog for the Non-Profit Core definition manifest.
-      Contains the authorized metadata dictionary for mapping contacts, accounts, and transactions.
+      One row per CDM attribute in the Non-Profit Core entity group (Contact, Account, Transaction, and
+      donation-related entities). Sourced from the Microsoft Common Data Model nonProfitCore manifest.
+      Consumed by int_cdm_columns to validate int_contacts, int_transactions, and int_parks column mappings.
+    config:
+      column_types:
+        is_primary_key: boolean
+        is_nullable: boolean
+        is_foreign_key: boolean
+
+  - name: cdm_crosswalk
+    description: >
+      One row per column mapping between a staging model and its target CDM integration model.
+      Maps local staging column names to their authorized CDM attribute names, grouped by integration model
+      and CDM entity. Consumed at compile time by the generate_cdm_projection macro to produce the SELECT
+      clause for each integration model.
+    config:
+      column_types:
+        integration_model: varchar
+        cdm_entity: varchar
+        source_model: varchar
+        cdm_column_name: varchar
+        staging_column_name: varchar
 
   - name: reservation_status_codes
     description: >

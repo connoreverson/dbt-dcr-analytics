@@ -1,0 +1,1 @@
+from sqlfluff_plugin_dbtps.rules import get_rules

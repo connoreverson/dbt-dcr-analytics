@@ -1,0 +1,5 @@
+fct_name,column_name,id_to_exclude,comment
+fct_model_directories,resource_name,stg_vistareserve%,Windows path separator false positive: Git Bash HOME uses / but manifest uses \ causing empty directory_path extraction
+fct_model_directories,resource_name,stg_geoparks%,Windows path separator false positive: Git Bash HOME uses / but manifest uses \ causing empty directory_path extraction
+fct_source_directories,resource_name,vistareserve%,Windows path separator false positive: Git Bash HOME uses / but manifest uses \ causing empty directory_path extraction
+fct_source_directories,resource_name,geoparks%,Windows path separator false positive: Git Bash HOME uses / but manifest uses \ causing empty directory_path extraction

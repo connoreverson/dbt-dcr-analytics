@@ -1,0 +1,1 @@
+sqlfluff_plugin_dbtps

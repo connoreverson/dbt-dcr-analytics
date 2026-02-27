@@ -1,0 +1,2 @@
+[sqlfluff]
+sqlfluff_plugin_dbtps = sqlfluff_plugin_dbtps.rules
