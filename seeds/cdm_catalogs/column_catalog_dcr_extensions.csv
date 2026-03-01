@@ -1,0 +1,14 @@
+cdm_entity_name,dbt_column_name,dbt_data_type,is_primary_key,is_foreign_key,description
+Park,parks_sk,varchar,true,false,The canonical integration surrogate key for the park account.
+Park,accountnumber,varchar,false,false,The original business-recognized identifier of the park property.
+Park,name,varchar,false,false,The business-recognized name of the park property.
+Park,description,varchar,false,false,Descriptive text about the park.
+Park,address1_city,varchar,false,false,City component of the park's physical address.
+Park,address1_stateorprovince,varchar,false,false,State or province of the park's physical address.
+Park,address1_postalcode,varchar,false,false,Postal code of the park's physical address.
+Park,address1_latitude,numeric,false,false,Latitude coordinate of the park.
+Park,address1_longitude,numeric,false,false,Longitude coordinate of the park.
+Park,total_acres,numeric,false,false,Total geographic area of the park in acres.
+Park,classification,varchar,false,false,The park's administrative classification.
+Park,region_id,varchar,false,false,The numeric identifier of the organizational region to which this park belongs.
+Park,source_system,varchar,false,false,The authoritative operational system code from which this park record originates.

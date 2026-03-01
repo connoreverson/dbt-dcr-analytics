@@ -1,0 +1,268 @@
+[
+  {
+    "id": "ALL-DAG-01",
+    "title": "Unidirectional Dependency Flow",
+    "is_automated": false,
+    "layer": "all",
+    "description": "Dependencies must flow in one direction: sources \u2192 staging (and base) \u2192 integration \u2192 marts (facts, dimensions, reports). Models must never reference a downstream layer and must never skip a layer; a staging model cannot reference an integration model, and a fact model cannot reference a staging model directly."
+  },
+  {
+    "id": "ALL-DAG-02",
+    "title": "No Circular Dependencies",
+    "is_automated": true,
+    "layer": "all",
+    "description": "No model may create a dependency that forms a cycle in the DAG. If dbt raises a circular dependency error, restructure the models so that shared logic is extracted into a model at an earlier layer or into a macro."
+  },
+  {
+    "id": "ALL-CFG-01",
+    "title": "Centralize Configs in dbt\\_project.yml",
+    "is_automated": false,
+    "layer": "all",
+    "description": "Model configurations \u2014 including materialization, schema routing, and tags \u2014 must be set as layer-wide defaults in dbt\\_project.yml. Per-model {{ config() }} blocks in SQL files should only be used for individual exceptions to the project-level defaults."
+  },
+  {
+    "id": "ALL-CFG-02",
+    "title": "Config Block Placement",
+    "is_automated": false,
+    "layer": "all",
+    "description": "When a per-model {{ config() }} block is needed, it must be the first statement in the SQL file, before any CTEs or SQL logic."
+  },
+  {
+    "id": "ALL-CFG-03",
+    "title": "Package Version Pinning",
+    "is_automated": false,
+    "layer": "all",
+    "description": "All packages declared in packages.yml must specify a version or version range; unpinned packages introduce a risk that upstream changes could break the project without warning."
+  },
+  {
+    "id": "ALL-NAME-01",
+    "title": "File Name Prefixes",
+    "is_automated": true,
+    "layer": "all",
+    "description": "SQL files must be prefixed with 'stg', 'base', 'int', 'fct', 'dim', or 'rpt' according to their layer. YAML property files must have a leading underscore (e.g., '\\_models.yml', '\\_sources.yml')."
+  },
+  {
+    "id": "ALL-NAME-02",
+    "title": "Plural Phrasing",
+    "is_automated": false,
+    "layer": "all",
+    "description": "File names must use plural phrasing: 'stg\\_salesforce\\_\\_accounts' (not the singular 'account'), 'int\\_projects' (not 'project')."
+  },
+  {
+    "id": "ALL-NAME-03",
+    "title": "Abbreviation Restraint",
+    "is_automated": false,
+    "layer": "all",
+    "description": "Do not abbreviate words or phrases that are fewer than 20 characters long. The gain in brevity is offset by the loss of intuitiveness; 'activity\\_id' should not become 'actv\\_id'. Conversely, abbreviate names that would otherwise be excessively long; 'int\\_delivery\\_framework\\_\\_integrated\\_disbursement\\_and\\_information\\_system.sql' should become 'int\\_delivery\\_framework\\_\\_idis.sql'."
+  },
+  {
+    "id": "ALL-NAME-04",
+    "title": "Business Concept Phrasing",
+    "is_automated": false,
+    "layer": "all",
+    "description": "File names must represent business concepts rather than business system names. Prefer 'stg\\_salesforce\\_\\_accounts' over 'stg\\_salesforce\\_\\_account\\_\\_c' if the source system uses unintuitive internal naming."
+  },
+  {
+    "id": "ALL-FMT-01",
+    "title": "File Length",
+    "is_automated": false,
+    "layer": "all",
+    "description": "Models should generally stay under 200 lines. Deviations are acceptable when necessary, but a model that grows substantially beyond this guideline warrants a closer look at whether its logic could be broken into upstream models or macros."
+  },
+  {
+    "id": "ALL-FMT-02",
+    "title": "Line Length",
+    "is_automated": true,
+    "layer": "all",
+    "description": "Each line should be fewer than 80 characters."
+  },
+  {
+    "id": "ALL-FMT-03",
+    "title": "Lowercase Keywords",
+    "is_automated": true,
+    "layer": "all",
+    "description": "All SQL keywords must be lowercase: 'select \\* from requests', not 'SELECT \\* FROM requests'."
+  },
+  {
+    "id": "ALL-FMT-04",
+    "title": "Lowercase Function Names",
+    "is_automated": true,
+    "layer": "all",
+    "description": "All function names must be lowercase: 'sum(amount)', not 'SUM(amount)'."
+  },
+  {
+    "id": "ALL-FMT-05",
+    "title": "Snake Case Field Names",
+    "is_automated": true,
+    "layer": "all",
+    "description": "All field names must be snake\\_case and lowercase: 'request\\_id', not 'Request\\_id', 'request-id', 'requestId', 'RequestId', 'requestid', or '\\`request id\\`'."
+  },
+  {
+    "id": "ALL-FMT-06",
+    "title": "Predicate Indentation",
+    "is_automated": true,
+    "layer": "all",
+    "description": "Where and when clause predicates must be indented on new lines for readability.\n\n```sql\n-- \u2705 Good\nselect *\nfrom requests\nwhere\n    status = 'active'\n    and created_at >= '2024-01-01'\n    and amount > 0\n\n-- \u274c Bad\nselect *\nfrom requests\nwhere status = 'active' and created_at >= '2024-01-01' and amount > 0\n```"
+  },
+  {
+    "id": "ALL-FMT-07",
+    "title": "Table Aliasing",
+    "is_automated": true,
+    "layer": "all",
+    "description": "When joining tables and referencing columns from both, follow this order of preference: first, reference the full table name instead of an alias when the table name is short (roughly fewer than 20 characters); second, rename the CTE to a shorter phrase if possible; lastly, alias to something descriptive. Do not alias tables with single-letter variables (such as 'a' and 'b') or unintuitive abbreviations (such as 'rq' instead of 'requests' or 'df' instead of 'delivery\\_frameworks').\n\n```sql\n-- \u2705 Good: use full CTE name when short\nselect\n    requests.request_id,\n    requests.amount,\n    statuses.status_label\nfrom requests\nleft join statuses\n    on requests.status_id = statuses.status_id\n\n-- \u2705 Good: descriptive alias when name is long\nselect\n    apps.application_id,\n    apps.submitted_at,\n    reviewers.reviewer_name\nfrom grant_applications as apps\nleft join application_reviewers as reviewers\n    on apps.application_id = reviewers.application_id\n\n-- \u274c Bad: single-letter aliases\nselect\n    a.application_id,\n    a.submitted_at,\n    b.reviewer_name\nfrom grant_applications a\nleft join application_reviewers b\n    on a.application_id = b.application_id\n```"
+  },
+  {
+    "id": "ALL-CTE-01",
+    "title": "Import CTEs at Top",
+    "is_automated": true,
+    "layer": "all",
+    "description": "All {{ ref() }} and {{ source() }} statements must be isolated in import CTEs at the top of the model.\n\n```sql\n-- \u2705 Good\nwith\n\npayments as (\n    select * from {{ ref('stg_stripe__payments') }}\n),\n\norders as (\n    select * from {{ ref('stg_shopify__orders') }}\n),\n\npayments_joined_to_orders as (\n    select\n        payments.payment_id,\n        payments.amount,\n        orders.order_date\n    from payments\n    left join orders\n        on payments.order_id = orders.order_id\n)\n\nselect * from payments_joined_to_orders\n\n-- \u274c Bad: ref() buried in transformation logic\nwith\n\npayments_joined_to_orders as (\n    select\n        payments.payment_id,\n        payments.amount,\n        orders.order_date\n    from {{ ref('stg_stripe__payments') }} as payments\n    left join {{ ref('stg_shopify__orders') }} as orders\n        on payments.order_id = orders.order_id\n)\n\nselect * from payments_joined_to_orders\n```"
+  },
+  {
+    "id": "ALL-CTE-02",
+    "title": "Explicit Joins with Aliases",
+    "is_automated": true,
+    "layer": "all",
+    "description": "All joins must be explicit (e.g., 'left join', 'inner join') and all joined columns must be prefixed with a CTE or table alias."
+  },
+  {
+    "id": "ALL-CTE-03",
+    "title": "Meaningful CTE Names",
+    "is_automated": false,
+    "layer": "all",
+    "description": "CTE names must be meaningful and succinct: import CTEs should include the object being imported (e.g., 'grant\\_applications', 'payments', 'budget\\_lines'); simple transformation CTEs should include the object and a verb (e.g., 'payments\\_to\\_fund\\_grain', 'asset\\_id\\_added\\_to\\_payments'); complex transformations should have the subject, object, and verb (e.g., 'payments\\_joined\\_to\\_budgets')."
+  },
+  {
+    "id": "ALL-CTE-04",
+    "title": "No Duplicative CTEs Across Models",
+    "is_automated": false,
+    "layer": "all",
+    "description": "If the same CTE logic appears in more than one model, reconstruct it into a dedicated upstream model or a macro."
+  },
+  {
+    "id": "ALL-CTE-05",
+    "title": "Single Unit of Work",
+    "is_automated": false,
+    "layer": "all",
+    "description": "Each CTE must perform a single unit of work. Joining requests to users is acceptable as one step; joining requests to users and counting them by user in the same CTE is not.\n\n```sql\n-- \u2705 Good: each CTE does one thing\nrequests_joined_to_users as (\n    select\n        requests.request_id,\n        requests.amount,\n        users.user_name\n    from requests\n    left join users\n        on requests.user_id = users.user_id\n),\n\nrequests_counted_by_user as (\n    select\n        user_name,\n        count(*) as request_count,\n        sum(amount) as total_amount\n    from requests_joined_to_users\n    group by user_name\n)\n\n-- \u274c Bad: join and aggregation in one CTE\nrequests_by_user as (\n    select\n        users.user_name,\n        count(*) as request_count,\n        sum(requests.amount) as total_amount\n    from requests\n    left join users\n        on requests.user_id = users.user_id\n    group by users.user_name\n)\n```"
+  },
+  {
+    "id": "ALL-CTE-06",
+    "title": "Comment Confusing CTEs",
+    "is_automated": false,
+    "layer": "all",
+    "description": "CTEs with non-obvious logic must have a comment above them explaining their purpose."
+  },
+  {
+    "id": "ALL-CTE-07",
+    "title": "Primary Key First",
+    "is_automated": true,
+    "layer": "all",
+    "description": "In transformation CTEs and the final select, the primary key or object identifier must be the first selected field (renamed if appropriate). Import CTEs that simply select from a ref or source are exempt from this rule.\n\n```sql\n-- \u2705 Good: PK is the first field\npayments_enriched as (\n    select\n        payments.payment_id,\n        payments.amount,\n        orders.order_date\n    from payments\n    left join orders\n        on payments.order_id = orders.order_id\n)\n\n-- \u274c Bad: PK buried in the middle\npayments_enriched as (\n    select\n        payments.amount,\n        orders.order_date,\n        payments.payment_id\n    from payments\n    left join orders\n        on payments.order_id = orders.order_id\n)\n```"
+  },
+  {
+    "id": "ALL-CTE-08",
+    "title": "Column Alias Prefixing",
+    "is_automated": false,
+    "layer": "all",
+    "description": "All columns in joins and final selects must be correctly prefixed with their CTE or table alias."
+  },
+  {
+    "id": "ALL-CTE-09",
+    "title": "No Direct Database References",
+    "is_automated": false,
+    "layer": "all",
+    "description": "From statements must use {{ ref() }}, CTEs, or {{ source() }} (in the case of staging models); never BigQuery fully qualified table names."
+  },
+  {
+    "id": "ALL-CTE-10",
+    "title": "Early Aggregation",
+    "is_automated": false,
+    "layer": "all",
+    "description": "Aggregations must occur as early in each script as possible to prevent cardinality issues in downstream CTEs and joins."
+  },
+  {
+    "id": "ALL-CTE-11",
+    "title": "Simple Final Select",
+    "is_automated": false,
+    "layer": "all",
+    "description": "The final statement of the model must be a simple 'select \\* from \\<final\\_cte\\>' with no additional logic.\n\n```sql\n-- \u2705 Good\nfinal as (\n    select\n        payment_id,\n        amount,\n        order_date\n    from payments_enriched\n)\n\nselect * from final\n\n-- \u274c Bad: additional logic in the final select\nselect\n    payment_id,\n    amount,\n    order_date,\n    case when amount > 1000 then 'large' else 'small' end as size_tier\nfrom payments_enriched\n```"
+  },
+  {
+    "id": "ALL-PERF-01",
+    "title": "Use Macros Over Boilerplate",
+    "is_automated": false,
+    "layer": "all",
+    "description": "Use dbt macros and custom Jinja instead of verbose, repetitive SQL statements; particularly long and fragile case statements that could be expressed as a macro or a seed-driven lookup.\n\n```sql\n-- \u2705 Good: seed-driven lookup joined in\nstatus_labels as (\n    select * from {{ ref('grant_status_mappings') }}\n),\n\ngrants_labeled as (\n    select\n        grants.grant_id,\n        status_labels.status_label\n    from grants\n    left join status_labels\n        on grants.status_code = status_labels.status_code\n)\n\n-- \u274c Bad: fragile case statement that duplicates seed data\ngrants_labeled as (\n    select\n        grant_id,\n        case\n            when status_code = 'AP' then 'Approved'\n            when status_code = 'DN' then 'Denied'\n            when status_code = 'PD' then 'Pending'\n            when status_code = 'RV' then 'Under Review'\n            when status_code = 'CL' then 'Closed'\n            -- 20 more lines ...\n        end as status_label\n    from grants\n)\n```"
+  },
+  {
+    "id": "ALL-PERF-02",
+    "title": "Reproducible Primary Keys",
+    "is_automated": false,
+    "layer": "all",
+    "description": "Primary keys must be generated in a reproducible way (e.g., using {{ dbt\\_utils.generate\\_surrogate\\_key() }}) so that the same input always produces the same key. Never use random functions like GENERATE\\_UUID()."
+  },
+  {
+    "id": "ALL-PERF-03",
+    "title": "Avoid Select Distinct and Union Distinct",
+    "is_automated": false,
+    "layer": "all",
+    "description": "Do not use 'select distinct' or 'union distinct'. In most SQL dialects, bare 'union' is equivalent to 'union distinct'; always use 'union all' explicitly. These operations are computationally expensive and may indicate a workaround for insufficiently processed upstream data. If deduplication is needed, address the root cause in an earlier model layer.\n\n```sql\n-- \u2705 Good: explicit union all\nselect * from system_a_awards\nunion all\nselect * from system_b_awards\n\n-- \u274c Bad: bare union (silently deduplicates)\nselect * from system_a_awards\nunion\nselect * from system_b_awards\n```"
+  },
+  {
+    "id": "ALL-PERF-04",
+    "title": "CTEs Over Subqueries",
+    "is_automated": false,
+    "layer": "all",
+    "description": "Models must use CTEs instead of subqueries; CTEs are easier to read, easier to debug, and easier to restructure when the model evolves."
+  },
+  {
+    "id": "ALL-TST-01",
+    "title": "Test What You Deliver and What You Depend On",
+    "is_automated": false,
+    "layer": "all",
+    "description": "Test expectations about inputs as early as possible (at the source or staging layer) and test expectations about outputs when they are delivered (at the marts layer). In intermediate layers, test the things most likely to create problems: business rules, complex joins, and any logic that has failed or surprised you before."
+  },
+  {
+    "id": "ALL-TST-02",
+    "title": "Justify Your Testing Choices (in comments or meta tags, not descriptions)",
+    "is_automated": false,
+    "layer": "all",
+    "description": "The rationale for why tests were chosen and what data quality risks they cover must be documented. However, this rationale must NOT be placed in the user-facing model or column `description` fields, as it clutters the document and buries the actual data definition. Instead, document testing rationale in a `meta` block within the YAML, or as an inline SQL comment within the model file itself. A reviewer should be able to find and understand what the analyst verified and what assumptions remain.\n\n###### **Example**\n\n\"tests verify that the primary key remains unique after the union (protecting against overlapping ID ranges across systems)\" belongs via a code comment or a meta tag. The YAML `description` should remain solely focused on defining the business entity and grain.\n\n###### **Red-flag words in descriptions**\n\nIf a model or column description contains any of these words, the sentence almost certainly belongs in a `meta: testing_rationale:` block instead: `unique`, `not_null`, `fan-out`, `deduplication`, `protecting against`, `tests verify`, `collision`, `ensures that`, `guards against`. Descriptions should answer \"what is this data?\" \u2014 not \"why did we test it?\"\n\n###### **Good vs. bad description examples**\n\n```yaml\n# BAD \u2014 restates tests, explains pipeline mechanics\ndescription: >\n  Deduplicated customer records from VistaReserve. Tests verify\n  that the primary key is unique and strictly non-null, protecting\n  against duplicate dimension rows that would fan out downstream joins.\n  The base model's window function selects the most recent record.\n\n# GOOD \u2014 explains the business entity\ndescription: >\n  Known individuals who transact with DCR through reservations,\n  point-of-sale purchases, or pass registrations. One row per\n  distinct customer. Columns are renamed from VistaReserve's\n  internal conventions to CDM-adjacent business names.\n```"
+  },
+  {
+    "id": "ALL-TST-03",
+    "title": "Exploratory Data Profiling During Development",
+    "is_automated": false,
+    "layer": "all",
+    "description": "Before finalizing a model, profile the data flowing through it. This is a development practice, not an artifact that persists in the codebase. At minimum, the analyst should investigate: row counts before and after each join or filter to confirm that cardinality behaves as expected; value distributions for key columns to confirm that the data looks reasonable; null rates for columns that the model depends on; and any unexpected duplicates, orphans, or outliers. The profiling itself does not need to be committed, but the insights it produces should inform the tests the analyst writes and the rationale they document.\n\n###### **Techniques**\n\nUse 'dbt show' to preview model output during development. Run ad-hoc count(\\*) queries on individual CTEs by temporarily making them the final select to verify row counts at each transformation step. Compare counts before and after a join to detect fan-out (the count should not increase unless the join is intentionally one-to-many). Query 'select column, count(\\*) from model group by column order by count(\\*) desc' to inspect value distributions and spot unexpected nulls, blanks, or dominant values. These checks take minutes and frequently surface issues that formal tests would miss until production.\n\n---"
+  },
+  {
+    "id": "SQL-STG-01",
+    "title": "Directory Syntax**\n\nSaved in './models/staging/{source}/\\*'\n\n##### **Rule: SQL-STG-02 File Name Syntax**\n\nPhrased like 'stg\\_\\<source\\>\\_\\_\\<entity\\>.sql'\n\n##### **Rule: SQL-STG-03 Entity Word Choice**\n\nRephrase from system logic to business meaning, substituting intuitive words and adding pluralization as needed.\n\n##### **Rule: SQL-STG-04 File Name Underscore Delimitation**\n\nOne underscore between the 'stg' prefix and source; 'stg\\_salesforce'.\n\nTwo underscores between the source and entity; 'stg\\_salesforce\\_\\_accounts.sql'\n\n#### **Input Restrictions**\n\n##### **Rule: SQL-STG-05 Consume Source Tables or Base Models**\n\nMust import data from source tables using the {{ source() }} macro. If a base model exists for the source table (see the Base Models section), import from the base model using the {{ ref() }} macro instead.\n\n##### **Rule: SQL-STG-06 No Joins, Aggregations, or Record Filtering**\n\nStaging models must not contain joins, aggregations, or record filtering. If a staging model seems to require any of these operations, create a base model to handle the pre-processing and have the staging model consume the base model's output.\n\n#### **Transformations**\n\n##### **Rule: SQL-STG-07 Add a Hash Key**\n\nIf one does not already exist, create a hash key column called 'hk\\_\\<entity\\>' using macro {{ dbt\\_utils.generate\\_surrogate\\_key() }}.\n\nThe hash key must incorporate all fields that are needed to uniquely identify a record across systems and over time.\n\n```sql\n-- \u2705 Good: reproducible hash key from business keys\nselect\n    {{ dbt_utils.generate_surrogate_key([\n        'source_system',\n        'account_id'\n    ]) }} as hk_accounts,\n    account_id,\n    account_name\nfrom source\n\n-- \u274c Bad: non-reproducible key from generate_uuid()\nselect\n    generate_uuid() as hk_accounts,\n    account_id,\n    account_name\nfrom source\n```\n\n##### **Rule: SQL-STG-08 Optional, Pick Relevant Columns**\n\nMay select all columns from the source table.\n\nCan exclude columns that contain no useful data, are restricted for security or compliance purposes, or that \u2014 after consulting the business \u2014 have no known use.\n\n##### **Rule: SQL-STG-09 Rename Columns for Understandability**\n\nMust assign names to columns that people will understand and recognize across the project, especially when the names from the source system are unintuitive.\n\nShould use field names from an appropriate Microsoft Common Data Model entity if possible.\n\n```sql\n-- \u2705 Good: intuitive, CDM-aligned names\nselect\n    acct_nbr as account_id,\n    acct_nm as account_name,\n    crt_dt as created_at,\n    mod_dt as modified_at\nfrom source\n\n-- \u274c Bad: source system abbreviations kept as-is\nselect\n    acct_nbr,\n    acct_nm,\n    crt_dt,\n    mod_dt\nfrom source\n```\n\n##### **Rule: SQL-STG-10 Recast Sub-Optimally Formatted Source Data**\n\nMust convert incoming data to the most appropriate data types.\n\n###### **Examples**\n\nParse date and time information incorrectly loaded as strings to timestamps, dates, or times.\n\nCast decimals incorrectly loaded as floats or numeric to integer.\n\n##### **Rule: SQL-STG-11 Standardize Value Formats**\n\nCan apply hard rules that change the format or representation of data so it is easier to work with, without changing its meaning.\n\n###### **Examples**\n\nTrimming whitespace from a string.\n\nRemoving special characters like HTML artifacts in strings.\n\nCorrecting casing like messy titles.\n\n##### **Rule: SQL-STG-12 Parse and Flatten Structure**\n\nCan extract nested or composite data into discrete columns so downstream models can reference them directly without parsing.\n\n###### **Examples**\n\nSplitting a composite identifier into its constituent parts.\n\nExtracting values from a stringified JSON.\n\n### **Base Models**\n\n#### **Purpose**\n\nBase models prevent repetitive or complex processing from cluttering staging and integration models; they isolate pre-processing logic \u2014 unions, splits, deduplication \u2014 so that the models consuming them can remain simple and readable.\n\n#### **Scope**\n\nBase models are optional. They should only be created when pre-processing a source table before staging improves the readability of the code or the performance of the materialization.\n\n#### **Structure**\n\n##### **Rule: SQL-BASE-01 Directory Syntax**\n\nSaved in './models/staging/{source}/base/\\*'\n\n##### **Rule: SQL-BASE-02 File Name Syntax**\n\nPhrased like 'base\\_\\<source\\>\\_\\_\\<entity\\>.sql'\n\n##### **Rule: SQL-BASE-03 Entity Name Word Choice**\n\nRephrase from system logic to business meaning, substituting intuitive words and adding pluralization as needed.\n\n##### **Rule: SQL-BASE-04 File Name Underscore Delimitation**\n\nOne underscore between the 'base' prefix and source; 'base\\_salesforce'.\n\nTwo underscores between the source and entity; 'base\\_salesforce\\_\\_accounts.sql'\n\n#### **Input Restrictions**\n\n##### **Rule: SQL-BASE-05 Consume Source Tables**\n\nMust import data from source tables using the {{ source() }} macro.\n\n#### **Transformations**\n\n##### **Rule: SQL-BASE-06 Combine Multiple Tables**\n\nCan union or join multiple source tables that logically represent the same entity into a single output so that downstream staging models receive a consolidated input.\n\n###### **Examples**\n\nUnioning sharded tables.\n\nJoining frequently crossreferenced tables.\n\n##### **Rule: SQL-BASE-07 Split Up a Single Table**\n\nCan filter or partition a single source table that contains multiple entity types into separate base models, each representing one entity, so that downstream staging models each handle a single coherent dataset.\n\n###### **Examples**\n\nSeparating the single source table, 'transactions\\_dtl', into three models representing the records it contains: 'base\\_neighborly\\_coloradodola\\_\\_budget\\_line\\_items', and 'base\\_neighborly\\_coloradodola\\_\\_draw\\_line\\_items'.\n\n##### **Rule: SQL-BASE-08 Add Columns**\n\nCan extract or derive columns from complex source structures so that downstream staging models do not need to repeat the parsing logic.\n\n###### **Examples**\n\nExtracting JSON or struct keys and values.\n\n##### **Rule: SQL-BASE-09 Complex Deduplication**\n\nCan remove duplicate records from source data when the deduplication logic is too complex for a simple staging model (e.g., requiring window functions to select the most recent version of a record based on multiple timestamp columns).\n\n### **Integration Models**\n\n#### **Purpose**\n\nIntegration models harmonize and collate data across source systems into third-normal form models that represent organization-wide entities \u2014 producing one authoritative version of each business concept regardless of where the data originated.\n\n**An integration model that only renames columns from a single staging source is wrong.** If a model consumes one staging source and performs only column renames, it is functioning as a second staging model \u2014 not an integration model. Every integration model must perform at least one substantive transformation: unioning data across systems, joining to enrich records, deduplicating/harmonizing records, or generating surrogate keys. If the SPEC specifies multiple input sources for a model, all must be consumed.\n\n#### **Scope**\n\nMust have one or more integration models for all facts and dimensions.\n\n#### **Structure**\n\n##### **Rule: SQL-INT-01 Directory Syntax**\n\nSaved in './models/integration/\\*'\n\n##### **Rule: SQL-INT-02 File Name Syntax**\n\nPhrased like 'int\\_\\<entity\\>.sql'\n\n##### **Rule: SQL-INT-03 Entity Name Word Choice**\n\nMust exactly match the name of the assigned Microsoft Common Data Model entity, converted to snake_case and pluralized. For example, if the CDM entity is `CustomerAsset`, the model must be named `int_customer_assets`.\n\n> Custom entities are permitted when no standard CDM entity is semantically appropriate. Custom entity names must be documented in a `CDM_EXCEPTION_<model>.md` file in `reference/` before adoption. See `reference/CDM_EXCEPTION_int_parks.md` for the template.\n\n##### **Rule: SQL-INT-04 File Name Underscore Delimitation**\n\nOne underscore between the 'int' prefix and entity; 'int\\_projects'.\n\n##### **Rule: SQL-INT-05 Microsoft Common Data Model Column Conformance**\n\nIntegration model columns must conform with the Microsoft Common Data Model definition for the entity that corresponds to the model. The non-profit core manifest is preferred, but a different manifest can be used when an appropriate schema is not available in it. Integration models may not contain columns \u2014 aside from foreign keys or surrogate keys \u2014 that are not specified by the Common Data Model entity definition. If a staging model produces columns that are valuable but not in the CDM, those columns must be dropped from the integration model; they can be joined back in at the marts layer from the staging model if needed. If an analyst believes a non-CDM column belongs in the integration layer, they must request an exception from their supervisor and document the rationale in the model description.\n\n> If no standard CDM entity provides adequate coverage, file a CDM Entity Exception Request per the `cdm-exception-request` skill. The custom entity must be cataloged in `seeds/cdm_catalogs/` and registered in `seeds/cdm_crosswalk.csv`. The exception request documents which standard entities were evaluated and why each was rejected.\n\nWhen applying CDM column names to this project, convert from the CDM's camelCase to snake\\_case and from singular to plural where appropriate. Lookup columns that are integer values in the CDM can be simplified to strings.\n\n```sql\n-- \u2705 Good: only CDM columns plus keys; non-CDM data dropped\nselect\n    projects.project_sk,\n    projects.project_id,\n    projects.name,                  -- CDM column\n    projects.description,           -- CDM column\n    projects.start_date,            -- CDM column\n    projects.end_date,              -- CDM column\n    projects.status                 -- CDM column\nfrom projects\n\n-- \u274c Bad: non-CDM columns kept in the integration model\nselect\n    projects.project_sk,\n    projects.project_id,\n    projects.name,\n    projects.description,\n    projects.start_date,\n    projects.end_date,\n    projects.status,\n    projects.internal_tracking_code, -- not in CDM\n    projects.legacy_system_flag      -- not in CDM\nfrom projects\n```\n\n##### **Rule: SQL-INT-06 Surrogate Key Naming**\n\nSurrogate keys in integration models must be named '\\<object\\>\\_sk'.\n\n#### **Input Restrictions**\n\n##### **Rule: SQL-INT-07 Consume Staging Models**\n\nMust import data from one or more staging models using the {{ ref() }} macro.\n\n#### **Transformations**\n\n##### **Rule: SQL-INT-08 Union Data Across Systems**\n\nData on individual business concepts is often stored in multiple systems; union it into single integration models to produce a comprehensive dataset.\n\n##### **Rule: SQL-INT-09 Filter Irrelevant Data**\n\nExclude records from integration models that are not relevant to the integration entity being modeled.\n\n###### **Examples**\n\nThe integration model represents grant awards, but the staging table contains both grant applications and awards; exclude the applications from the integration model.\n\n##### **Rule: SQL-INT-10 Join to Enrich Records**\n\nPresent the columns and values in the integration model with the most accurate, complete, and fresh information across all applicable staging models.\n\n##### **Rule: SQL-INT-11 Harmonize and Deduplicate Records**\n\nEach row in the integration model must represent a distinct record across all upstream staging models and source tables. Execute coalesce statements, case statements, joins, window functions, and aggregations as needed.\n\n##### **Rule: SQL-INT-12 Minimal Renaming**\n\nMinor changes to column name syntax may be needed, but widespread or duplicative renaming is a sign that staging model column names are insufficiently standardized \u2014 fix the problem at its source.\n\n### **Fact Models**\n\n#### **Purpose**\n\nFact models store the measurable results of business process events at a declared grain, so that the data can be analyzed efficiently and accurately across one or more dimensions.\n\n#### **Scope**\n\nMust have a fact model for each business process event being consumed in a downstream report model or exposure.\n\n#### **Structure**\n\n##### **Rule: SQL-FCT-01 Directory Syntax**\n\nSaved in './models/marts/{owner}/\\*'\n\n##### **Rule: SQL-FCT-02 File Name Syntax**\n\nPhrased like 'fct\\_\\<business\\_process\\_event\\>.sql'\n\n##### **Rule: SQL-FCT-03 Business Process Event Word Choice**\n\nMust accurately and succinctly describe the business process event and its grain. The name should sound like an \"event noun\" or a log of activity; for example, 'fct\\_project\\_completions' rather than 'fct\\_projects'.\n\n##### **Rule: SQL-FCT-04 File Name Underscore Delimitation**\n\nOne underscore between the 'fct' prefix and business process event; 'fct\\_awards'.\n\n#### **Input Restrictions**\n\n##### **Rule: SQL-FCT-05 Consume Integration Models**\n\nMust import data from one or more integration models using the {{ ref() }} macro.\n\n#### **Transformations**\n\n##### **Rule: SQL-FCT-06 Declare the Grain**\n\nModel the result of the business process with a consistent grain; each row must correspond to a physical observable event, not the demands of a particular report. Where possible, prefer the atomic grain \u2014 the lowest level at which data is captured by the business process \u2014 over a summarized grain.\n\n##### **Rule: SQL-FCT-07 Compute Numeric Measurements**\n\nIdentify the measurements that result from the business process event that have a one-to-one relationship with the event being measured.\n\n###### **Examples**\n\nThe amount of dollars approved in a particular grant award.\n\nThe quantity of products requested in a funding application.\n\n##### **Rule: SQL-FCT-08 Join in Dimension Keys**\n\nEach fact row must have a non-null foreign key to all relevant dimensions so downstream models can provide context on the who, what, where, when, why, and how of the facts as needed.\n\n### **Dimension Models**\n\n#### **Purpose**\n\nProvide descriptive context on the who, what, where, when, why, and how of business process events and their fact models.\n\n#### **Scope**\n\nMust have a dimension model for each characteristic of one or more fact models that needs to be described in a downstream report model or exposure.\n\n#### **Structure**\n\n##### **Rule: SQL-DIM-01 Directory Syntax**\n\nSaved in './models/marts/{owner}/\\*'\n\n##### **Rule: SQL-DIM-02 File Name Syntax**\n\nPhrased like 'dim\\_\\<noun\\>.sql'\n\n##### **Rule: SQL-DIM-03 Noun Word Choice**\n\nMust accurately and succinctly describe the business entity that it represents as a noun. The name should sound like a \"head noun\" and \"attributive noun\"; for example, 'dim\\_order\\_categories' rather than 'dim\\_categories'.\n\n##### **Rule: SQL-DIM-04 File Name Underscore Delimitation**\n\nOne underscore between the 'dim' prefix and noun; 'dim\\_customers'.\n\n#### **Input Restrictions**\n\n##### **Rule: SQL-DIM-05 Consume Integration Models**\n\nMust import data from one or more integration models using the {{ ref() }} macro.\n\n#### **Transformations**\n\n##### **Rule: SQL-DIM-06 Join Multiple Integration Tables**\n\nMust produce a single, wide, flattened dimensional table with all relevant descriptive attribute columns across all data sources for a relevant entity.\n\n##### **Rule: SQL-DIM-07 Dimension Keys**\n\nMust include each key that is needed to join it into all appropriate fact tables.\n\n##### **Rule: SQL-DIM-08 Split or Combine Columns**\n\nCan optimize existing data for downstream consumption, preventing challenging post processing in visualization or spreadsheet tools.\n\n###### **Examples**\n\nSplit a full name into first and last names.\n\nCombine multiple address part columns into a full address.\n\n##### **Rule: SQL-DIM-09 Add Enriching Columns**\n\nCan provide intuitive or verbose descriptions of existing data, preventing cumbersome grouping in visualization or spreadsheet tools.\n\n###### **Examples**\n\nDiscrete binning of continuous amounts.\n\nGeographic hierarchies.\n\n### **Report Models**\n\n#### **Purpose**\n\nReport models standardize how commonly used combinations of facts and dimensions are served \u2014 promoting reusability and reproducibility so that the same business question produces the same answer regardless of who runs it or when.\n\n#### **Scope**\n\nMust create a report model when the same combination of facts and dimensions is consumed by two or more downstream dashboards, exports, or processes, or when the structure of the output is unlikely to change (for example, when the format of a report is specified by a federal regulation or grant agreement). Report models should be extensible \u2014 columns displayed to users can be added, removed, and changed without restructuring the model \u2014 and maintainable, so a single report can serve multiple use cases or time periods.\n\n#### **Structure**\n\n##### **Rule: SQL-RPT-01 Directory Syntax**\n\nSaved in './models/marts/{owner}/\\*'\n\n##### **Rule: SQL-RPT-02 File Name Syntax**\n\nPhrased like 'rpt\\_\\<subject\\>.sql'\n\n##### **Rule: SQL-RPT-03 Subject Word Choice**\n\nMust accurately and succinctly describe the subject or subjects that are being presented in the report.\n\n##### **Rule: SQL-RPT-04 File Name Underscore Delimitation**\n\nOne underscore between the 'rpt' prefix and subject; 'rpt\\_accomplishments\\_by\\_activity'.\n\n#### **Input Restrictions**\n\n##### **Rule: SQL-RPT-05 Consume Fact and Dimension Models**\n\nMust import data from one or more fact and dimension models using the {{ ref() }} macro.\n\n#### **Transformations**\n\n##### **Rule: SQL-RPT-06 Join Multiple Fact and Dimension Tables**\n\nMust produce a single, wide, flattened report table with all relevant descriptive attribute columns across all facts and dimensions to present information on business events and their characteristics.\n\n##### **Rule: SQL-RPT-07 Aggregate Facts to Consistent Grains**\n\nFacts may contain data at, or the data in the report may need to be served in, different grains compared to the models that they are being sourced from. Use grouping to present all data in the report at a consistent grain.\n\n### **Macros**\n\n#### **Purpose**\n\nMacros encapsulate reusable SQL logic and Jinja code so that the same pattern does not need to be written \u2014 and maintained \u2014 in multiple places across the project.\n\n#### **Scope**\n\nA macro is warranted when the same SQL pattern appears in two or more models; when a complex transformation would obscure the business logic of the model it lives in; or when a dbt community package does not already provide the needed functionality.\n\n#### **Structure**\n\n##### **Rule: SQL-MAC-01 Directory Syntax**\n\nSaved in './macros/\\*'. Subdirectories may be used to organize macros by function (e.g., './macros/staging/', './macros/testing/').\n\n##### **Rule: SQL-MAC-02 File Name Syntax**\n\nFile names must describe the action or output of the macro in snake\\_case: 'generate\\_surrogate\\_key.sql', 'pivot\\_columns.sql'. One macro per file unless closely related helper macros are grouped together.\n\n##### **Rule: SQL-MAC-03 Argument Validation**\n\nMacros must validate their arguments with defensive checks (e.g., raising an error if a required argument is missing or an unexpected value is passed) so that misuse produces a clear error message rather than silent incorrect output.\n\n##### **Rule: SQL-MAC-04 Prefer Packages Over Custom Macros**\n\nBefore writing a custom macro, check whether a well-maintained community package (such as dbt\\_utils, dbt\\_expectations, or dbt\\_date) already provides the functionality. Custom macros should only be written when no suitable package exists or when the package's implementation does not meet the project's specific needs.\n\n### **Singular Tests**\n\n#### **Purpose**\n\nSingular tests validate complex business logic, data quality expectations, or cross-model assertions that cannot be expressed with generic YAML-based tests \u2014 they are custom SQL queries that return failing rows.\n\n#### **Scope**\n\nUse singular tests when a validation requires custom SQL that goes beyond the capabilities of generic tests (unique, not\\_null, accepted\\_values, relationships) or their community-package extensions.\n\n#### **Structure**\n\n##### **Rule: SQL-TST-01 Directory Syntax**\n\nSaved in './tests/\\*'. Subdirectories may be used to organize tests by the layer or model they validate (e.g., './tests/staging/', './tests/marts/').\n\n##### **Rule: SQL-TST-02 File Name Syntax**\n\nFile names must describe the assertion being tested: 'assert\\_no\\_orphan\\_awards.sql', 'assert\\_revenue\\_matches\\_ledger.sql'. Use the prefix 'assert\\_' to distinguish singular tests from other SQL files.\n\n##### **Rule: SQL-TST-03 Query Must Return Failing Rows**\n\nA singular test query must return the set of rows that violate the assertion. If the query returns zero rows, the test passes; any rows returned constitute a failure.\n\n##### **Rule: SQL-TST-04 Reference Models with ref**\n\nSingular tests must reference models using the {{ ref() }} macro, not direct database table names, so that dbt can track the test's position in the DAG.\n\n### **Seeds**\n\n#### **Purpose**\n\nProvide small, static reference data \u2014 such as code-to-label mappings, category lists, or status definitions \u2014 that changes infrequently and is version-controlled alongside the project code.\n\n#### **Scope**\n\nSeeds are appropriate for static lookup tables that are small enough to commit to version control (generally fewer than a few hundred rows). Data that changes regularly or is large should be loaded as a source, not a seed.\n\n#### **Structure**\n\n##### **Rule: SQL-SEED-01 Directory Syntax**\n\nSaved in './seeds/\\*'. Subdirectories may be used if the number of seeds warrants organization.\n\n##### **Rule: SQL-SEED-02 File Format**\n\nSeeds must be CSV files with a header row. Column names in the header must follow the same snake\\_case convention as model columns (ALL-FMT-05).\n\n##### **Rule: SQL-SEED-03 Naming**\n\nSeed file names must describe the reference data they contain in snake\\_case: 'country\\_codes.csv', 'grant\\_status\\_mappings.csv'.\n\n##### **Rule: SQL-SEED-04 No Business Logic in Seeds**\n\nSeeds must contain only raw reference data. Any transformation or enrichment of seed data must happen in a model that references the seed using {{ ref() }}.\n\n##### **Rule: SQL-SEED-05 YAML Properties**\n\nEvery seed must have a corresponding entry in a \\_seeds.yml file within the ./seeds/ directory, including a description and column-level data type overrides where the default string type is not appropriate.\n\n### **Snapshots**\n\n#### **Purpose**\n\nCapture point-in-time changes to mutable source data using SCD Type 2 tracking, preserving a history of how records change over time.\n\n#### **Scope**\n\nSnapshots are not currently in active use in this project. If a use case arises that requires historical change tracking of source data, the following conventions should be applied.\n\n#### **Structure**\n\n##### **Rule: SQL-SNAP-01 Directory Syntax**\n\nSaved in './snapshots/\\*'.\n\n##### **Rule: SQL-SNAP-02 File Name Syntax**\n\nFile names must describe the source entity being tracked: 'snp\\_\\<source\\>\\_\\_\\<entity\\>.sql'.\n\n##### **Rule: SQL-SNAP-03 Strategy Declaration**\n\nEach snapshot must declare its strategy (timestamp or check) and the columns used for change detection in its config block. The timestamp strategy is preferred when a reliable updated\\_at column is available in the source.\n\n##### **Rule: SQL-SNAP-04 Source Reference**\n\nSnapshots must reference source tables using the {{ source() }} macro, not the {{ ref() }} macro, since they capture raw source state before transformation.\n\n### **Analyses**\n\n#### **Purpose**\n\nProvide a place for ad-hoc or exploratory SQL queries that compile through dbt (benefiting from {{ ref() }} and Jinja) but do not materialize as tables or views in the warehouse.\n\n#### **Scope**\n\nAnalyses are appropriate for audit queries, one-time investigations, data validation scripts, or SQL that supports reporting outside of the standard model pipeline. They should not be used as a substitute for models \u2014 if a query is consumed by a downstream process or BI tool, it belongs in the models directory.\n\n#### **Structure**\n\n##### **Rule: SQL-ANL-01 Directory Syntax**\n\nSaved in './analyses/\\*'. Subdirectories may be used to organize by purpose or team.\n\n##### **Rule: SQL-ANL-02 File Name Syntax**\n\nFile names must describe the query's purpose in snake\\_case: 'audit\\_missing\\_award\\_amounts.sql', 'explore\\_payment\\_timing.sql'.\n\n##### **Rule: SQL-ANL-03 Use ref and source Macros**\n\nAnalyses must reference models and sources using {{ ref() }} and {{ source() }} so that dbt can compile them correctly and lineage remains visible.\n\n### **Hooks**\n\n#### **Purpose**\n\nHooks execute SQL statements at specific points in the dbt run lifecycle \u2014 before or after individual models, or at the start or end of a full run \u2014 to handle operational tasks that fall outside standard model transformations.\n\n#### **Scope**\n\nHooks should be used sparingly and only for operational needs that cannot be accomplished through models, tests, or macros \u2014 common examples include granting permissions on newly created tables, creating UDFs, logging run metadata, or vacuuming tables after incremental loads. Hooks must not contain business logic or transformations; those belong in models.\n\n#### **Structure**\n\n##### **Rule: SQL-HOOK-01 Declare Hooks in dbt\\_project.yml**\n\non-run-start and on-run-end hooks must be declared in dbt\\_project.yml so they are visible and centralized. Per-model pre-hook and post-hook configurations should be set at the project level and only overridden in individual model {{ config() }} blocks when necessary.\n\n##### **Rule: SQL-HOOK-02 Extract Complex Hook Logic into Macros**\n\nIf a hook requires more than a single SQL statement, extract the logic into a macro in the ./macros/ directory and call the macro from the hook declaration. Do not embed multi-statement SQL directly in dbt\\_project.yml or config blocks.\n\n##### **Rule: SQL-HOOK-03 Document Hook Purpose**\n\nEach hook must have a comment in dbt\\_project.yml (or in the macro it calls) explaining what it does and why it is necessary, so that analysts encountering it understand its role in the pipeline.\n\n---\n\n## **YAML & Properties Configuration**\n\n### **Purpose**\n\nYAML property files are where the project defines what is true about each data asset \u2014 its tests, its contracts, and its documentation \u2014 close to the code that produces it. The purpose of these standards is to ensure that every model's properties are rigorous enough to catch data quality issues before they reach customers and detailed enough that a new analyst can understand the model without reading the SQL first.\n\n### **Scope**\n\nApplies to all Models, Sources, Seeds, Snapshots, and Macros defined in .yml files.\n\n### **YAML/SQL Consistency**\n\n#### **Rule: YML-SYNC-01 Columns Must Match SQL Output",
+    "is_automated": false,
+    "layer": "staging",
+    "description": "Every column documented in a `_models.yml` file must exist in the SQL model's output. Conversely, every column in the SQL model's output should be documented in the YAML. A YAML column definition that the SQL does not produce will cause a contract error if contracts are enforced, and is misleading documentation regardless. Before saving a `_models.yml` file, verify column names against the model's final SELECT."
+  },
+  {
+    "id": "YML-SYNC-02",
+    "title": "No Duplicate Model Entries",
+    "is_automated": false,
+    "layer": "all",
+    "description": "Each model must appear exactly once in its `_models.yml` file. Duplicate entries (e.g., defining `int_cdm_columns` twice in the same YAML) cause unpredictable behavior \u2014 dbt may silently use the last definition, masking the first. If a model definition needs to be updated, modify the existing entry rather than adding a second one."
+  },
+  {
+    "id": "YML-DOC-01",
+    "title": "Mandatory Description Field",
+    "is_automated": false,
+    "layer": "all",
+    "description": "Every model, source, seed, exposure, and macro must have a description field."
+  },
+  {
+    "id": "YML-DOC-02",
+    "title": "Description Content Quality",
+    "is_automated": false,
+    "layer": "all",
+    "description": "Descriptions must explain the business meaning, grain, and potential filters of the data \u2014 not just the technical derivation. Include the types of transactions or records in the model; how the model characterizes the records; and any subtle or complex limitations. The description must also include a brief testing rationale \u2014 what data quality risks the applied tests protect against and why those tests were chosen for this model (see ALL-TST-02)."
+  }
+]
