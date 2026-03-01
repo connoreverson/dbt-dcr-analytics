@@ -13,20 +13,21 @@ def parse_standards():
 
     rules = []
     
-    # regex to match rules
+    # regex to match rules at both #### and ##### heading depths
+    # tag is optional; missing tag defaults to is_automated = False
     rule_pattern = re.compile(
-        r'#### \*\*Rule: ([A-Z0-9-]+) (.*?)\*\* \[(Automated|Manual)\]\n(.*?(?=#### \*\*Rule: |^### |^## |\Z))',
+        r'^(#{4,5}) \*\*Rule: ([A-Z0-9-]+) (.*?)\*\*(?:\s*\[(Automated|Manual)\])?\n(.*?(?=^#{4,5} \*\*Rule: |^### |^## |\Z))',
         re.MULTILINE | re.DOTALL
     )
 
     for match in rule_pattern.finditer(content):
-        rule_id = match.group(1).strip()
-        title = match.group(2).strip()
-        tag = match.group(3).strip()
-        description = match.group(4).strip()
-        
+        rule_id = match.group(2).strip()
+        title = match.group(3).strip()
+        tag = match.group(4)
+        description = match.group(5).strip()
+
         is_automated = tag == "Automated"
-        
+
         # determine layer
         layer = "all"
         if rule_id.startswith("SQL-STG"):
@@ -37,6 +38,28 @@ def parse_standards():
             layer = "base"
         elif rule_id.startswith("SQL-FCT") or rule_id.startswith("SQL-DIM"):
             layer = "marts"
+        elif rule_id.startswith("SQL-RPT"):
+            layer = "marts"
+        elif rule_id.startswith("SQL-MAC"):
+            layer = "macros"
+        elif rule_id.startswith("SQL-TST"):
+            layer = "tests"
+        elif rule_id.startswith("SQL-SEED"):
+            layer = "seeds"
+        elif rule_id.startswith("SQL-SNAP"):
+            layer = "snapshots"
+        elif rule_id.startswith("SQL-ANL"):
+            layer = "analyses"
+        elif rule_id.startswith("SQL-HOOK"):
+            layer = "hooks"
+        elif rule_id.startswith("SRC-YML") or rule_id.startswith("STG-YML"):
+            layer = "staging"
+        elif rule_id.startswith("INT-YML"):
+            layer = "integration"
+        elif rule_id.startswith("MRT-YML"):
+            layer = "marts"
+        elif rule_id.startswith("MAC-YML") or rule_id.startswith("DOC-YML"):
+            layer = "macros"
 
         rules.append({
             "id": rule_id,
