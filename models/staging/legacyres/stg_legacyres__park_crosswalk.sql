@@ -8,7 +8,7 @@ final as (
 
     select
         --  hash key
-        {{ dbt_utils.generate_surrogate_key(['source.legacy_park_id']) }} as hk_park_crosswalk,  -- noqa: LT05
+        {{ dbt_utils.generate_surrogate_key(['source.legacy_park_id']) }} as hk_park_crosswalk,
         --  ids
         cast(source.legacy_park_id as varchar) as legacy_park_id,
         cast(source.legacy_park_name as varchar) as legacy_park_name,

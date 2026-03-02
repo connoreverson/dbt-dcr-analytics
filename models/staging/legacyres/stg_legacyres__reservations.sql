@@ -8,7 +8,7 @@ final as (
 
     select
         --  hash key
-        {{ dbt_utils.generate_surrogate_key(['source.res_id']) }} as hk_reservations,  -- noqa: LT05
+        {{ dbt_utils.generate_surrogate_key(['source.res_id']) }} as hk_reservations,
         --  ids
         cast(source.res_id as varchar) as reservation_id,
         cast(source.legacy_cust_id as varchar) as legacy_customer_id,

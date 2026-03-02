@@ -8,7 +8,7 @@ final as (
 
     select
         --  hash key
-        {{ dbt_utils.generate_surrogate_key(['source.facility_type']) }} as hk_fee_schedule,  -- noqa: LT05
+        {{ dbt_utils.generate_surrogate_key(['source.facility_type']) }} as hk_fee_schedule,
         --  ids / natural key
         cast(source.facility_type as varchar) as facility_type,
         --  rates (stored as decimal dollars)

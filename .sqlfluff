@@ -1,7 +1,7 @@
 [sqlfluff]
 dialect = duckdb
 templater = dbt
-max_line_length = 80
+max_line_length = 120
 
 [sqlfluff:rules:capitalisation.keywords]
 capitalisation_policy = lower

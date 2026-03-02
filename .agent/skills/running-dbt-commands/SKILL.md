@@ -258,7 +258,14 @@ sqlfluff fix models/ --dialect duckdb --templater dbt
 sqlfluff lint models/ --dialect duckdb --templater dbt
 ```
 
-Unfixable residuals requiring manual attention: RF04 (keyword identifiers — add `-- noqa: RF04`), LT05 (comment lines over 80 chars — rewrap manually).
+**Always read the file after `sqlfluff fix`.** The auto-fixer operates at the token level and does
+not understand semantic column ordering. It can silently reorder columns in multi-expression blocks
+(e.g. moving a date column above a multi-line arithmetic expression it was written after). Verify
+the output makes sense before committing.
+
+Unfixable residuals requiring manual attention: RF04 (keyword identifiers — add `-- noqa: RF04`),
+LT05 (long comment lines — rewrap manually; code lines over 120 chars are rare after the limit
+increase and indicate a genuinely complex expression worth splitting).
 
 ### dbt-score
 

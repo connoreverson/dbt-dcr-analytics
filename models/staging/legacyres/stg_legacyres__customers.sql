@@ -8,7 +8,7 @@ final as (
 
     select
         --  hash key
-        {{ dbt_utils.generate_surrogate_key(['source.legacy_cust_id']) }} as hk_customers,  -- noqa: LT05
+        {{ dbt_utils.generate_surrogate_key(['source.legacy_cust_id']) }} as hk_customers,
         --  ids
         cast(source.legacy_cust_id as varchar) as legacy_customer_id,
         --  pii — name and contact

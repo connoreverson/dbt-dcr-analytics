@@ -1,7 +1,6 @@
-from typing import Tuple, List, Type
+from typing import Tuple
 from sqlfluff.core.rules import BaseRule, LintResult, RuleContext
 from sqlfluff.core.rules.crawlers import SegmentSeekerCrawler
-from sqlfluff.core.parser import KeywordSegment, WhitespaceSegment
 
 class Rule_DBTPS_L001(BaseRule):
     """ALL-PERF-03: No bare union (use 'union all')."""
@@ -41,15 +40,15 @@ class Rule_DBTPS_L003(BaseRule):
     crawl_behaviour = SegmentSeekerCrawler({"select_statement"})
     
     def _eval(self, context: RuleContext) -> LintResult:
-        # A subquery is typically a select_statement inside a bracketed segment.
+        # A subquery is a select_statement inside a bracketed segment.
         if context.parent_stack and context.parent_stack[-1].is_type("bracketed"):
-            # Check if it's part of generate_surrogate_key
-            raw_upper = context.segment.raw.upper()
-            if "GENERATE_SURROGATE_KEY" not in raw_upper:
-                return LintResult(
-                    anchor=context.segment,
-                    description="ALL-PERF-04: subquery found (use CTEs instead)"
-                )
+            # CTE bodies are also select_statements inside brackets — do not flag them.
+            if any(p.is_type("common_table_expression") for p in context.parent_stack):
+                return LintResult()
+            return LintResult(
+                anchor=context.segment,
+                description="ALL-PERF-04: subquery found (use CTEs instead)"
+            )
         return LintResult()
 
 class Rule_DBTPS_L004(BaseRule):

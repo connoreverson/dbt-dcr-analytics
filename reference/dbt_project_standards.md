@@ -54,7 +54,9 @@ Models should generally stay under 200 lines. Deviations are acceptable when nec
 
 #### **Rule: ALL-FMT-02 Line Length** [Automated]
 
-Each line should be fewer than 80 characters.
+Each line should be fewer than 120 characters. The 120-character limit accommodates dbt macro
+expressions (e.g. `dbt_utils.generate_surrogate_key([...])`) and verbose cast expressions without
+requiring `-- noqa` suppressions on surrogate key lines.
 
 #### **Rule: ALL-FMT-03 Lowercase Keywords** [Automated]
 
