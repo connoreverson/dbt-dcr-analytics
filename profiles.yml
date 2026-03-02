@@ -20,3 +20,5 @@ dcr_analytics:
           alias: infratrak
         - path: 'source_data/duckdb/dcr_les_01_rangershield.duckdb'
           alias: rangershield
+        - path: 'source_data/duckdb/dcr_nrm_01_biosurvey.duckdb'
+          alias: biosurvey

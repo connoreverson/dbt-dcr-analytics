@@ -1,0 +1,358 @@
+version: 2
+
+models:
+  - name: stg_biosurvey__field_observations_raw
+    description: >
+      One row per legacy field observation from the mixed-entity MS Access export.
+      Covers Flora counts, Fauna counts, and Water Quality readings in a single table,
+      discriminated by observation_type. Biometric columns are null for Water Quality
+      rows; water chemistry columns are null for Flora and Fauna rows. The nesting_status
+      string 'None' is normalized to NULL. The ecoli_count field is cast to integer
+      from the legacy VARCHAR storage.
+    columns:
+      - name: hk_observation
+        description: Surrogate key derived from raw_id.
+        tests:
+          - unique
+          - not_null
+      - name: raw_id
+        description: Original MS Access export integer. Not stable across re-exports.
+        tests:
+          - unique
+          - not_null
+      - name: observation_type
+        description: Mixed-entity discriminator indicating what kind of observation this row represents.
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - Fauna
+                - Flora
+                - Water Quality
+      - name: site_id
+        description: Survey site where this observation was recorded.
+        tests:
+          - not_null
+      - name: observation_date
+        description: Calendar date of the observation.
+        tests:
+          - not_null
+      - name: observer_name
+        description: Name of the field biologist who recorded the observation.
+        tests:
+          - not_null
+      - name: species_code
+        description: Species identifier for Flora and Fauna rows. Null for Water Quality rows.
+      - name: count_estimate
+        description: Individual count for Flora and Fauna rows. Null for Water Quality rows.
+      - name: density_estimate_per_hectare
+        description: Density estimate in individuals per hectare. Null for Water Quality rows.
+      - name: nesting_status
+        description: >
+          Active nesting state for Fauna rows. The source string 'None' is normalized
+          to NULL at this layer. Values: Active, Abandoned, NULL.
+        tests:
+          - accepted_values:
+              values:
+                - Active
+                - Abandoned
+              config:
+                where: "nesting_status is not null"
+      - name: ph_level
+        description: pH measurement. Populated for Water Quality rows and a small number of legacy Flora rows.
+      - name: ecoli_count
+        description: >
+          E. coli count cast to integer from legacy VARCHAR storage. Represents CFU/100ml.
+          Null for Flora and Fauna rows.
+      - name: turbidity_ntu
+        description: Turbidity in NTU. Null for Flora and Fauna rows.
+      - name: temperature_celsius
+        description: Water temperature in Celsius. Null for Flora and Fauna rows.
+      - name: gps_latitude
+        description: GPS latitude at time of observation, where recorded.
+      - name: gps_longitude
+        description: GPS longitude at time of observation, where recorded.
+      - name: notes
+        description: Free-text field notes from the observer.
+
+  - name: stg_biosurvey__flora_fauna_surveys
+    description: >
+      One row per flora or fauna survey record from the partially normalized MS Access
+      schema. Covers field surveys from 1993 onward across 255 survey sites. Latitude
+      and longitude are null for approximately 60% of records — pre-GPS surveys
+      (roughly pre-2010) used written site descriptions only.
+    columns:
+      - name: hk_flora_fauna_survey
+        description: Surrogate key derived from survey_id.
+        tests:
+          - unique
+          - not_null
+      - name: survey_id
+        description: Primary identifier for the survey record.
+        tests:
+          - unique
+          - not_null
+      - name: site_id
+        description: Survey site where this observation was made.
+        tests:
+          - not_null
+      - name: species_code
+        description: Species observed, references stg_biosurvey__species_codes.
+        tests:
+          - not_null
+      - name: survey_date
+        description: Calendar date of the field survey.
+        tests:
+          - not_null
+      - name: observer_name
+        description: Name of the field biologist who conducted the survey.
+        tests:
+          - not_null
+      - name: count_estimate
+        description: Estimated count of individual organisms observed.
+        tests:
+          - not_null
+      - name: density_estimate_per_hectare
+        description: >
+          Estimated density in individuals per hectare. Applicable to Flora surveys
+          only — null for all Fauna rows (4,842 of 9,550), where individual counts
+          are used instead of areal density.
+      - name: latitude
+        description: >
+          GPS latitude of the survey point. Null for pre-GPS surveys (~pre-2010),
+          which represent approximately 60% of records.
+      - name: longitude
+        description: GPS longitude of the survey point. Null for pre-GPS surveys.
+
+  - name: stg_biosurvey__survey_sites
+    description: >
+      One row per named biological survey site. Survey sites are fixed monitoring
+      locations within DCR parks, identified by structured codes in the format
+      S-{park_number}-{sequence}. Used as a reference dimension by flora/fauna,
+      water quality, and invasive species observation models.
+    columns:
+      - name: hk_survey_site
+        description: Surrogate key derived from site_id.
+        tests:
+          - unique
+          - not_null
+      - name: site_id
+        description: "Structured site identifier (format: S-{park}-{sequence})."
+        tests:
+          - unique
+          - not_null
+      - name: park_id
+        description: Integer identifier of the park containing this survey site.
+        tests:
+          - not_null
+      - name: site_name
+        description: Human-readable name for the survey site.
+        tests:
+          - not_null
+      - name: site_description
+        description: Narrative description of the site ecology and location context.
+
+  - name: stg_biosurvey__species_codes
+    description: >
+      One row per species in the DCR biological survey catalog. Contains 18 species —
+      9 fauna and 9 flora — tracked across all survey programs. Three flora species
+      are currently classified invasive; none are classified endangered. Species codes
+      follow a structured format: FL- for flora, FA- for fauna.
+    columns:
+      - name: hk_species
+        description: Surrogate key derived from species_code.
+        tests:
+          - unique
+          - not_null
+      - name: species_code
+        description: Structured species identifier (e.g., FL-WES-81, FA-BLA-26).
+        tests:
+          - unique
+          - not_null
+      - name: common_name
+        description: Common English name for the species.
+        tests:
+          - not_null
+      - name: scientific_name
+        description: Binomial scientific name.
+        tests:
+          - not_null
+      - name: category
+        description: High-level classification of the species.
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - Fauna
+                - Flora
+      - name: is_endangered
+        description: True if the species carries an active state or federal endangered classification.
+        tests:
+          - not_null
+      - name: is_invasive
+        description: True if the species is classified invasive on DCR managed lands.
+        tests:
+          - not_null
+      - name: alternate_names
+        description: Pipe-delimited list of alternate common names. Null if none exist.
+
+  - name: stg_biosurvey__endangered_species_monitoring
+    description: >
+      Annual population monitoring records for endangered species at survey sites.
+      This model is currently empty — no monitoring records have been entered into the
+      source system. The schema is staged to support forward compatibility when annual
+      survey data becomes available.
+    columns:
+      - name: hk_endangered_monitoring
+        description: Surrogate key derived from monitoring_id.
+        tests:
+          - unique
+          - not_null
+      - name: monitoring_id
+        description: Primary identifier for the monitoring record.
+        tests:
+          - unique
+          - not_null
+      - name: site_id
+        description: Survey site where the annual monitoring was conducted.
+        tests:
+          - not_null
+      - name: species_code
+        description: Endangered species being monitored.
+        tests:
+          - not_null
+      - name: monitoring_year
+        description: Calendar year the monitoring was conducted.
+        tests:
+          - not_null
+      - name: population_count
+        description: Total individual count recorded during the monitoring period.
+        tests:
+          - not_null
+      - name: nesting_pairs
+        description: Number of active nesting pairs observed.
+        tests:
+          - not_null
+      - name: reproductive_success_rate
+        description: Percentage of nesting attempts that produced surviving offspring.
+        tests:
+          - not_null
+      - name: compliance_reported
+        description: True if the annual regulatory compliance report was submitted.
+        tests:
+          - not_null
+
+  - name: stg_biosurvey__invasive_species_observations
+    description: >
+      One row per invasive species observation at a survey site. Tracks extent,
+      treatment type, and treatment date. Approximately 60% of observations (1,504 of
+      2,500) have no treatment applied — these are untreated sites awaiting management
+      action. GPS coordinates are recorded only for sites where treatment was applied.
+    columns:
+      - name: hk_invasive_observation
+        description: Surrogate key derived from observation_id.
+        tests:
+          - unique
+          - not_null
+      - name: observation_id
+        description: Primary identifier for the invasive species observation record.
+        tests:
+          - unique
+          - not_null
+      - name: site_id
+        description: Survey site where the invasive species was observed.
+        tests:
+          - not_null
+      - name: species_code
+        description: Invasive species observed, references stg_biosurvey__species_codes.
+        tests:
+          - not_null
+      - name: observation_date
+        description: Calendar date the invasive species was first observed at this site.
+        tests:
+          - not_null
+      - name: extent_square_meters
+        description: Estimated area covered by the invasive species in square meters.
+        tests:
+          - not_null
+      - name: treatment_applied
+        description: >
+          Type of management treatment applied. Null for untreated observations.
+          Values: Biological Control, Herbicide, Manual Removal.
+        tests:
+          - accepted_values:
+              values:
+                - Biological Control
+                - Herbicide
+                - Manual Removal
+              config:
+                where: "treatment_applied is not null"
+      - name: treatment_date
+        description: Date treatment was applied. Null when no treatment has been applied.
+      - name: latitude
+        description: GPS latitude of the treatment location. Null for untreated observations.
+      - name: longitude
+        description: GPS longitude of the treatment location. Null for untreated observations.
+
+  - name: stg_biosurvey__water_quality_tests
+    description: >
+      One row per water quality test conducted at a survey site. Covers three distinct
+      protocol eras (1993–present), each with different laboratory standards and
+      measurement methods. The protocol_era column enables era-aware analysis and
+      flags records where cross-era direct comparisons may be unreliable.
+    columns:
+      - name: hk_water_quality_test
+        description: Surrogate key derived from test_id.
+        tests:
+          - unique
+          - not_null
+      - name: test_id
+        description: Primary identifier for the water quality test record.
+        tests:
+          - unique
+          - not_null
+      - name: site_id
+        description: Survey site where the water sample was collected.
+        tests:
+          - not_null
+      - name: sample_date
+        description: Date the water sample was collected.
+        tests:
+          - not_null
+      - name: dissolved_oxygen_mgl
+        description: Dissolved oxygen concentration in milligrams per liter.
+        tests:
+          - not_null
+      - name: ph_level
+        description: pH of the water sample at time of collection.
+        tests:
+          - not_null
+      - name: ecoli_cfu_100ml
+        description: E. coli colony-forming units per 100ml, measured under the protocol standards of the applicable era.
+        tests:
+          - not_null
+      - name: turbidity_ntu
+        description: Turbidity in Nephelometric Turbidity Units.
+        tests:
+          - not_null
+      - name: temperature_celsius
+        description: Water temperature in degrees Celsius at time of sampling.
+        tests:
+          - not_null
+      - name: nitrogen_mgl
+        description: Total nitrogen concentration in milligrams per liter.
+        tests:
+          - not_null
+      - name: phosphorus_mgl
+        description: Total phosphorus concentration in milligrams per liter.
+        tests:
+          - not_null
+      - name: protocol_era
+        description: Measurement protocol era governing the standards used for this sample.
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 1993-2004 (Legacy Lab)
+                - 2005-2017 (Revised)
+                - 2018-Present (EPA-Aligned)

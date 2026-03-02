@@ -1,0 +1,217 @@
+version: 2
+
+sources:
+  - name: biosurvey
+    description: >
+      BioSurvey Legacy — DCR's Natural Resources Management field data system,
+      originally built on MS Access across multiple survey eras (1993–present). The
+      database reflects three distinct protocol periods with different measurement
+      standards, resulting in some cross-era data quality inconsistencies. The core
+      data quality issue is field_observations_raw: a single mixed-entity table that
+      co-locates flora, fauna, and water quality observations in one flat export. This
+      structure was common in early MS Access designs before the database was partially
+      normalized in later eras.
+    database: biosurvey
+    schema: main
+    tables:
+      - name: field_observations_raw
+        description: >
+          The legacy mixed-entity observation export from the original MS Access schema.
+          A single row may represent a Flora count, Fauna count, or Water Quality reading —
+          the observation_type column is the discriminator. Biometric columns
+          (count_estimate, density, nesting_status) are null for Water Quality rows;
+          water chemistry columns (ph_level, ecoli_count, turbidity_ntu, temperature)
+          are null for Flora and Fauna rows. The ecoli_count field is stored as VARCHAR
+          due to a legacy reporting format; values are numeric strings. The nesting_status
+          field contains both true NULLs and the string 'None' for fauna without active
+          nesting — these are normalized to NULL at staging.
+        columns:
+          - name: raw_id
+            description: Surrogate integer assigned by the MS Access export. Not a stable business key across re-exports.
+          - name: observation_type
+            description: "Mixed-entity discriminator. Values: Fauna, Flora, Water Quality."
+          - name: site_id
+            description: Survey site identifier, references survey_sites.site_id.
+          - name: species_code
+            description: Species identifier for Flora and Fauna rows. Null for Water Quality rows.
+          - name: observation_date
+            description: Calendar date the observation was recorded.
+          - name: observer_name
+            description: Name of the field biologist who recorded the observation.
+          - name: count_estimate
+            description: Individual count for Flora and Fauna rows. Null for Water Quality rows.
+          - name: density_estimate_per_hectare
+            description: Density estimate for Flora and Fauna rows. Null for Water Quality rows.
+          - name: nesting_status
+            description: >
+              Active nesting state for Fauna rows only. Contains both NULL and the string
+              'None' for fauna without nesting activity; both are normalized to NULL.
+              Values: Active, Abandoned, NULL.
+          - name: ph_level
+            description: pH measurement for Water Quality rows (and a small number of legacy Flora rows). Null for most Flora and all Fauna rows.
+          - name: ecoli_count
+            description: >
+              E. coli count stored as VARCHAR due to legacy reporting format.
+              Values are numeric strings representing CFU/100ml. Cast to integer at staging.
+              Null for Flora and Fauna rows.
+          - name: turbidity_ntu
+            description: Turbidity in NTU for Water Quality rows. Null for Flora and most Fauna rows.
+          - name: temperature_celsius
+            description: Water temperature for Water Quality rows. Null for Flora and Fauna rows.
+          - name: gps_latitude
+            description: GPS latitude at time of observation, where recorded.
+          - name: gps_longitude
+            description: GPS longitude at time of observation, where recorded.
+          - name: notes
+            description: Free-text field notes from the observer.
+
+      - name: flora_fauna_surveys
+        description: >
+          Partially normalized flora and fauna survey records extracted from the
+          legacy MS Access schema. Covers surveys from 1993 onward. Approximately
+          60% of records lack GPS coordinates — older surveys (pre-2010) were recorded
+          with written site descriptions only, not GPS, so latitude and longitude are
+          null for those rows.
+        columns:
+          - name: survey_id
+            description: Primary identifier for the survey record.
+          - name: site_id
+            description: Survey site identifier, references survey_sites.site_id.
+          - name: species_code
+            description: Species observed, references species_codes.species_code.
+          - name: survey_date
+            description: Calendar date of the survey.
+          - name: observer_name
+            description: Name of the field biologist who conducted the survey.
+          - name: count_estimate
+            description: Estimated count of individuals observed.
+          - name: density_estimate_per_hectare
+            description: Estimated density of individuals per hectare.
+          - name: latitude
+            description: GPS latitude. Null for surveys conducted before GPS field equipment was adopted (~pre-2010).
+          - name: longitude
+            description: GPS longitude. Null for surveys conducted before GPS field equipment was adopted (~pre-2010).
+
+      - name: survey_sites
+        description: >
+          Reference table of named biological survey sites across DCR parks. Each site
+          is a fixed monitoring location identified by a structured site_id
+          (format: S-{park}-{sequence}).
+        columns:
+          - name: site_id
+            description: Primary identifier in the format S-{park_number}-{sequence}.
+          - name: park_id
+            description: Integer identifier of the park containing this survey site.
+          - name: site_name
+            description: Human-readable name for the survey site.
+          - name: site_description
+            description: Narrative description of the survey site and its ecological context.
+
+      - name: species_codes
+        description: >
+          Reference catalog of 18 flora and fauna species tracked in DCR biological
+          surveys. Codes follow a structured naming convention: FL- prefix for flora,
+          FA- prefix for fauna, followed by three-letter abbreviation and numeric suffix.
+          Three flora species are classified as invasive; none are currently classified
+          as endangered.
+        columns:
+          - name: species_code
+            description: Primary identifier for the species (e.g., FL-WES-81, FA-BLA-26).
+          - name: common_name
+            description: Common English name for the species.
+          - name: scientific_name
+            description: Binomial scientific name for the species.
+          - name: category
+            description: "High-level classification. Values: Fauna, Flora."
+          - name: is_endangered
+            description: True if the species has a current state or federal endangered classification.
+          - name: is_invasive
+            description: True if the species is classified as an invasive species in DCR managed lands.
+          - name: alternate_names
+            description: Pipe-delimited list of alternate common names. Null if no alternates exist.
+
+      - name: endangered_species_monitoring
+        description: >
+          Annual population monitoring records for endangered species at specific survey
+          sites. This table is currently empty — data population is pending the
+          completion of annual field surveys and regulatory reporting. Schema is
+          preserved for forward compatibility.
+        columns:
+          - name: monitoring_id
+            description: Primary identifier for the monitoring record.
+          - name: site_id
+            description: Survey site where monitoring occurred.
+          - name: species_code
+            description: Endangered species being monitored.
+          - name: monitoring_year
+            description: Calendar year the monitoring was conducted.
+          - name: population_count
+            description: Total individual count observed during the monitoring period.
+          - name: nesting_pairs
+            description: Number of active nesting pairs observed.
+          - name: reproductive_success_rate
+            description: Percentage of nesting attempts that produced surviving offspring.
+          - name: compliance_reported
+            description: True if the annual compliance report was submitted to regulators.
+
+      - name: invasive_species_observations
+        description: >
+          Observations of invasive plant species at survey sites, including extent
+          measurements and treatment records. Approximately 60% of observations
+          (1,504 of 2,500) have no treatment recorded — these represent untreated
+          sites awaiting management action. GPS coordinates are null when no treatment
+          was applied, as precise GPS was only captured during active treatment events.
+        columns:
+          - name: observation_id
+            description: Primary identifier for the invasive species observation.
+          - name: site_id
+            description: Survey site where the invasive species was observed.
+          - name: species_code
+            description: Invasive species observed, references species_codes.species_code.
+          - name: observation_date
+            description: Calendar date the invasive species was first observed.
+          - name: extent_square_meters
+            description: Estimated area covered by the invasive species in square meters.
+          - name: treatment_applied
+            description: >
+              Type of treatment applied to control the invasive species. Null for
+              untreated observations. Values: Biological Control, Herbicide,
+              Manual Removal.
+          - name: treatment_date
+            description: Date treatment was applied. Null when no treatment has been applied.
+          - name: latitude
+            description: GPS latitude of the treatment location. Null when no treatment was applied.
+          - name: longitude
+            description: GPS longitude of the treatment location. Null when no treatment was applied.
+
+      - name: water_quality_tests
+        description: >
+          Water quality test results collected at survey sites across three protocol
+          eras. Each era used different measurement standards and lab methods, which
+          may affect cross-era comparability of E. coli counts and nutrient levels.
+          The protocol_era column enables era-aware analysis.
+        columns:
+          - name: test_id
+            description: Primary identifier for the water quality test record.
+          - name: site_id
+            description: Survey site where the water sample was collected.
+          - name: sample_date
+            description: Date the water sample was collected.
+          - name: dissolved_oxygen_mgl
+            description: Dissolved oxygen concentration in milligrams per liter.
+          - name: ph_level
+            description: pH of the water sample.
+          - name: ecoli_cfu_100ml
+            description: E. coli colony-forming units per 100ml of water.
+          - name: turbidity_ntu
+            description: Turbidity in Nephelometric Turbidity Units.
+          - name: temperature_celsius
+            description: Water temperature in degrees Celsius at time of sampling.
+          - name: nitrogen_mgl
+            description: Total nitrogen concentration in milligrams per liter.
+          - name: phosphorus_mgl
+            description: Total phosphorus concentration in milligrams per liter.
+          - name: protocol_era
+            description: >
+              Measurement protocol era. Values: 1993-2004 (Legacy Lab),
+              2005-2017 (Revised), 2018-Present (EPA-Aligned).
