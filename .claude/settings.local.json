@@ -1,15 +1,6 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git add:*.sql)",
-      "Bash(git add:*.yml)",
-      "Bash(git add:*.yaml)",
-      "Bash(git add:*.md)",
-      "Bash(git add:*.csv)",
-      "Bash(git add:*.py)",
-      "Bash(git add:*.txt)",
-      "Bash(git add:*.toml)",
-      "Bash(git add:*.json)",
       "Bash(git commit:-m *)",
       "Bash(dbt build:*)",
       "Bash(dbt show:*)",
@@ -28,7 +19,8 @@
       "Bash(pip install -r requirements.txt)",
       "Bash(dbt debug:*)",
       "Bash(dbt ls:*)",
-      "Bash(dbt run-operation:*)"
+      "Bash(dbt run-operation:*)",
+      "Bash(wc:*)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
