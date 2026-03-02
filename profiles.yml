@@ -16,3 +16,5 @@ dcr_analytics:
           alias: stategov
         - path: 'source_data/duckdb/dcr_fin_02_granttrack.duckdb'
           alias: granttrack
+        - path: 'source_data/duckdb/dcr_ast_01_infratrak.duckdb'
+          alias: infratrak

@@ -1,0 +1,290 @@
+version: 2
+
+models:
+  - name: stg_infratrak__assets
+    description: >
+      One staged row per physical infrastructure asset registered in InfraTrak
+      Lifecycle across DCR park units in Regions 1 and 2. Covers ten asset
+      categories including buildings, roads, trails, bridges, dams, and utility
+      infrastructure. Geographic coordinates (latitude, longitude) represent each
+      asset's centroid or primary access point in decimal degrees. This source
+      reflects only the Phase 1 deployment area; approximately 40% of DCR's
+      physical assets (Regions 3 and 4) are not represented.
+    columns:
+      - name: hk_asset
+        description: Surrogate hash key for the asset, derived from asset_tag.
+        tests:
+          - unique
+          - not_null
+      - name: asset_tag
+        description: Natural key for the asset in the format AST-{park_id}-{seq}.
+        tests:
+          - unique
+          - not_null
+      - name: park_id
+        description: Foreign key to stg_infratrak__parks.park_id.
+        tests:
+          - not_null
+      - name: asset_category
+        description: Physical type of the asset.
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - Bridge
+                - Cabin
+                - Campsite
+                - Dam
+                - Electrical Pedestal
+                - Picnic Shelter
+                - Restroom
+                - Road
+                - Trail
+                - Water Treatment System
+      - name: description
+        description: Free-text description of the asset and its location.
+      - name: construction_year
+        description: Year the asset was constructed; may be null for older assets with unknown dates.
+      - name: expected_lifespan_years
+        description: Design lifespan in years.
+        tests:
+          - not_null
+      - name: replacement_value
+        description: Estimated replacement cost at current construction prices.
+        tests:
+          - not_null
+      - name: latitude
+        description: Latitude of the asset centroid in decimal degrees (WGS 84).
+        tests:
+          - not_null
+      - name: longitude
+        description: Longitude of the asset centroid in decimal degrees (WGS 84).
+        tests:
+          - not_null
+      - name: is_visible_in_survey
+        description: True if the asset was captured during the 2019 physical field inventory.
+        tests:
+          - not_null
+
+  - name: stg_infratrak__condition_assessments
+    description: >
+      One staged row per Facility Condition Index (FCI) inspection for a DCR
+      physical asset. Each assessment assigns a score from 1 (worst) to 100
+      (best) using a standardised inspection protocol. The FCI ≥ 70 threshold
+      defines "good" condition for capital planning purposes; assets below this
+      threshold contribute to the deferred maintenance backlog. Inspection
+      frequency varies by asset criticality: dams and water treatment systems
+      are assessed annually; standard facilities operate on a three-year cycle.
+    columns:
+      - name: hk_condition_assessment
+        description: Surrogate hash key for the assessment, derived from assessment_id.
+        tests:
+          - unique
+          - not_null
+      - name: assessment_id
+        description: Natural key for the assessment in the format FCI-{uuid}.
+        tests:
+          - unique
+          - not_null
+      - name: asset_tag
+        description: Foreign key to stg_infratrak__assets.asset_tag.
+        tests:
+          - not_null
+      - name: inspector_id
+        description: >
+          Employee identifier of the inspector who conducted the assessment,
+          in EMP-{uuid} format.
+        tests:
+          - not_null
+      - name: fci_score
+        description: >
+          Facility Condition Index score, integer 1–100. Higher values indicate
+          better condition; FCI ≥ 70 is considered "good" for capital planning.
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+              max_value: 100
+      - name: inspection_date
+        description: Date the inspection was conducted.
+        tests:
+          - not_null
+      - name: notes
+        description: Inspector's free-text observations.
+
+  - name: stg_infratrak__deferred_maintenance
+    description: >
+      One staged row per asset with an outstanding deferred maintenance backlog.
+      Backlog amounts are calculated annually by comparing each asset's current
+      FCI score against the FCI ≥ 70 "good" threshold and estimating the cost
+      to remediate the gap. The aggregate of this table forms the capital
+      maintenance backlog figure used in DCR's legislative budget requests. The
+      total understates the true statewide backlog by approximately 40% because
+      Regions 3 and 4 are not in InfraTrak.
+    columns:
+      - name: hk_deferred_maintenance
+        description: Surrogate hash key for the backlog record, derived from backlog_id.
+        tests:
+          - unique
+          - not_null
+      - name: backlog_id
+        description: Natural key for the backlog record in the format DM-{uuid}.
+        tests:
+          - unique
+          - not_null
+      - name: asset_tag
+        description: Foreign key to stg_infratrak__assets.asset_tag.
+        tests:
+          - not_null
+      - name: estimated_repair_cost
+        description: Estimated cost to bring the asset to FCI ≥ 70.
+        tests:
+          - not_null
+      - name: calculation_date
+        description: Date the cost estimate was produced; typically 1 January of the reporting year.
+        tests:
+          - not_null
+      - name: is_funded
+        description: True if a budget appropriation has been approved to fund this backlog item.
+        tests:
+          - not_null
+
+  - name: stg_infratrak__employees
+    description: >
+      One staged row per maintenance worker and inspector provisioned in
+      InfraTrak Lifecycle for Regions 1 and 2. This is a local EAM dimension
+      table — it reflects users granted access to the system and may not be
+      complete relative to the full DCR workforce in PeopleFirst HR
+      (DCR-HCM-01). Provisioning is managed manually through access requests
+      rather than automated identity federation.
+    columns:
+      - name: hk_employee
+        description: Surrogate hash key for the employee, derived from employee_id.
+        tests:
+          - unique
+          - not_null
+      - name: employee_id
+        description: Natural key for the employee in the format EMP-{uuid}.
+        tests:
+          - unique
+          - not_null
+      - name: first_name
+        description: Employee's given name.
+        tests:
+          - not_null
+      - name: last_name
+        description: Employee's family name.
+        tests:
+          - not_null
+      - name: title
+        description: Job title.
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - Facility Manager
+                - Inspector
+                - Maintenance Worker I
+                - Maintenance Worker II
+                - Maintenance Worker III
+      - name: assigned_region
+        description: Region number to which the employee is primarily assigned.
+        tests:
+          - not_null
+
+  - name: stg_infratrak__parks
+    description: >
+      One staged row per park unit covered by InfraTrak Lifecycle. This is a
+      local EAM dimension table that mirrors park units in Regions 1 and 2. The
+      park_id corresponds to the park_id embedded in asset tags and referenced
+      in work orders. This table is distinct from the parks dimension in
+      GeoParks Enterprise (DCR-GEO-01); crosswalk tables exist but have drifted
+      since 2022.
+    columns:
+      - name: hk_park
+        description: Surrogate hash key for the park, derived from park_id.
+        tests:
+          - unique
+          - not_null
+      - name: park_id
+        description: Integer identifier for the park unit.
+        tests:
+          - unique
+          - not_null
+      - name: park_name
+        description: Full name of the park unit.
+        tests:
+          - not_null
+      - name: region_id
+        description: Region number.
+        tests:
+          - not_null
+      - name: classification
+        description: DCR land classification.
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - State Beach
+                - State Historic Park
+                - State Natural Reserve
+                - State Park
+                - State Recreation Area
+
+  - name: stg_infratrak__work_orders
+    description: >
+      One staged row per maintenance work order for physical assets in DCR park
+      units. Each work order is linked to a specific asset and a primary
+      assignee, and carries labor hours, material cost, and total cost. The
+      completed_date is null for orders with status Open or In Progress.
+      Completion discipline varies by region: approximately 90% of Region 1
+      maintenance activities result in a closed work order; Region 2 closes
+      approximately 70%, attributed to mobile app connectivity issues in canyon
+      parks.
+    columns:
+      - name: hk_work_order
+        description: Surrogate hash key for the work order, derived from wo_id.
+        tests:
+          - unique
+          - not_null
+      - name: wo_id
+        description: Natural key for the work order in the format WO-{uuid}.
+        tests:
+          - unique
+          - not_null
+      - name: asset_tag
+        description: Foreign key to stg_infratrak__assets.asset_tag.
+        tests:
+          - not_null
+      - name: park_id
+        description: Park unit where the work was performed; denormalised from the asset record.
+        tests:
+          - not_null
+      - name: primary_assignee
+        description: Employee identifier of the primary assigned worker, in EMP-{uuid} format.
+        tests:
+          - not_null
+      - name: wo_type
+        description: Type of maintenance activity.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Corrective', 'Emergency', 'Preventative']
+      - name: status
+        description: Work order lifecycle status.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Abandoned', 'Completed', 'In Progress', 'Open']
+      - name: reported_date
+        description: Date the maintenance need was identified.
+        tests:
+          - not_null
+      - name: completed_date
+        description: Date the work order was closed; null for Open and In Progress orders.
+      - name: labor_hours
+        description: Total labor hours recorded against the work order.
+      - name: material_cost
+        description: Cost of materials used in the work.
+      - name: total_cost
+        description: Total cost of the work order including labor and materials.

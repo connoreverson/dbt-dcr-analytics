@@ -1,0 +1,170 @@
+version: 2
+
+sources:
+  - name: infratrak
+    description: >
+      InfraTrak Lifecycle (DCR-AST-01). An Enterprise Asset Management (EAM)
+      SaaS platform covering physical assets in DCR park units. Phase 1
+      implementation covers Regions 1 and 2 (28 park units); Phase 2 (Regions 3
+      and 4) is paused indefinitely, meaning approximately 40% of DCR's asset
+      portfolio is absent from this source. Data quality within the onboarded
+      regions is high and reflects SaaS platform conventions: consistent typing,
+      UUID-style identifiers, and no denormalisation artefacts.
+    database: infratrak
+    schema: main
+    tables:
+      - name: assets
+        description: >
+          Registry of physical infrastructure assets across DCR park units in
+          Regions 1 and 2. One row per asset. Asset tags embed the park_id:
+          format is AST-{park_id}-{sequence} (e.g. AST-01-00000). Geographic
+          coordinates represent the asset's centroid or primary access point.
+          Assets not visible during the 2019 field inventory (underground
+          utilities, minor outbuildings) and assets constructed after 2020
+          may be absent.
+        columns:
+          - name: asset_tag
+            description: >
+              Unique identifier for the asset, in the format AST-{park_id}-{seq}
+              (e.g. AST-01-00000). The embedded park_id segment is zero-padded
+              to two digits.
+          - name: park_id
+            description: Foreign key to parks.park_id.
+          - name: asset_category
+            description: >
+              Physical type of the asset. Values: Bridge, Cabin, Campsite, Dam,
+              Electrical Pedestal, Picnic Shelter, Restroom, Road, Trail,
+              Water Treatment System.
+          - name: description
+            description: Free-text description of the asset and its location.
+          - name: construction_year
+            description: Year the asset was constructed; may be null for older assets with unknown dates.
+          - name: expected_lifespan_years
+            description: Design lifespan in years, used for replacement value amortisation calculations.
+          - name: replacement_value
+            description: Estimated cost to replace the asset at current construction prices.
+          - name: latitude
+            description: Latitude of the asset centroid in decimal degrees (WGS 84).
+          - name: longitude
+            description: Longitude of the asset centroid in decimal degrees (WGS 84).
+          - name: is_visible_in_survey
+            description: >
+              True if the asset was captured during the 2019 physical field
+              inventory; false for assets added administratively after that date.
+
+      - name: condition_assessments
+        description: >
+          Periodic inspection records scoring each asset on the Facility
+          Condition Index (FCI) scale. FCI scores range from 1 (worst) to 100
+          (best); a score of 70 or above is considered "good" condition for
+          capital planning purposes. Inspection frequency varies by criticality:
+          dams and water systems annually; standard facilities on a three-year
+          cycle.
+        columns:
+          - name: assessment_id
+            description: Unique identifier for the assessment in the format FCI-{uuid}.
+          - name: asset_tag
+            description: Foreign key to assets.asset_tag.
+          - name: inspector_id
+            description: Employee identifier for the inspector, in EMP-{uuid} format.
+          - name: inspection_date
+            description: Date the inspection was conducted.
+          - name: fci_score
+            description: >
+              Facility Condition Index score, integer 1–100. Higher values
+              indicate better condition. The deferred maintenance backlog
+              calculation targets assets scoring below 70.
+          - name: notes
+            description: Inspector's free-text observations recorded during the assessment.
+
+      - name: deferred_maintenance
+        description: >
+          One row per asset with an estimated backlog of deferred repair work.
+          Backlog values are calculated annually and represent the cost to bring
+          the asset to FCI ≥ 70. The aggregate of this table is the figure
+          submitted in DCR's annual legislative budget request for capital
+          maintenance appropriations. This source under-reports the true
+          statewide backlog because Regions 3 and 4 are not in InfraTrak.
+        columns:
+          - name: backlog_id
+            description: Unique identifier for the deferred maintenance record in the format DM-{uuid}.
+          - name: asset_tag
+            description: Foreign key to assets.asset_tag.
+          - name: estimated_repair_cost
+            description: Estimated cost to bring the asset to FCI ≥ 70.
+          - name: calculation_date
+            description: Date the repair cost estimate was calculated; typically 1 January of the reporting year.
+          - name: is_funded
+            description: True if a budget appropriation has been approved to cover this backlog item.
+
+      - name: employees
+        description: >
+          InfraTrak-local employee dimension covering maintenance workers and
+          inspectors assigned to Regions 1 and 2. One row per employee. This
+          table reflects employees provisioned in InfraTrak and may not match
+          the full employee list in PeopleFirst HR (DCR-HCM-01); provisioning
+          is managed manually through access request processes.
+        columns:
+          - name: employee_id
+            description: Unique identifier for the employee in the format EMP-{uuid}.
+          - name: first_name
+            description: Employee's given name.
+          - name: last_name
+            description: Employee's family name.
+          - name: title
+            description: >
+              Job title. Values: Facility Manager, Inspector, Maintenance
+              Worker I, Maintenance Worker II, Maintenance Worker III.
+          - name: assigned_region
+            description: Region number (1 or 2) to which the employee is primarily assigned.
+
+      - name: parks
+        description: >
+          InfraTrak-local park dimension. One row per park unit covered by the
+          system. Covers only the 50 park units in the database (Regions 1 and
+          2 only; Regions 3 and 4 are absent due to the paused Phase 2
+          implementation). Park identifiers here correspond to park_id in
+          assets and work_orders.
+        columns:
+          - name: park_id
+            description: Integer identifier for the park unit.
+          - name: park_name
+            description: Full name of the park unit (e.g. Tall Pines State Park).
+          - name: region_id
+            description: Region number.
+          - name: classification
+            description: >
+              DCR land classification. Values: State Beach, State Historic Park,
+              State Natural Reserve, State Park, State Recreation Area.
+
+      - name: work_orders
+        description: >
+          One row per maintenance work order across all onboarded park units.
+          Work orders are linked to a specific asset and assignee. The
+          completed_date is null for work orders with status Open or In Progress.
+          Work order completion rates vary by region: Region 1 closes
+          approximately 90% of maintenance activities; Region 2 approximately
+          70%, attributed to unreliable mobile app connectivity in canyon parks.
+        columns:
+          - name: wo_id
+            description: Unique identifier for the work order in the format WO-{uuid}.
+          - name: asset_tag
+            description: Foreign key to assets.asset_tag.
+          - name: park_id
+            description: Park unit where the work was performed; denormalised from the asset record.
+          - name: primary_assignee
+            description: Employee identifier of the primary assigned maintenance worker.
+          - name: wo_type
+            description: "Type of maintenance activity. Values: Corrective, Emergency, Preventative."
+          - name: status
+            description: "Work order lifecycle status. Values: Abandoned, Completed, In Progress, Open."
+          - name: reported_date
+            description: Date the maintenance need was identified and the work order was created.
+          - name: completed_date
+            description: Date the work order was closed; null for Open and In Progress orders.
+          - name: labor_hours
+            description: Total labor hours recorded against the work order.
+          - name: material_cost
+            description: Cost of materials and parts used in the work.
+          - name: total_cost
+            description: Total cost of the work order, including labor and materials.
