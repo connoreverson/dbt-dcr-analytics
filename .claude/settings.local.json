@@ -23,6 +23,8 @@
       "Bash(sqlfluff lint:*)",
       "Bash(sqlfluff fix:*)",
       "Bash(python scripts/check_model.py:*)",
+      "Bash(python scripts/review_model.py:*)",
+      "Bash(python scripts/parse_standards.py:*)",
       "Bash(pip install -r requirements.txt)",
       "Bash(dbt debug:*)"
     ],

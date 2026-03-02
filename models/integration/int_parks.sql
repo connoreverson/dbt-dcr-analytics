@@ -1,6 +1,3 @@
--- depends_on: {{ ref('int_cdm_columns') }}
--- depends_on: {{ ref('cdm_crosswalk') }}
-
 with
 
 source_geo as (
@@ -12,44 +9,39 @@ source_vista as (
 ),
 
 cdm_geo as (
-    {{ generate_cdm_projection(
-        integration_model='int_parks',
-        source_model='stg_geoparks__parks_master',
-        cte_name='source_geo',
-        sk_source_columns=['geo_park_id'],
-        pass_through_columns=[
-            'total_acres',
-            'cast(null as varchar) as classification',
-            'cast(null as integer) as region_id',
-            'null as address1_city',
-            'null as address1_stateorprovince',
-            'null as address1_postalcode',
-            'null as address1_latitude',
-            'null as address1_longitude',
-            generate_source_system_tag('DCR-GEO-01') ~ " as source_system"
-        ]
-    ) }}
+    select
+        {{ dbt_utils.generate_surrogate_key(['geo_park_id']) }} as parks_sk,
+        geo_park_id as accountnumber,
+        park_name as name,
+        gis_steward as description,
+        total_acres,
+        cast(null as varchar) as classification,
+        cast(null as integer) as region_id,
+        null as address1_city,
+        null as address1_stateorprovince,
+        null as address1_postalcode,
+        null as address1_latitude,
+        null as address1_longitude,
+        {{ generate_source_system_tag('DCR-GEO-01') }} as source_system
+    from source_geo
 ),
 
 cdm_vista as (
-    {{ generate_cdm_projection(
-        integration_model='int_parks',
-        source_model='stg_vistareserve__parks',
-        cte_name='source_vista',
-        sk_source_columns=['park_id'],
-        pass_through_columns=[
-            'null as description',
-            'cast(null as decimal(10, 2)) as total_acres',
-            'classification',
-            'region_id',
-            'null as address1_city',
-            'null as address1_stateorprovince',
-            'null as address1_postalcode',
-            'null as address1_latitude',
-            'null as address1_longitude',
-            generate_source_system_tag('DCR-REV-01') ~ " as source_system"
-        ]
-    ) }}
+    select
+        {{ dbt_utils.generate_surrogate_key(['park_id']) }} as parks_sk,
+        park_id as accountnumber,
+        park_name as name,
+        null as description,
+        cast(null as decimal(10, 2)) as total_acres,
+        classification,
+        region_id,
+        null as address1_city,
+        null as address1_stateorprovince,
+        null as address1_postalcode,
+        null as address1_latitude,
+        null as address1_longitude,
+        {{ generate_source_system_tag('DCR-REV-01') }} as source_system
+    from source_vista
 ),
 
 union_sources as (

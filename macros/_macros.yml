@@ -59,33 +59,3 @@ macros:
         type: string
         description: The column expression referencing the VistaReserve integer park_id.
 
-  - name: get_cdm_columns
-    description: >
-      Queries the consolidated int_cdm_columns model at compile time to retrieve an array
-      of authorized column definitions for a given CDM entity.
-    arguments:
-      - name: entity
-        type: string
-        description: The target CDM entity to fetch authorized column mappings against.
-
-  - name: generate_cdm_projection
-    description: >
-      Parses the central cdm_crosswalk to produce a fully validated projection SELECT 
-      statement matching local staging models to normalized analytical conventions.
-      This macro generates surrogate keys locally without risking raw script string interpretation errors.
-    arguments:
-      - name: integration_model
-        type: string
-        description: Target integration model requesting physical mapping projection logic.
-      - name: source_model
-        type: string
-        description: Sourcing staging model from which the projection draws columns and primary key relationships.
-      - name: cte_name
-        type: string
-        description: The specific CTE alias within the integration model containing the joined upstream data.
-      - name: sk_source_columns
-        type: list
-        description: A list of natural key columns (e.g. `['geo_park_id']`) to generate the composite surrogate key. If omitted, falls back to the staging column mapped to the output surrogate key in the crosswalk.
-      - name: pass_through_columns
-        type: list
-        description: A list of columns (e.g. `['_contact_sk', 'source_system']`) that bypass CDM catalog validation and execute directly in the SELECT block. Useful for appending foreign keys after the projection loop finishes.

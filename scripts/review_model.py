@@ -5,6 +5,10 @@ import json
 import subprocess
 from pathlib import Path
 
+# Add project root to path so we can import from scripts
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from scripts.check_model import run_checks
+
 try:
     import questionary
 except ImportError:
@@ -17,33 +21,56 @@ def get_layer(model_name):
     if model_name.startswith("base_"): return "base"
     return "unknown"
 
-def run_automated_checks(model_name):
+def run_automated_checks(model_name, is_agent=False):
     print(f"Running automated checks for {model_name}...")
-    env = os.environ.copy()
     try:
-        result = subprocess.run(
-            ["python", "scripts/check_model.py", "--select", model_name, "--json"],
-            capture_output=True,
-            text=True,
-            env=env
-        )
-        if not result.stdout.strip():
-            print("No JSON output from check_model.py.")
-            return []
-        
-        # Output could contain some other noise before the JSON array, let's find the array
-        stdout = result.stdout
-        json_start = stdout.find('[')
-        if json_start != -1:
-            try:
-                return json.loads(stdout[json_start:])
-            except json.JSONDecodeError:
-                pass
-        print("Failed to decode check_model.py JSON output.")
-        return []
+        results = run_checks(model_name, quiet=is_agent)
+        # Convert CheckResult objects into the dict format
+        return [{"rule": r.name, "status": r.status, "messages": r.messages} for r in results]
     except Exception as e:
-        print(f"Error running check_model.py: {e}")
+        print(f"Error running check_model: {e}")
         return []
+
+def get_model_metadata(model_name):
+    manifest_path = Path("target/manifest.json")
+    sql_content = "SQL content not found."
+    yaml_content = "YAML content not found."
+    
+    if manifest_path.exists():
+        with open(manifest_path, "r", encoding="utf-8") as f:
+            manifest = json.load(f)
+            
+        node = None
+        for k, v in manifest.get("nodes", {}).items():
+            if v.get("name") == model_name and v.get("resource_type") == "model":
+                node = v
+                break
+                
+        if node:
+            # Get SQL
+            sql_path = node.get("original_file_path")
+            if sql_path and os.path.exists(sql_path):
+                with open(sql_path, "r", encoding="utf-8") as f:
+                    sql_content = f.read()
+                    
+            # Get YAML block
+            patch_path = node.get("patch_path")
+            if patch_path:
+                yaml_file_path = patch_path.split("://")[-1]
+                if os.path.exists(yaml_file_path):
+                    import yaml
+                    try:
+                        with open(yaml_file_path, "r", encoding="utf-8") as f:
+                            parsed_yaml = yaml.safe_load(f)
+                        models = parsed_yaml.get("models", [])
+                        for m in models:
+                            if m.get("name") == model_name:
+                                yaml_content = yaml.dump([m], sort_keys=False)
+                                break
+                    except Exception as e:
+                        yaml_content = f"Error reading YAML: {e}"
+                        
+    return sql_content, yaml_content
 
 def main():
     parser = argparse.ArgumentParser(description="Interactive review of a dbt model against qualitative standards.")
@@ -54,14 +81,18 @@ def main():
     model_name = args.select
     
     # Run automated checks
-    auto_results = run_automated_checks(model_name)
+    auto_results = run_automated_checks(model_name, is_agent=args.agent)
     fails = [r for r in auto_results if r.get("status") == "FAIL"]
     
     if fails:
         print(f"\n[!] WARNING: {model_name} failed {len(fails)} automated checks.")
         for f in fails:
-            print(f"  - {f['rule']}")
-        print("You should probably fix these before qualitative review.\n")
+            print(f"\n  - {f['rule']}")
+            for msg in f.get('messages', [])[:5]:
+                print(f"      {msg}")
+            if len(f.get('messages', [])) > 5:
+                print(f"      ... and {len(f.get('messages', [])) - 5} more lines")
+        print("\nYou should probably fix these before qualitative review.\n")
     else:
         print(f"\n[+] {model_name} passed all automated checks.\n")
         
@@ -81,14 +112,25 @@ def main():
         print(f"No manual rules found for layer: {layer}.")
         sys.exit(0)
         
+    print(f"You will be asked to evaluate {len(manual_rules)} manual rules.\n")
+        
     if args.agent:
         # Agent mode: generate template
+        sql_content, yaml_content = get_model_metadata(model_name)
+        
         template_lines = [f"# Qualitative Review Template for {model_name}"]
         template_lines.append(f"Model Layer: {layer}\n")
+        
+        template_lines.append("## Setup Data\n")
+        template_lines.append("### Model SQL\n```sql\n" + sql_content.strip() + "\n```\n")
+        template_lines.append("### Model YAML\n```yaml\n" + yaml_content.strip() + "\n```\n")
+        
         template_lines.append("Instructions: For each rule below, mark PASS or FAIL and provide a brief rationale.\n")
         
         for rule in manual_rules:
             template_lines.append(f"## {rule['id']} - {rule['title']}")
+            if rule.get('description'):
+                template_lines.append(f"**Description:**\n{rule['description']}\n")
             template_lines.append(f"Result: [ ] PASS / [ ] FAIL")
             template_lines.append(f"Rationale: \n\n")
             
@@ -111,9 +153,10 @@ def main():
     
     review_results = []
     
-    for rule in manual_rules:
+    total_rules = len(manual_rules)
+    for i, rule in enumerate(manual_rules, 1):
         print("-" * 80)
-        print(f"Rule: {rule['id']} - {rule['title']}")
+        print(f"Rule {i} of {total_rules}: {rule['id']} - {rule['title']}")
         print(f"Description:\n{rule['description']}\n")
         
         status = questionary.select(

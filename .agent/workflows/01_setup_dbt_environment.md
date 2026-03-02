@@ -4,7 +4,7 @@ description: Setup dbt Environment
 
 # 01: Setup dbt Environment
 
-// turbo
+// turbo-all
 
 ## Steps
 1. Activate virtual environment per CLAUDE.md Operating Principle 10

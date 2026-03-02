@@ -15,10 +15,10 @@
   },
   {
     "id": "ALL-CFG-01",
-    "title": "Centralize Configs in dbt\\_project.yml",
+    "title": "Centralize Configs in dbt_project.yml",
     "is_automated": false,
     "layer": "all",
-    "description": "Model configurations \u2014 including materialization, schema routing, and tags \u2014 must be set as layer-wide defaults in dbt\\_project.yml. Per-model {{ config() }} blocks in SQL files should only be used for individual exceptions to the project-level defaults."
+    "description": "Model configurations \u2014 including materialization, schema routing, and tags \u2014 must be set as layer-wide defaults in dbt_project.yml. Per-model {{ config() }} blocks in SQL files should only be used for individual exceptions to the project-level defaults."
   },
   {
     "id": "ALL-CFG-02",
@@ -39,28 +39,28 @@
     "title": "File Name Prefixes",
     "is_automated": true,
     "layer": "all",
-    "description": "SQL files must be prefixed with 'stg', 'base', 'int', 'fct', 'dim', or 'rpt' according to their layer. YAML property files must have a leading underscore (e.g., '\\_models.yml', '\\_sources.yml')."
+    "description": "SQL files must be prefixed with 'stg', 'base', 'int', 'fct', 'dim', or 'rpt' according to their layer. YAML property files must have a leading underscore (e.g., '_models.yml', '_sources.yml')."
   },
   {
     "id": "ALL-NAME-02",
     "title": "Plural Phrasing",
     "is_automated": false,
     "layer": "all",
-    "description": "File names must use plural phrasing: 'stg\\_salesforce\\_\\_accounts' (not the singular 'account'), 'int\\_projects' (not 'project')."
+    "description": "File names must use plural phrasing: 'stg_salesforce__accounts' (not the singular 'account'), 'int_projects' (not 'project')."
   },
   {
     "id": "ALL-NAME-03",
     "title": "Abbreviation Restraint",
     "is_automated": false,
     "layer": "all",
-    "description": "Do not abbreviate words or phrases that are fewer than 20 characters long. The gain in brevity is offset by the loss of intuitiveness; 'activity\\_id' should not become 'actv\\_id'. Conversely, abbreviate names that would otherwise be excessively long; 'int\\_delivery\\_framework\\_\\_integrated\\_disbursement\\_and\\_information\\_system.sql' should become 'int\\_delivery\\_framework\\_\\_idis.sql'."
+    "description": "Do not abbreviate words or phrases that are fewer than 20 characters long. The gain in brevity is offset by the loss of intuitiveness; 'activity_id' should not become 'actv_id'. Conversely, abbreviate names that would otherwise be excessively long; 'int_delivery_framework__integrated_disbursement_and_information_system.sql' should become 'int_delivery_framework__idis.sql'."
   },
   {
     "id": "ALL-NAME-04",
     "title": "Business Concept Phrasing",
     "is_automated": false,
     "layer": "all",
-    "description": "File names must represent business concepts rather than business system names. Prefer 'stg\\_salesforce\\_\\_accounts' over 'stg\\_salesforce\\_\\_account\\_\\_c' if the source system uses unintuitive internal naming."
+    "description": "File names must represent business concepts rather than business system names. Prefer 'stg_salesforce__accounts' over 'stg_salesforce__account__c' if the source system uses unintuitive internal naming."
   },
   {
     "id": "ALL-FMT-01",
@@ -81,7 +81,7 @@
     "title": "Lowercase Keywords",
     "is_automated": true,
     "layer": "all",
-    "description": "All SQL keywords must be lowercase: 'select \\* from requests', not 'SELECT \\* FROM requests'."
+    "description": "All SQL keywords must be lowercase: 'select * from requests', not 'SELECT * FROM requests'."
   },
   {
     "id": "ALL-FMT-04",
@@ -95,7 +95,7 @@
     "title": "Snake Case Field Names",
     "is_automated": true,
     "layer": "all",
-    "description": "All field names must be snake\\_case and lowercase: 'request\\_id', not 'Request\\_id', 'request-id', 'requestId', 'RequestId', 'requestid', or '\\`request id\\`'."
+    "description": "All field names must be snake_case and lowercase: 'request_id', not 'Request_id', 'request-id', 'requestId', 'RequestId', 'requestid', or '\\`request id\\`'."
   },
   {
     "id": "ALL-FMT-06",
@@ -109,7 +109,7 @@
     "title": "Table Aliasing",
     "is_automated": true,
     "layer": "all",
-    "description": "When joining tables and referencing columns from both, follow this order of preference: first, reference the full table name instead of an alias when the table name is short (roughly fewer than 20 characters); second, rename the CTE to a shorter phrase if possible; lastly, alias to something descriptive. Do not alias tables with single-letter variables (such as 'a' and 'b') or unintuitive abbreviations (such as 'rq' instead of 'requests' or 'df' instead of 'delivery\\_frameworks').\n\n```sql\n-- \u2705 Good: use full CTE name when short\nselect\n    requests.request_id,\n    requests.amount,\n    statuses.status_label\nfrom requests\nleft join statuses\n    on requests.status_id = statuses.status_id\n\n-- \u2705 Good: descriptive alias when name is long\nselect\n    apps.application_id,\n    apps.submitted_at,\n    reviewers.reviewer_name\nfrom grant_applications as apps\nleft join application_reviewers as reviewers\n    on apps.application_id = reviewers.application_id\n\n-- \u274c Bad: single-letter aliases\nselect\n    a.application_id,\n    a.submitted_at,\n    b.reviewer_name\nfrom grant_applications a\nleft join application_reviewers b\n    on a.application_id = b.application_id\n```"
+    "description": "When joining tables and referencing columns from both, follow this order of preference: first, reference the full table name instead of an alias when the table name is short (roughly fewer than 20 characters); second, rename the CTE to a shorter phrase if possible; lastly, alias to something descriptive. Do not alias tables with single-letter variables (such as 'a' and 'b') or unintuitive abbreviations (such as 'rq' instead of 'requests' or 'df' instead of 'delivery_frameworks').\n\n```sql\n-- \u2705 Good: use full CTE name when short\nselect\n    requests.request_id,\n    requests.amount,\n    statuses.status_label\nfrom requests\nleft join statuses\n    on requests.status_id = statuses.status_id\n\n-- \u2705 Good: descriptive alias when name is long\nselect\n    apps.application_id,\n    apps.submitted_at,\n    reviewers.reviewer_name\nfrom grant_applications as apps\nleft join application_reviewers as reviewers\n    on apps.application_id = reviewers.application_id\n\n-- \u274c Bad: single-letter aliases\nselect\n    a.application_id,\n    a.submitted_at,\n    b.reviewer_name\nfrom grant_applications a\nleft join application_reviewers b\n    on a.application_id = b.application_id\n```"
   },
   {
     "id": "ALL-CTE-01",
@@ -130,7 +130,7 @@
     "title": "Meaningful CTE Names",
     "is_automated": false,
     "layer": "all",
-    "description": "CTE names must be meaningful and succinct: import CTEs should include the object being imported (e.g., 'grant\\_applications', 'payments', 'budget\\_lines'); simple transformation CTEs should include the object and a verb (e.g., 'payments\\_to\\_fund\\_grain', 'asset\\_id\\_added\\_to\\_payments'); complex transformations should have the subject, object, and verb (e.g., 'payments\\_joined\\_to\\_budgets')."
+    "description": "CTE names must be meaningful and succinct: import CTEs should include the object being imported (e.g., 'grant_applications', 'payments', 'budget_lines'); simple transformation CTEs should include the object and a verb (e.g., 'payments_to_fund_grain', 'asset_id_added_to_payments'); complex transformations should have the subject, object, and verb (e.g., 'payments_joined_to_budgets')."
   },
   {
     "id": "ALL-CTE-04",
@@ -186,7 +186,7 @@
     "title": "Simple Final Select",
     "is_automated": true,
     "layer": "all",
-    "description": "The final statement of the model must be a simple 'select \\* from \\<final\\_cte\\>' with no additional logic.\n\n```sql\n-- \u2705 Good\nfinal as (\n    select\n        payment_id,\n        amount,\n        order_date\n    from payments_enriched\n)\n\nselect * from final\n\n-- \u274c Bad: additional logic in the final select\nselect\n    payment_id,\n    amount,\n    order_date,\n    case when amount > 1000 then 'large' else 'small' end as size_tier\nfrom payments_enriched\n```"
+    "description": "The final statement of the model must be a simple 'select * from \\<final_cte\\>' with no additional logic.\n\n```sql\n-- \u2705 Good\nfinal as (\n    select\n        payment_id,\n        amount,\n        order_date\n    from payments_enriched\n)\n\nselect * from final\n\n-- \u274c Bad: additional logic in the final select\nselect\n    payment_id,\n    amount,\n    order_date,\n    case when amount > 1000 then 'large' else 'small' end as size_tier\nfrom payments_enriched\n```"
   },
   {
     "id": "ALL-PERF-01",
@@ -200,7 +200,7 @@
     "title": "Reproducible Primary Keys",
     "is_automated": true,
     "layer": "all",
-    "description": "Primary keys must be generated in a reproducible way (e.g., using {{ dbt\\_utils.generate\\_surrogate\\_key() }}) so that the same input always produces the same key. Never use random functions like GENERATE\\_UUID()."
+    "description": "Primary keys must be generated in a reproducible way (e.g., using {{ dbt_utils.generate_surrogate_key() }}) so that the same input always produces the same key. Never use random functions like GENERATE_UUID()."
   },
   {
     "id": "ALL-PERF-03",
@@ -235,21 +235,21 @@
     "title": "Exploratory Data Profiling During Development",
     "is_automated": false,
     "layer": "all",
-    "description": "Before finalizing a model, profile the data flowing through it. This is a development practice, not an artifact that persists in the codebase. At minimum, the analyst should investigate: row counts before and after each join or filter to confirm that cardinality behaves as expected; value distributions for key columns to confirm that the data looks reasonable; null rates for columns that the model depends on; and any unexpected duplicates, orphans, or outliers. The profiling itself does not need to be committed, but the insights it produces should inform the tests the analyst writes and the rationale they document.\n\n###### **Techniques**\n\nUse 'dbt show' to preview model output during development. Run ad-hoc count(\\*) queries on individual CTEs by temporarily making them the final select to verify row counts at each transformation step. Compare counts before and after a join to detect fan-out (the count should not increase unless the join is intentionally one-to-many). Query 'select column, count(\\*) from model group by column order by count(\\*) desc' to inspect value distributions and spot unexpected nulls, blanks, or dominant values. These checks take minutes and frequently surface issues that formal tests would miss until production.\n\n---"
+    "description": "Before finalizing a model, profile the data flowing through it. This is a development practice, not an artifact that persists in the codebase. At minimum, the analyst should investigate: row counts before and after each join or filter to confirm that cardinality behaves as expected; value distributions for key columns to confirm that the data looks reasonable; null rates for columns that the model depends on; and any unexpected duplicates, orphans, or outliers. The profiling itself does not need to be committed, but the insights it produces should inform the tests the analyst writes and the rationale they document.\n\n###### **Techniques**\n\nUse 'dbt show' to preview model output during development. Run ad-hoc count(*) queries on individual CTEs by temporarily making them the final select to verify row counts at each transformation step. Compare counts before and after a join to detect fan-out (the count should not increase unless the join is intentionally one-to-many). Query 'select column, count(*) from model group by column order by count(*) desc' to inspect value distributions and spot unexpected nulls, blanks, or dominant values. These checks take minutes and frequently surface issues that formal tests would miss until production.\n\n---"
   },
   {
     "id": "SQL-STG-01",
     "title": "Directory Syntax",
     "is_automated": true,
     "layer": "staging",
-    "description": "Saved in './models/staging/{source}/\\*'"
+    "description": "Saved in './models/staging/{source}/*'"
   },
   {
     "id": "SQL-STG-02",
     "title": "File Name Syntax",
     "is_automated": true,
     "layer": "staging",
-    "description": "Phrased like 'stg\\_\\<source\\>\\_\\_\\<entity\\>.sql'"
+    "description": "Phrased like 'stg_\\<source\\>__\\<entity\\>.sql'"
   },
   {
     "id": "SQL-STG-03",
@@ -263,7 +263,7 @@
     "title": "File Name Underscore Delimitation",
     "is_automated": true,
     "layer": "staging",
-    "description": "One underscore between the 'stg' prefix and source; 'stg\\_salesforce'.\n\nTwo underscores between the source and entity; 'stg\\_salesforce\\_\\_accounts.sql'\n\n#### **Input Restrictions**"
+    "description": "One underscore between the 'stg' prefix and source; 'stg_salesforce'.\n\nTwo underscores between the source and entity; 'stg_salesforce__accounts.sql'\n\n#### **Input Restrictions**"
   },
   {
     "id": "SQL-STG-05",
@@ -284,7 +284,7 @@
     "title": "Add a Hash Key",
     "is_automated": true,
     "layer": "staging",
-    "description": "If one does not already exist, create a hash key column called 'hk\\_\\<entity\\>' using macro {{ dbt\\_utils.generate\\_surrogate\\_key() }}.\n\nThe hash key must incorporate all fields that are needed to uniquely identify a record across systems and over time.\n\n```sql\n-- \u2705 Good: reproducible hash key from business keys\nselect\n    {{ dbt_utils.generate_surrogate_key([\n        'source_system',\n        'account_id'\n    ]) }} as hk_accounts,\n    account_id,\n    account_name\nfrom source\n\n-- \u274c Bad: non-reproducible key from generate_uuid()\nselect\n    generate_uuid() as hk_accounts,\n    account_id,\n    account_name\nfrom source\n```"
+    "description": "If one does not already exist, create a hash key column called 'hk_\\<entity\\>' using macro {{ dbt_utils.generate_surrogate_key() }}.\n\nThe hash key must incorporate all fields that are needed to uniquely identify a record across systems and over time.\n\n```sql\n-- \u2705 Good: reproducible hash key from business keys\nselect\n    {{ dbt_utils.generate_surrogate_key([\n        'source_system',\n        'account_id'\n    ]) }} as hk_accounts,\n    account_id,\n    account_name\nfrom source\n\n-- \u274c Bad: non-reproducible key from generate_uuid()\nselect\n    generate_uuid() as hk_accounts,\n    account_id,\n    account_name\nfrom source\n```"
   },
   {
     "id": "SQL-STG-08",
@@ -326,14 +326,14 @@
     "title": "Directory Syntax",
     "is_automated": true,
     "layer": "base",
-    "description": "Saved in './models/staging/{source}/base/\\*'"
+    "description": "Saved in './models/staging/{source}/base/*'"
   },
   {
     "id": "SQL-BASE-02",
     "title": "File Name Syntax",
     "is_automated": true,
     "layer": "base",
-    "description": "Phrased like 'base\\_\\<source\\>\\_\\_\\<entity\\>.sql'"
+    "description": "Phrased like 'base_\\<source\\>__\\<entity\\>.sql'"
   },
   {
     "id": "SQL-BASE-03",
@@ -347,7 +347,7 @@
     "title": "File Name Underscore Delimitation",
     "is_automated": true,
     "layer": "base",
-    "description": "One underscore between the 'base' prefix and source; 'base\\_salesforce'.\n\nTwo underscores between the source and entity; 'base\\_salesforce\\_\\_accounts.sql'\n\n#### **Input Restrictions**"
+    "description": "One underscore between the 'base' prefix and source; 'base_salesforce'.\n\nTwo underscores between the source and entity; 'base_salesforce__accounts.sql'\n\n#### **Input Restrictions**"
   },
   {
     "id": "SQL-BASE-05",
@@ -368,7 +368,7 @@
     "title": "Split Up a Single Table",
     "is_automated": false,
     "layer": "base",
-    "description": "Can filter or partition a single source table that contains multiple entity types into separate base models, each representing one entity, so that downstream staging models each handle a single coherent dataset.\n\n###### **Examples**\n\nSeparating the single source table, 'transactions\\_dtl', into three models representing the records it contains: 'base\\_neighborly\\_coloradodola\\_\\_budget\\_line\\_items', and 'base\\_neighborly\\_coloradodola\\_\\_draw\\_line\\_items'."
+    "description": "Can filter or partition a single source table that contains multiple entity types into separate base models, each representing one entity, so that downstream staging models each handle a single coherent dataset.\n\n###### **Examples**\n\nSeparating the single source table, 'transactions_dtl', into three models representing the records it contains: 'base_neighborly_coloradodola__budget_line_items', and 'base_neighborly_coloradodola__draw_line_items'."
   },
   {
     "id": "SQL-BASE-08",
@@ -389,14 +389,14 @@
     "title": "Directory Syntax",
     "is_automated": true,
     "layer": "integration",
-    "description": "Saved in './models/integration/\\*'"
+    "description": "Saved in './models/integration/*'"
   },
   {
     "id": "SQL-INT-02",
     "title": "File Name Syntax",
     "is_automated": true,
     "layer": "integration",
-    "description": "Phrased like 'int\\_\\<entity\\>.sql'"
+    "description": "Phrased like 'int_\\<entity\\>.sql'"
   },
   {
     "id": "SQL-INT-03",
@@ -410,21 +410,21 @@
     "title": "File Name Underscore Delimitation",
     "is_automated": true,
     "layer": "integration",
-    "description": "One underscore between the 'int' prefix and entity; 'int\\_projects'."
+    "description": "One underscore between the 'int' prefix and entity; 'int_projects'."
   },
   {
     "id": "SQL-INT-05",
     "title": "Microsoft Common Data Model Column Conformance",
     "is_automated": true,
     "layer": "integration",
-    "description": "Integration model columns must conform with the Microsoft Common Data Model definition for the entity that corresponds to the model. The non-profit core manifest is preferred, but a different manifest can be used when an appropriate schema is not available in it. Integration models may not contain columns \u2014 aside from foreign keys or surrogate keys \u2014 that are not specified by the Common Data Model entity definition. If a staging model produces columns that are valuable but not in the CDM, those columns must be dropped from the integration model; they can be joined back in at the marts layer from the staging model if needed. If an analyst believes a non-CDM column belongs in the integration layer, they must request an exception from their supervisor and document the rationale in the model description.\n\nWhen applying CDM column names to this project, convert from the CDM's camelCase to snake\\_case and from singular to plural where appropriate. Lookup columns that are integer values in the CDM can be simplified to strings.\n\n```sql\n-- \u2705 Good: only CDM columns plus keys; non-CDM data dropped\nselect\n    projects.project_sk,\n    projects.project_id,\n    projects.name,                  -- CDM column\n    projects.description,           -- CDM column\n    projects.start_date,            -- CDM column\n    projects.end_date,              -- CDM column\n    projects.status                 -- CDM column\nfrom projects\n\n-- \u274c Bad: non-CDM columns kept in the integration model\nselect\n    projects.project_sk,\n    projects.project_id,\n    projects.name,\n    projects.description,\n    projects.start_date,\n    projects.end_date,\n    projects.status,\n    projects.internal_tracking_code, -- not in CDM\n    projects.legacy_system_flag      -- not in CDM\nfrom projects\n```"
+    "description": "Integration model columns must conform with the Microsoft Common Data Model definition for the entity that corresponds to the model. The non-profit core manifest is preferred, but a different manifest can be used when an appropriate schema is not available in it. Integration models may not contain columns \u2014 aside from foreign keys or surrogate keys \u2014 that are not specified by the Common Data Model entity definition. If a staging model produces columns that are valuable but not in the CDM, those columns must be dropped from the integration model; they can be joined back in at the marts layer from the staging model if needed. If an analyst believes a non-CDM column belongs in the integration layer, they must request an exception from their supervisor and document the rationale in the model description.\n\nWhen applying CDM column names to this project, convert from the CDM's camelCase to snake_case and from singular to plural where appropriate. Lookup columns that are integer values in the CDM can be simplified to strings.\n\n```sql\n-- \u2705 Good: only CDM columns plus keys; non-CDM data dropped\nselect\n    projects.project_sk,\n    projects.project_id,\n    projects.name,                  -- CDM column\n    projects.description,           -- CDM column\n    projects.start_date,            -- CDM column\n    projects.end_date,              -- CDM column\n    projects.status                 -- CDM column\nfrom projects\n\n-- \u274c Bad: non-CDM columns kept in the integration model\nselect\n    projects.project_sk,\n    projects.project_id,\n    projects.name,\n    projects.description,\n    projects.start_date,\n    projects.end_date,\n    projects.status,\n    projects.internal_tracking_code, -- not in CDM\n    projects.legacy_system_flag      -- not in CDM\nfrom projects\n```"
   },
   {
     "id": "SQL-INT-06",
     "title": "Surrogate Key Naming",
     "is_automated": true,
     "layer": "integration",
-    "description": "Surrogate keys in integration models must be named '\\<object\\>\\_sk'.\n\n#### **Input Restrictions**"
+    "description": "Surrogate keys in integration models must be named '\\<object\\>_sk'.\n\n#### **Input Restrictions**"
   },
   {
     "id": "SQL-INT-07",
@@ -473,28 +473,28 @@
     "title": "Directory Syntax",
     "is_automated": true,
     "layer": "marts",
-    "description": "Saved in './models/marts/{owner}/\\*'"
+    "description": "Saved in './models/marts/{owner}/*'"
   },
   {
     "id": "SQL-FCT-02",
     "title": "File Name Syntax",
     "is_automated": true,
     "layer": "marts",
-    "description": "Phrased like 'fct\\_\\<business\\_process\\_event\\>.sql'"
+    "description": "Phrased like 'fct_\\<business_process_event\\>.sql'"
   },
   {
     "id": "SQL-FCT-03",
     "title": "Business Process Event Word Choice",
     "is_automated": false,
     "layer": "marts",
-    "description": "Must accurately and succinctly describe the business process event and its grain. The name should sound like an \"event noun\" or a log of activity; for example, 'fct\\_project\\_completions' rather than 'fct\\_projects'."
+    "description": "Must accurately and succinctly describe the business process event and its grain. The name should sound like an \"event noun\" or a log of activity; for example, 'fct_project_completions' rather than 'fct_projects'."
   },
   {
     "id": "SQL-FCT-04",
     "title": "File Name Underscore Delimitation",
     "is_automated": true,
     "layer": "marts",
-    "description": "One underscore between the 'fct' prefix and business process event; 'fct\\_awards'.\n\n#### **Input Restrictions**"
+    "description": "One underscore between the 'fct' prefix and business process event; 'fct_awards'.\n\n#### **Input Restrictions**"
   },
   {
     "id": "SQL-FCT-05",
@@ -529,28 +529,28 @@
     "title": "Directory Syntax",
     "is_automated": true,
     "layer": "marts",
-    "description": "Saved in './models/marts/{owner}/\\*'"
+    "description": "Saved in './models/marts/{owner}/*'"
   },
   {
     "id": "SQL-DIM-02",
     "title": "File Name Syntax",
     "is_automated": true,
     "layer": "marts",
-    "description": "Phrased like 'dim\\_\\<noun\\>.sql'"
+    "description": "Phrased like 'dim_\\<noun\\>.sql'"
   },
   {
     "id": "SQL-DIM-03",
     "title": "Noun Word Choice",
     "is_automated": false,
     "layer": "marts",
-    "description": "Must accurately and succinctly describe the business entity that it represents as a noun. The name should sound like a \"head noun\" and \"attributive noun\"; for example, 'dim\\_order\\_categories' rather than 'dim\\_categories'."
+    "description": "Must accurately and succinctly describe the business entity that it represents as a noun. The name should sound like a \"head noun\" and \"attributive noun\"; for example, 'dim_order_categories' rather than 'dim_categories'."
   },
   {
     "id": "SQL-DIM-04",
     "title": "File Name Underscore Delimitation",
     "is_automated": true,
     "layer": "marts",
-    "description": "One underscore between the 'dim' prefix and noun; 'dim\\_customers'.\n\n#### **Input Restrictions**"
+    "description": "One underscore between the 'dim' prefix and noun; 'dim_customers'.\n\n#### **Input Restrictions**"
   },
   {
     "id": "SQL-DIM-05",
@@ -592,14 +592,14 @@
     "title": "Directory Syntax",
     "is_automated": true,
     "layer": "marts",
-    "description": "Saved in './models/marts/{owner}/\\*'"
+    "description": "Saved in './models/marts/{owner}/*'"
   },
   {
     "id": "SQL-RPT-02",
     "title": "File Name Syntax",
     "is_automated": true,
     "layer": "marts",
-    "description": "Phrased like 'rpt\\_\\<subject\\>.sql'"
+    "description": "Phrased like 'rpt_\\<subject\\>.sql'"
   },
   {
     "id": "SQL-RPT-03",
@@ -613,7 +613,7 @@
     "title": "File Name Underscore Delimitation",
     "is_automated": true,
     "layer": "marts",
-    "description": "One underscore between the 'rpt' prefix and subject; 'rpt\\_accomplishments\\_by\\_activity'.\n\n#### **Input Restrictions**"
+    "description": "One underscore between the 'rpt' prefix and subject; 'rpt_accomplishments_by_activity'.\n\n#### **Input Restrictions**"
   },
   {
     "id": "SQL-RPT-05",
@@ -641,14 +641,14 @@
     "title": "Directory Syntax",
     "is_automated": false,
     "layer": "macros",
-    "description": "Saved in './macros/\\*'. Subdirectories may be used to organize macros by function (e.g., './macros/staging/', './macros/testing/')."
+    "description": "Saved in './macros/*'. Subdirectories may be used to organize macros by function (e.g., './macros/staging/', './macros/testing/')."
   },
   {
     "id": "SQL-MAC-02",
     "title": "File Name Syntax",
     "is_automated": false,
     "layer": "macros",
-    "description": "File names must describe the action or output of the macro in snake\\_case: 'generate\\_surrogate\\_key.sql', 'pivot\\_columns.sql'. One macro per file unless closely related helper macros are grouped together."
+    "description": "File names must describe the action or output of the macro in snake_case: 'generate_surrogate_key.sql', 'pivot_columns.sql'. One macro per file unless closely related helper macros are grouped together."
   },
   {
     "id": "SQL-MAC-03",
@@ -662,21 +662,21 @@
     "title": "Prefer Packages Over Custom Macros",
     "is_automated": false,
     "layer": "macros",
-    "description": "Before writing a custom macro, check whether a well-maintained community package (such as dbt\\_utils, dbt\\_expectations, or dbt\\_date) already provides the functionality. Custom macros should only be written when no suitable package exists or when the package's implementation does not meet the project's specific needs."
+    "description": "Before writing a custom macro, check whether a well-maintained community package (such as dbt_utils, dbt_expectations, or dbt_date) already provides the functionality. Custom macros should only be written when no suitable package exists or when the package's implementation does not meet the project's specific needs."
   },
   {
     "id": "SQL-TST-01",
     "title": "Directory Syntax",
     "is_automated": false,
     "layer": "tests",
-    "description": "Saved in './tests/\\*'. Subdirectories may be used to organize tests by the layer or model they validate (e.g., './tests/staging/', './tests/marts/')."
+    "description": "Saved in './tests/*'. Subdirectories may be used to organize tests by the layer or model they validate (e.g., './tests/staging/', './tests/marts/')."
   },
   {
     "id": "SQL-TST-02",
     "title": "File Name Syntax",
     "is_automated": true,
     "layer": "tests",
-    "description": "File names must describe the assertion being tested: 'assert\\_no\\_orphan\\_awards.sql', 'assert\\_revenue\\_matches\\_ledger.sql'. Use the prefix 'assert\\_' to distinguish singular tests from other SQL files."
+    "description": "File names must describe the assertion being tested: 'assert_no_orphan_awards.sql', 'assert_revenue_matches_ledger.sql'. Use the prefix 'assert_' to distinguish singular tests from other SQL files."
   },
   {
     "id": "SQL-TST-03",
@@ -697,21 +697,21 @@
     "title": "Directory Syntax",
     "is_automated": true,
     "layer": "seeds",
-    "description": "Saved in './seeds/\\*'. Subdirectories may be used if the number of seeds warrants organization."
+    "description": "Saved in './seeds/*'. Subdirectories may be used if the number of seeds warrants organization."
   },
   {
     "id": "SQL-SEED-02",
     "title": "File Format",
     "is_automated": true,
     "layer": "seeds",
-    "description": "Seeds must be CSV files with a header row. Column names in the header must follow the same snake\\_case convention as model columns (ALL-FMT-05)."
+    "description": "Seeds must be CSV files with a header row. Column names in the header must follow the same snake_case convention as model columns (ALL-FMT-05)."
   },
   {
     "id": "SQL-SEED-03",
     "title": "Naming",
     "is_automated": true,
     "layer": "seeds",
-    "description": "Seed file names must describe the reference data they contain in snake\\_case: 'country\\_codes.csv', 'grant\\_status\\_mappings.csv'."
+    "description": "Seed file names must describe the reference data they contain in snake_case: 'country_codes.csv', 'grant_status_mappings.csv'."
   },
   {
     "id": "SQL-SEED-04",
@@ -725,28 +725,28 @@
     "title": "YAML Properties",
     "is_automated": true,
     "layer": "seeds",
-    "description": "Every seed must have a corresponding entry in a \\_seeds.yml file within the ./seeds/ directory, including a description and column-level data type overrides where the default string type is not appropriate."
+    "description": "Every seed must have a corresponding entry in a _seeds.yml file within the ./seeds/ directory, including a description and column-level data type overrides where the default string type is not appropriate."
   },
   {
     "id": "SQL-SNAP-01",
     "title": "Directory Syntax",
     "is_automated": false,
     "layer": "snapshots",
-    "description": "Saved in './snapshots/\\*'."
+    "description": "Saved in './snapshots/*'."
   },
   {
     "id": "SQL-SNAP-02",
     "title": "File Name Syntax",
     "is_automated": false,
     "layer": "snapshots",
-    "description": "File names must describe the source entity being tracked: 'snp\\_\\<source\\>\\_\\_\\<entity\\>.sql'."
+    "description": "File names must describe the source entity being tracked: 'snp_\\<source\\>__\\<entity\\>.sql'."
   },
   {
     "id": "SQL-SNAP-03",
     "title": "Strategy Declaration",
     "is_automated": false,
     "layer": "snapshots",
-    "description": "Each snapshot must declare its strategy (timestamp or check) and the columns used for change detection in its config block. The timestamp strategy is preferred when a reliable updated\\_at column is available in the source."
+    "description": "Each snapshot must declare its strategy (timestamp or check) and the columns used for change detection in its config block. The timestamp strategy is preferred when a reliable updated_at column is available in the source."
   },
   {
     "id": "SQL-SNAP-04",
@@ -760,14 +760,14 @@
     "title": "Directory Syntax",
     "is_automated": false,
     "layer": "analyses",
-    "description": "Saved in './analyses/\\*'. Subdirectories may be used to organize by purpose or team."
+    "description": "Saved in './analyses/*'. Subdirectories may be used to organize by purpose or team."
   },
   {
     "id": "SQL-ANL-02",
     "title": "File Name Syntax",
     "is_automated": false,
     "layer": "analyses",
-    "description": "File names must describe the query's purpose in snake\\_case: 'audit\\_missing\\_award\\_amounts.sql', 'explore\\_payment\\_timing.sql'."
+    "description": "File names must describe the query's purpose in snake_case: 'audit_missing_award_amounts.sql', 'explore_payment_timing.sql'."
   },
   {
     "id": "SQL-ANL-03",
@@ -778,24 +778,24 @@
   },
   {
     "id": "SQL-HOOK-01",
-    "title": "Declare Hooks in dbt\\_project.yml",
+    "title": "Declare Hooks in dbt_project.yml",
     "is_automated": false,
     "layer": "hooks",
-    "description": "on-run-start and on-run-end hooks must be declared in dbt\\_project.yml so they are visible and centralized. Per-model pre-hook and post-hook configurations should be set at the project level and only overridden in individual model {{ config() }} blocks when necessary."
+    "description": "on-run-start and on-run-end hooks must be declared in dbt_project.yml so they are visible and centralized. Per-model pre-hook and post-hook configurations should be set at the project level and only overridden in individual model {{ config() }} blocks when necessary."
   },
   {
     "id": "SQL-HOOK-02",
     "title": "Extract Complex Hook Logic into Macros",
     "is_automated": false,
     "layer": "hooks",
-    "description": "If a hook requires more than a single SQL statement, extract the logic into a macro in the ./macros/ directory and call the macro from the hook declaration. Do not embed multi-statement SQL directly in dbt\\_project.yml or config blocks."
+    "description": "If a hook requires more than a single SQL statement, extract the logic into a macro in the ./macros/ directory and call the macro from the hook declaration. Do not embed multi-statement SQL directly in dbt_project.yml or config blocks."
   },
   {
     "id": "SQL-HOOK-03",
     "title": "Document Hook Purpose",
     "is_automated": false,
     "layer": "hooks",
-    "description": "Each hook must have a comment in dbt\\_project.yml (or in the macro it calls) explaining what it does and why it is necessary, so that analysts encountering it understand its role in the pipeline.\n\n---"
+    "description": "Each hook must have a comment in dbt_project.yml (or in the macro it calls) explaining what it does and why it is necessary, so that analysts encountering it understand its role in the pipeline.\n\n---"
   },
   {
     "id": "YML-SYNC-01",
@@ -837,7 +837,7 @@
     "title": "Filename Syntax",
     "is_automated": true,
     "layer": "staging",
-    "description": "Source definitions must be consolidated into a single group-specific YAML file named \\_sources.yml. Individual source files (e.g., src\\_salesforce.yml) are not permitted."
+    "description": "Source definitions must be consolidated into a single group-specific YAML file named _sources.yml. Individual source files (e.g., src_salesforce.yml) are not permitted."
   },
   {
     "id": "SRC-YML-03",
@@ -851,7 +851,7 @@
     "title": "Freshness Thresholds (Timeliness)",
     "is_automated": false,
     "layer": "staging",
-    "description": "Must include freshness blocks for all sources where data latency is a concern, defining warn\\_after and error\\_after thresholds to ensure pipeline reliability. To determine appropriate thresholds, ask: how frequently does this source update (hourly, daily, weekly)? and how stale can the data be before a downstream report or process produces misleading results? Set warn\\_after to the expected update interval plus a reasonable buffer, and error\\_after to the point at which the data is too stale to be useful. For example, a source that updates daily might use warn\\_after: {count: 36, period: hour} and error\\_after: {count: 48, period: hour}."
+    "description": "Must include freshness blocks for all sources where data latency is a concern, defining warn_after and error_after thresholds to ensure pipeline reliability. To determine appropriate thresholds, ask: how frequently does this source update (hourly, daily, weekly)? and how stale can the data be before a downstream report or process produces misleading results? Set warn_after to the expected update interval plus a reasonable buffer, and error_after to the point at which the data is too stale to be useful. For example, a source that updates daily might use warn_after: {count: 36, period: hour} and error_after: {count: 48, period: hour}."
   },
   {
     "id": "SRC-YML-05",
@@ -879,14 +879,14 @@
     "title": "Filename Syntax",
     "is_automated": true,
     "layer": "staging",
-    "description": "Staging model properties must be consolidated into a single group-specific YAML file named \\_models.yml. Individual model YAML files or unrelated resource files (e.g., \\_macros.yml) are not permitted in this directory.\n\n##### **Mandatory Tests**"
+    "description": "Staging model properties must be consolidated into a single group-specific YAML file named _models.yml. Individual model YAML files or unrelated resource files (e.g., _macros.yml) are not permitted in this directory.\n\n##### **Mandatory Tests**"
   },
   {
     "id": "STG-YML-03",
     "title": "Staging Primary Key Testing (Uniqueness, Completeness)",
     "is_automated": false,
     "layer": "staging",
-    "description": "Every staging model must identify a primary key (natural or surrogate) and must apply unique and not\\_null tests to it. This is the foundation for entity integrity throughout the pipeline; if the primary key is not trustworthy here, every downstream model inherits the problem.\n\n##### **Optional Tests**"
+    "description": "Every staging model must identify a primary key (natural or surrogate) and must apply unique and not_null tests to it. This is the foundation for entity integrity throughout the pipeline; if the primary key is not trustworthy here, every downstream model inherits the problem.\n\n##### **Optional Tests**"
   },
   {
     "id": "STG-YML-04",
@@ -907,14 +907,14 @@
     "title": "Filename Syntax",
     "is_automated": true,
     "layer": "integration",
-    "description": "Integration model properties must be consolidated into a single group-specific YAML file named \\_models.yml. Individual model YAML files are not permitted.\n\n##### **Mandatory Tests**"
+    "description": "Integration model properties must be consolidated into a single group-specific YAML file named _models.yml. Individual model YAML files are not permitted.\n\n##### **Mandatory Tests**"
   },
   {
     "id": "INT-YML-03",
     "title": "Integration Primary Key Testing (Uniqueness, Completeness)",
     "is_automated": false,
     "layer": "integration",
-    "description": "Every integration model must identify a primary key and must apply unique and not\\_null tests to it. After unioning and deduplicating data across systems, the primary key test confirms that the harmonization logic actually produced one row per entity."
+    "description": "Every integration model must identify a primary key and must apply unique and not_null tests to it. After unioning and deduplicating data across systems, the primary key test confirms that the harmonization logic actually produced one row per entity."
   },
   {
     "id": "INT-YML-04",
@@ -928,21 +928,21 @@
     "title": "Join Cardinality Validation (Uniqueness, Completeness)",
     "is_automated": false,
     "layer": "integration",
-    "description": "Test the results of joins to ensure no unintended duplication (fan-out) or data loss occurs during enrichment. This is where most silent data quality failures originate; a join that produces duplicates will cascade errors into every downstream fact and dimension. Implement this by comparing the row count of the model to the expected count based on the grain, or by using the dbt\\_expectations package's 'expect\\_table\\_row\\_count\\_to\\_equal\\_other\\_table' test to compare against the primary source."
+    "description": "Test the results of joins to ensure no unintended duplication (fan-out) or data loss occurs during enrichment. This is where most silent data quality failures originate; a join that produces duplicates will cascade errors into every downstream fact and dimension. Implement this by comparing the row count of the model to the expected count based on the grain, or by using the dbt_expectations package's 'expect_table_row_count_to_equal_other_table' test to compare against the primary source."
   },
   {
     "id": "INT-YML-06",
     "title": "Business Logic Constraints (Validity)",
     "is_automated": false,
     "layer": "integration",
-    "description": "Important business logic (e.g., \"start date must be before end date\") must be validated using generic tests (like accepted\\_values for status columns) or custom singular tests. The analyst should identify which business rules in the model carry the most risk if they fail, and test those first.\n\n##### **Recommended Tests**"
+    "description": "Important business logic (e.g., \"start date must be before end date\") must be validated using generic tests (like accepted_values for status columns) or custom singular tests. The analyst should identify which business rules in the model carry the most risk if they fail, and test those first.\n\n##### **Recommended Tests**"
   },
   {
     "id": "INT-YML-07",
     "title": "Calculated Field Nullability (Completeness)",
     "is_automated": false,
     "layer": "integration",
-    "description": "Test that calculated fields (e.g., total\\_revenue) are not null where mandatory. A null in a calculated field usually indicates an upstream data gap or a logic error in the transformation, and surfacing it here prevents misleading results in marts."
+    "description": "Test that calculated fields (e.g., total_revenue) are not null where mandatory. A null in a calculated field usually indicates an upstream data gap or a logic error in the transformation, and surfacing it here prevents misleading results in marts."
   },
   {
     "id": "INT-YML-08",
@@ -963,14 +963,14 @@
     "title": "Filename Syntax",
     "is_automated": true,
     "layer": "marts",
-    "description": "Mart model properties must be consolidated into a single group-specific YAML file named \\_models.yml. Exposures should be defined in \\_exposures.yml. Individual model YAML files are not permitted.\n\n##### **Mandatory Tests**"
+    "description": "Mart model properties must be consolidated into a single group-specific YAML file named _models.yml. Exposures should be defined in _exposures.yml. Individual model YAML files are not permitted.\n\n##### **Mandatory Tests**"
   },
   {
     "id": "MRT-YML-03",
     "title": "Mart Primary Key Testing (Uniqueness, Completeness)",
     "is_automated": false,
     "layer": "marts",
-    "description": "Every fact, dimension, and report model must identify a primary key and must apply unique and not\\_null tests to it. This is the last line of defense before data reaches customers; a duplicate or null key here will produce incorrect aggregations in dashboards and reports."
+    "description": "Every fact, dimension, and report model must identify a primary key and must apply unique and not_null tests to it. This is the last line of defense before data reaches customers; a duplicate or null key here will produce incorrect aggregations in dashboards and reports."
   },
   {
     "id": "MRT-YML-04",
@@ -984,7 +984,7 @@
     "title": "Contract Data Type Definitions (Validity)",
     "is_automated": false,
     "layer": "marts",
-    "description": "Must explicitly define data\\_type for every column in a contracted model to prevent unexpected schema changes from breaking downstream dependencies.\n\n###### **Mart Contract YAML Example**\n\n```yaml\n# models/marts/finance/_models.yml\nmodels:\n  - name: fct_award_disbursements\n    description: >\n      Individual disbursement events against approved grant awards.\n      One row per disbursement. Each row captures the dollar amount\n      released, the date of release, and the grant it was drawn\n      against. Consumed by rpt_grant_performance and the finance\n      reconciliation dashboard.\n    meta:\n      testing_rationale: >\n        Volumetric tests confirm row counts stay within historical\n        bounds to catch silent pipeline stalls. FK test to\n        dim_grants protects against orphaned disbursements.\n    config:\n      contract:\n        enforced: true\n    columns:\n      - name: disbursement_sk\n        data_type: string\n        description: >\n          Surrogate key uniquely identifying this disbursement\n          event across all source systems.\n        tests:\n          - unique\n          - not_null\n      - name: grant_sk\n        data_type: string\n        description: >\n          Reference to the grant award this disbursement was\n          drawn against. Links to dim_grants.\n        tests:\n          - not_null\n          - relationships:\n              to: ref('dim_grants')\n              field: grant_sk\n      - name: disbursed_amount\n        data_type: numeric\n        description: >\n          Dollar amount released in this disbursement event.\n      - name: disbursed_at\n        data_type: timestamp\n        description: >\n          Date and time the disbursement was processed by the\n          granting agency.\n```"
+    "description": "Must explicitly define data_type for every column in a contracted model to prevent unexpected schema changes from breaking downstream dependencies.\n\n###### **Mart Contract YAML Example**\n\n```yaml\n# models/marts/finance/_models.yml\nmodels:\n  - name: fct_award_disbursements\n    description: >\n      Individual disbursement events against approved grant awards.\n      One row per disbursement. Each row captures the dollar amount\n      released, the date of release, and the grant it was drawn\n      against. Consumed by rpt_grant_performance and the finance\n      reconciliation dashboard.\n    meta:\n      testing_rationale: >\n        Volumetric tests confirm row counts stay within historical\n        bounds to catch silent pipeline stalls. FK test to\n        dim_grants protects against orphaned disbursements.\n    config:\n      contract:\n        enforced: true\n    columns:\n      - name: disbursement_sk\n        data_type: string\n        description: >\n          Surrogate key uniquely identifying this disbursement\n          event across all source systems.\n        tests:\n          - unique\n          - not_null\n      - name: grant_sk\n        data_type: string\n        description: >\n          Reference to the grant award this disbursement was\n          drawn against. Links to dim_grants.\n        tests:\n          - not_null\n          - relationships:\n              to: ref('dim_grants')\n              field: grant_sk\n      - name: disbursed_amount\n        data_type: numeric\n        description: >\n          Dollar amount released in this disbursement event.\n      - name: disbursed_at\n        data_type: timestamp\n        description: >\n          Date and time the disbursement was processed by the\n          granting agency.\n```"
   },
   {
     "id": "MRT-YML-06",
@@ -998,14 +998,14 @@
     "title": "Complex Logic Unit Testing (Accuracy)",
     "is_automated": false,
     "layer": "marts",
-    "description": "Use the unit\\_tests: block to validate complex SQL logic (such as regex parsing, complex window functions, or multi-condition case statements) using mock input data. This ensures logic is correct before running against production data volumes. If the model contains only straightforward joins and filters, unit tests may not add value."
+    "description": "Use the unit_tests: block to validate complex SQL logic (such as regex parsing, complex window functions, or multi-condition case statements) using mock input data. This ensures logic is correct before running against production data volumes. If the model contains only straightforward joins and filters, unit tests may not add value."
   },
   {
     "id": "MRT-YML-08",
     "title": "Statistical Volumetric Testing (Completeness, Validity)",
     "is_automated": false,
     "layer": "marts",
-    "description": "Run statistical tests to ensure data is flowing within reasonable ranges (e.g., row counts are within expected historical bounds) to detect silent failures or stalled pipelines that pass schema tests but fail business needs. These tests complement source freshness checks by validating not just that data arrived, but that a reasonable quantity arrived with reasonable values. The dbt\\_expectations package provides tests like 'expect\\_table\\_row\\_count\\_to\\_be\\_between' and 'expect\\_column\\_values\\_to\\_be\\_between' that are well suited for this purpose.\n\n#### **Global Resources (Macros)**\n\n*Document and standardize reusable logic across the project.*"
+    "description": "Run statistical tests to ensure data is flowing within reasonable ranges (e.g., row counts are within expected historical bounds) to detect silent failures or stalled pipelines that pass schema tests but fail business needs. These tests complement source freshness checks by validating not just that data arrived, but that a reasonable quantity arrived with reasonable values. The dbt_expectations package provides tests like 'expect_table_row_count_to_be_between' and 'expect_column_values_to_be_between' that are well suited for this purpose.\n\n#### **Global Resources (Macros)**\n\n*Document and standardize reusable logic across the project.*"
   },
   {
     "id": "MAC-YML-01",
@@ -1019,7 +1019,7 @@
     "title": "Filename Syntax",
     "is_automated": true,
     "layer": "macros",
-    "description": "Macro properties must be consolidated into a single group-specific YAML file named \\_macros.yml."
+    "description": "Macro properties must be consolidated into a single group-specific YAML file named _macros.yml."
   },
   {
     "id": "MAC-YML-03",
@@ -1033,7 +1033,7 @@
     "title": "When to Use Doc Blocks",
     "is_automated": false,
     "layer": "macros",
-    "description": "Use {% docs %} blocks when the same column description applies across multiple models (e.g., a shared 'hk\\_' or 'created\\_at' definition) or when a description requires more detail than a single YAML line can convey clearly. For descriptions that are unique to one model and fit comfortably in a single line, inline YAML descriptions are sufficient."
+    "description": "Use {% docs %} blocks when the same column description applies across multiple models (e.g., a shared 'hk_' or 'created_at' definition) or when a description requires more detail than a single YAML line can convey clearly. For descriptions that are unique to one model and fit comfortably in a single line, inline YAML descriptions are sufficient."
   },
   {
     "id": "DOC-YML-02",
@@ -1047,6 +1047,6 @@
     "title": "Naming",
     "is_automated": true,
     "layer": "macros",
-    "description": "Doc block names must match or closely reflect the column or concept they describe: {% docs hk\\_entity %}, {% docs grant\\_award\\_amount %}. Avoid generic names like {% docs description %} or {% docs notes %}."
+    "description": "Doc block names must match or closely reflect the column or concept they describe: {% docs hk_entity %}, {% docs grant_award_amount %}. Avoid generic names like {% docs description %} or {% docs notes %}."
   }
 ]

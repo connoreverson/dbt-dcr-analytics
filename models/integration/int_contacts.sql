@@ -1,25 +1,18 @@
--- depends_on: {{ ref('int_cdm_columns') }}
--- depends_on: {{ ref('cdm_crosswalk') }}
-
 with
 
 source as (
-    select
-        *,
-        first_name as firstname,
-        last_name as lastname,
-        email as emailaddress1,
-        phone as telephone1
-    from {{ ref('stg_vistareserve__customer_profiles') }}
+    select * from {{ ref('stg_vistareserve__customer_profiles') }}
 ),
 
 final as (
-    {{ generate_cdm_projection(
-        integration_model='int_contacts', 
-        source_model='stg_vistareserve__customer_profiles',
-        cte_name='source',
-        sk_source_columns=['customer_id']
-    ) }}
+    select
+        {{ dbt_utils.generate_surrogate_key(['customer_id']) }} as contacts_sk,
+        customer_id as contact_id,
+        first_name,
+        last_name,
+        email as e_mail_address1,
+        phone as mobile_phone
+    from source
 )
 
 select * from final

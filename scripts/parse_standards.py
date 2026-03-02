@@ -22,9 +22,9 @@ def parse_standards():
 
     for match in rule_pattern.finditer(content):
         rule_id = match.group(2).strip()
-        title = match.group(3).strip()
+        title = match.group(3).strip().replace('\\_', '_').replace('\\*', '*')
         tag = match.group(4)
-        description = match.group(5).strip()
+        description = match.group(5).strip().replace('\\_', '_').replace('\\*', '*')
 
         is_automated = tag == "Automated"
 

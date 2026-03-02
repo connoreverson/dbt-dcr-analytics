@@ -15,6 +15,16 @@ metadata:
 3. **Always use `--quiet`** with `--warn-error-options '{"error": ["NoNodesForSelectionCriteria"]}'` to reduce output while catching selector typos
 4. **Always use `--select`** - never run the entire project without explicit user approval
 
+## Auto-Run Policy (SafeToAutoRun)
+
+Agents MUST default to setting `SafeToAutoRun: true` for all routine engineering commands, including:
+- **Read-only queries:** `dbt show`, `dbt compile`, `dbt ls`
+- **Testing during development:** `dbt build`, `dbt test`, `dbt run` for single models or layers
+- **Python scripts:** Model checks (`python scripts/check_model.py`) and review scripts (`python scripts/review_model.py`)
+- **Linting:** sqlfluff and dbt-score commands
+
+Exploratory queries against the CDM schema (e.g. `dbt show --inline ...`) are encouraged, but you MUST auto-run them. Do not halt your progress to prompt the user to approve a read-only query.
+
 ## Virtual Environment Activation (Shell-Aware)
 
 This project runs in **Git Bash** (`/usr/bin/bash`). Activate the venv with:
@@ -214,7 +224,7 @@ dbt show --select int_contacts --limit 1 --output json
 
 **Do NOT use Python one-liners** (`python -c "import duckdb; ..."`) to inspect model schemas. Use `dbt show` — it runs the model through dbt's compilation and gives you the actual output columns. If you need source table schemas, use the `codegen` package's `generate_source` or `generate_base_model` macros.
 
-**Do NOT guess column names** from the SPEC or from integration model SQL. The `generate_cdm_projection` macro may rename columns in ways that differ from the raw staging column names. Always verify with `dbt show`.
+**Do NOT guess column names** from the SPEC or from integration model SQL. Column aliases in integration models may differ from raw staging column names. Always verify with `dbt show`.
 
 ## Common Mistakes
 

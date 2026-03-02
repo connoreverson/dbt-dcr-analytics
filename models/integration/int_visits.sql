@@ -1,6 +1,3 @@
--- depends_on: {{ ref('int_cdm_columns') }}
--- depends_on: {{ ref('cdm_crosswalk') }}
-
 with
 
 source as (
@@ -20,34 +17,28 @@ joined_reservations as (
         source.*,
         source_contacts.contacts_sk as _contact_sk,
         source_assets.customer_assets_sk as _asset_sk,
-        source_assets._parent_park_sk as _park_sk,
-        {{ generate_source_system_tag('DCR-REV-01') }} as source_system
+        source_assets._parent_park_sk as _park_sk
     from source
     left join
         source_contacts
         on
             cast(source.customer_id as varchar)
-            = cast(source_contacts.contactid as varchar)
+            = cast(source_contacts.contact_id as varchar)
     left join
         source_assets
         on
             cast(source.asset_id as varchar)
-            = cast(source_assets.customerassetid as varchar)
+            = cast(source_assets.customerasset_id as varchar)
 ),
 
 final as (
-    {{ generate_cdm_projection(
-        integration_model='int_visits',
-        source_model='stg_vistareserve__reservations',
-        cte_name='joined_reservations',
-        sk_source_columns=['reservation_id'],
-        pass_through_columns=[
-            '_contact_sk', 
-            '_asset_sk', 
-            '_park_sk',
-            'source_system'
-        ]
-    ) }}
+    select
+        {{ dbt_utils.generate_surrogate_key(['reservation_id']) }} as visits_sk,
+        reservation_id as visit_id,
+        _contact_sk,
+        _asset_sk,
+        _park_sk
+    from joined_reservations
 )
 
 select * from final

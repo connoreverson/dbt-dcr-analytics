@@ -22,5 +22,44 @@
     "checkpointing": {
       "enabled": true
     }
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git add:*.sql)",
+      "Bash(git add:*.yml)",
+      "Bash(git add:*.yaml)",
+      "Bash(git add:*.md)",
+      "Bash(git add:*.csv)",
+      "Bash(git add:*.py)",
+      "Bash(git add:*.txt)",
+      "Bash(git add:*.toml)",
+      "Bash(git add:*.json)",
+      "Bash(git commit:-m *)",
+      "Bash(dbt build:*)",
+      "Bash(dbt show:*)",
+      "Bash(dbt list:*)",
+      "Bash(dbt test:*)",
+      "Bash(dbt run:*)",
+      "Bash(dbt seed:*)",
+      "Bash(dbt deps:*)",
+      "Bash(dbt source:*)",
+      "Bash(dbt compile:*)",
+      "Bash(sqlfluff lint:*)",
+      "Bash(sqlfluff fix:*)",
+      "Bash(python scripts/check_model.py:*)",
+      "Bash(python scripts/review_model.py:*)",
+      "Bash(python scripts/parse_standards.py:*)",
+      "Bash(pip install -r requirements.txt)",
+      "Bash(dbt debug:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(rm -r:*)",
+      "Bash(pip install:*)",
+      "Write(reference/business_artifacts/*)",
+      "Edit(reference/business_artifacts/*)",
+      "Write(requirements.txt)",
+      "Edit(requirements.txt)"
+    ]
   }
 }

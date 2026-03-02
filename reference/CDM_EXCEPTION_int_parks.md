@@ -153,7 +153,7 @@ The `Park` entity serves as the **top-level organizational node** in the integra
 
 ## 5. Implementation Path
 
-1. **Add `Park` entity rows to CDM catalog seed.** Create rows in `seeds/cdm_catalogs/column_catalog_asset.csv` (or a new `column_catalog_dcr_extensions.csv`) defining each column above with `cdm_entity_name = 'Park'`. This allows `int_cdm_columns` and `get_cdm_columns('Park')` to resolve the entity.
+1. **Add `Park` entity rows to CDM catalog seed.** Create rows in `seeds/cdm_catalogs/column_catalog_asset.csv` (or a new `column_catalog_dcr_extensions.csv`) defining each column above with `cdm_entity_name = 'Park'`. These seeds serve as reference data for CDM conformance.
 2. **Update `seeds/cdm_crosswalk.csv`.** Change `cdm_entity` from `Account` to `Park` for all `int_parks` rows.
 3. **Update `models/integration/_models.yml`.** Add `meta: cdm_entity: Park` and `meta: cdm_entity_rationale:` referencing this document.
 4. **No SQL changes required.** The model's column names, logic, and relationships are unchanged.
@@ -163,6 +163,6 @@ The `Park` entity serves as the **top-level organizational node** in the integra
 
 ## 6. Precedent and Governance Note
 
-This is the expected outcome when applying a commercial data model to a public-sector domain. The CDM's coverage of government land management is negligible. This exception request does not bypass SQL-INT-05 — it satisfies it by defining the entity the model conforms to, rather than forcing conformance to an inappropriate entity. The custom entity is documented, its columns are cataloged in the same seed infrastructure as standard CDM entities, and it participates in the same macro-driven projection pipeline (`generate_cdm_projection`).
+This is the expected outcome when applying a commercial data model to a public-sector domain. The CDM's coverage of government land management is negligible. This exception request does not bypass SQL-INT-05 — it satisfies it by defining the entity the model conforms to, rather than forcing conformance to an inappropriate entity. The custom entity is documented, its columns are cataloged in the same seed infrastructure as standard CDM entities, and its conformance is validated against those seeds.
 
 Future vertical slices (Infrastructure/Assets, Natural Resources) will likely require similar extensions for entities like `Trail`, `WaterBody`, or `WildlifeHabitat`. This form should serve as the template for those requests.

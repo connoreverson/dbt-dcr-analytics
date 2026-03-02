@@ -4,8 +4,8 @@ seeds:
   - name: column_catalog_asset
     description: >
       One row per CDM attribute in the Asset entity group (CustomerAsset, Case, and related entities).
-      Sourced from the Microsoft Common Data Model Asset manifest. Consumed by int_cdm_columns and the
-      get_cdm_columns macro to validate that integration model column names are authorized CDM fields.
+      Sourced from the Microsoft Common Data Model Asset manifest. Reference data for CDM conformance
+      validation.
     config:
       column_types:
         is_primary_key: boolean
@@ -15,8 +15,8 @@ seeds:
   - name: column_catalog_visits
     description: >
       One row per CDM attribute in the Visits entity group (Visit and related scheduling entities).
-      Sourced from the Microsoft Common Data Model Visits manifest. Consumed by int_cdm_columns and the
-      get_cdm_columns macro to validate int_reservations column mappings against the Visit entity.
+      Sourced from the Microsoft Common Data Model Visits manifest. Reference data for CDM conformance
+      validation of visit and reservation column mappings.
     config:
       column_types:
         is_primary_key: boolean
@@ -27,7 +27,7 @@ seeds:
     description: >
       One row per CDM attribute in the Application Common entity group (shared cross-domain structures
       including currency, address, and annotation entities). Sourced from the Microsoft Common Data Model
-      applicationCommon manifest. Consumed by int_cdm_columns to provide shared attribute definitions.
+      applicationCommon manifest. Reference data for shared CDM attribute definitions.
     config:
       column_types:
         is_primary_key: boolean
@@ -38,7 +38,7 @@ seeds:
     description: >
       One row per CDM attribute in the CDM Foundation entity group (foundational traits, data types, and
       base entity definitions shared across all CDM manifests). Sourced from the Microsoft Common Data Model
-      cdmfoundation manifest. Consumed by int_cdm_columns as the base layer for column authorization.
+      cdmfoundation manifest. Reference data for foundational CDM column definitions.
     config:
       column_types:
         is_primary_key: boolean
@@ -49,7 +49,7 @@ seeds:
     description: >
       One row per CDM attribute in the Non-Profit Core entity group (Contact, Account, Transaction, and
       donation-related entities). Sourced from the Microsoft Common Data Model nonProfitCore manifest.
-      Consumed by int_cdm_columns to validate int_contacts, int_transactions, and int_parks column mappings.
+      Reference data for CDM conformance validation of contact, account, and transaction column mappings.
     config:
       column_types:
         is_primary_key: boolean
@@ -60,8 +60,8 @@ seeds:
     description: >
       One row per column mapping between a staging model and its target CDM integration model.
       Maps local staging column names to their authorized CDM attribute names, grouped by integration model
-      and CDM entity. Consumed at compile time by the generate_cdm_projection macro to produce the SELECT
-      clause for each integration model.
+      and CDM entity. Serves as the authoritative reference for CDM column conformance across the
+      integration layer.
     config:
       column_types:
         integration_model: varchar
