@@ -8,7 +8,13 @@ metadata:
 
 # Linting and Governance Verification
 
-Runs three governance tools in sequence. Each has Windows-specific behaviors documented here. Always run in this order: **sqlfluff → dbt-score → dbt-project-evaluator**.
+Runs three governance tools in sequence. Each has Windows-specific behaviors documented here.
+
+There are two verification paths depending on the scope of work:
+
+- **Single-model checks (during development):** `python scripts/check_model.py --select <model_name>` — this runs sqlfluff, dbt build, dbt-score, and dbt-project-evaluator checks internally. Use this when iterating on a specific model. It replaces running the three tools separately for per-model work.
+- **Qualitative Code Review (during development):** `python scripts/review_model.py --select <model_name> --agent` — this fetches the automated results from `check_model.py` and generates a checklist template in `tmp/review_<model_name>.md` containing the qualitative/manual rules that linters cannot check. LLMs MUST run this, read the template, and fill it out. Humans can run without the `--agent` flag for an interactive prompt.
+- **Full-project sweeps (phase gates):** The existing 3-tool sequence (sqlfluff fix+lint → dbt-score lint → dbt-project-evaluator build) remains the correct approach for validating all models at once, since `check_model.py` is model-scoped. Always run in this order: **sqlfluff → dbt-score → dbt-project-evaluator**.
 
 ## 1. sqlfluff
 
@@ -189,6 +195,7 @@ A phase is complete when all three tools pass cleanly:
 
 | Tool | Pass condition |
 |------|----------------|
+| `check_model.py` (per-model) | Exit code 0, zero FAIL results in summary |
 | `sqlfluff lint` | Zero violations reported |
 | `dbt-score lint` | All models ≥ configured threshold (default `fail_any_model_under = 5.0`) |
 | `dbt build --select package:dbt_project_evaluator` | Completes with 0 warnings and 0 errors |

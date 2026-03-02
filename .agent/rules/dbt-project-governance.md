@@ -69,7 +69,7 @@ Integration models must map to Microsoft Common Data Model entities. The SPEC de
 
 | Integration Model | CDM Entity |
 |---|---|
-| `int_parks` | FunctionalLocation |
+| `int_parks` | Park (custom — see `reference/CDM_EXCEPTION_int_parks.md`) |
 | `int_contacts` | Contact |
 | `int_customer_assets` | CustomerAsset |
 | `int_transactions` | Transaction |
@@ -77,7 +77,11 @@ Integration models must map to Microsoft Common Data Model entities. The SPEC de
 
 Column names in integration models should align with CDM field names where practical, with deviations documented in the model's YAML description.
 
+If no standard CDM entity provides both semantic correctness and adequate column coverage, file a `CDM_EXCEPTION_<model>.md` in `reference/` following the template established by `CDM_EXCEPTION_int_parks.md`. The custom entity must be cataloged in `seeds/cdm_catalogs/` and registered in `seeds/cdm_crosswalk.csv`. See the `cdm-exception-request` skill for the full process.
+
 ## Linting
+
+> For per-model verification during development, run `python scripts/check_model.py --select <model_name>`. This consolidates sqlfluff, dbt build, dbt-score, and dbt-project-evaluator checks into a single command with a unified pass/fail summary.
 
 - sqlfluff must pass on all SQL files before a model is considered complete
 - dbt-score must meet minimum thresholds defined in the project configuration
@@ -150,3 +154,8 @@ Before declaring any phase complete, verify against the SPEC:
 4. **All tests defined** — PK tests, FK relationship tests, business logic constraints, volumetric tests as specified
 5. **CDM entity mapping matches** — the CDM entity and column mappings match the SPEC's mapping table
 6. **No orphaned artifacts** — no unused macros, no duplicate YAML entries, no YAML/SQL mismatches
+
+## Dependency Management
+
+- **`requirements.txt` is read-only.** Do not add, remove, or modify packages in `requirements.txt`. If a new dependency is needed, ask the user.
+- **Package installation is scoped.** Only run `pip install -r requirements.txt` to install dependencies. Never run `pip install <package>` directly — this prevents unvetted packages from entering the environment.

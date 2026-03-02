@@ -1,7 +1,7 @@
 with
 
-int_reservations as (
-    select * from {{ ref('int_reservations') }}
+int_visits as (
+    select * from {{ ref('int_visits') }}
 ),
 
 fct_reservations as (
@@ -33,7 +33,7 @@ fct_reservations as (
         cast(promo_code as varchar) as promo_code,
         cast(number_of_guests as integer) as number_of_guests
 
-    from int_reservations
+    from int_visits
 )
 
 select * from fct_reservations

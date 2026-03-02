@@ -31,13 +31,7 @@ final as (
         sk_source_columns=['asset_id'],
         pass_through_columns=[
             '_parent_park_sk', 
-            'name',
-            'asset_type',
-            'pet_policy',
-            'utility_hookup',
-            'max_occupancy',
-            'is_ada_accessible',
-            'source_system'
+            'name'
         ]
     ) }}
 )

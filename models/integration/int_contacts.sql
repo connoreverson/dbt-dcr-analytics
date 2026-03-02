@@ -18,15 +18,7 @@ final as (
         integration_model='int_contacts', 
         source_model='stg_vistareserve__customer_profiles',
         cte_name='source',
-        sk_source_columns=['customer_id'],
-        pass_through_columns=[
-            'account_created_at',
-            'address_state',
-            'has_annual_pass',
-            'is_senior',
-            'is_veteran',
-            generate_source_system_tag('DCR-REV-01') ~ " as source_system"
-        ]
+        sk_source_columns=['customer_id']
     ) }}
 )
 

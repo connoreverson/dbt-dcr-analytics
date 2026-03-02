@@ -49,11 +49,7 @@ final as (
         pass_through_columns=[
             '_contact_sk', 
             '_park_sk', 
-            'source_system',
-            'transaction_amount',
-            'revenue_category',
-            'is_kiosk_entry',
-            'transaction_created_at'
+            'source_system'
         ]
     ) }}
 )

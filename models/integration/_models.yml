@@ -40,10 +40,8 @@ models:
   - name: int_parks
     description: >
       Integration model harmonizing park records from GeoParks (DCR-GEO-01) and VistaReserve
-      (DCR-REV-01) into the CDM Account entity. Grain: one row per unique park, deduplicated
+      (DCR-REV-01) into the custom CDM Park entity. Grain: one row per unique park, deduplicated
       via fuzzy name matching with GeoParks designated as the system of record.
-      EXCEPTION: total_acres, classification, and region_id are passed through to support
-      dim_parks enrichment without violating ALL-DAG-01.
     meta:
       testing_rationale: >
         Tests protect against duplicate park accounts and ensure the primary key is never null.
@@ -112,18 +110,7 @@ models:
         description: Customer's primary email address.
       - name: mobilephone
         description: Customer's mobile or primary phone number.
-      - name: account_created_at
-        description: Timestamp when the customer account was originally created in VistaReserve.
-      - name: address_state
-        description: The two-letter state abbreviation of the customer's registered address.
-      - name: has_annual_pass
-        description: Boolean flag indicating whether the customer holds an active annual DCR pass.
-      - name: is_senior
-        description: Boolean flag indicating whether the customer qualifies for senior status.
-      - name: is_veteran
-        description: Boolean flag indicating whether the customer qualifies for veteran status.
-      - name: source_system
-        description: The authoritative operational system code for this contact record (DCR-REV-01).
+
 
   - name: int_customer_assets
     description: >
@@ -160,18 +147,7 @@ models:
               field: parks_sk
       - name: name
         description: The asset identifier used as a display name, sourced from the VistaReserve asset ID.
-      - name: asset_type
-        description: The type of inventory asset (e.g., campsite, cabin, yurt).
-      - name: pet_policy
-        description: The pet policy applicable to this asset (e.g., allowed, not_allowed).
-      - name: utility_hookup
-        description: Utility hookup availability for this asset (e.g., full, electric_only, none).
-      - name: max_occupancy
-        description: Maximum number of guests permitted at this asset simultaneously.
-      - name: is_ada_accessible
-        description: Boolean flag indicating whether this asset meets ADA accessibility requirements.
-      - name: source_system
-        description: The authoritative operational system code for this asset record (DCR-REV-01).
+
 
   - name: int_transactions
     description: >
@@ -229,22 +205,13 @@ models:
               field: parks_sk
       - name: source_system
         description: The authoritative operational system code for this transaction (DCR-REV-01).
-      - name: transaction_amount
-        description: The monetary value of the transaction in its original VistaReserve representation.
-      - name: revenue_category
-        description: The accounting classification for funds collected (e.g., Day Use, Retail, Firewood).
-      - name: is_kiosk_entry
-        description: Boolean flag indicating whether the transaction occurred at an unstaffed kiosk.
-      - name: transaction_created_at
-        description: Timestamp when the transaction was recorded in VistaReserve.
 
-  - name: int_reservations
+
+  - name: int_visits
     description: >
       Harmonized reservation lifecycle events from VistaReserve (DCR-REV-01) mapped to the CDM
       Visit entity. Grain: one row per unique reservation/visit. Includes foreign keys to
       int_contacts (booking customer) and int_customer_assets (booked asset).
-      EXCEPTION: several non-CDM reservation attributes are passed through to support
-      fct_reservations enrichment.
     meta:
       testing_rationale: >
         Tests protect chronological integrity and guarantee reservations map cleanly to
@@ -257,7 +224,7 @@ models:
       - dbt_expectations.expect_table_row_count_to_equal_other_table:
           compare_model: ref('stg_vistareserve__reservations')
     columns:
-      - name: reservations_sk
+      - name: visits_sk
         description: The canonical integration surrogate key for the visit/reservation.
         meta:
           testing_rationale: Duplicate visits would distort occupancy metrics.
@@ -300,19 +267,3 @@ models:
         description: Foreign key linking the reservation to the park, derived from the booked asset's parent park.
       - name: source_system
         description: The authoritative operational system code for this reservation (DCR-REV-01).
-      - name: reservation_status
-        description: The current booking state of the reservation (e.g., Confirmed, Cancelled, Completed).
-      - name: total_amount
-        description: The total monetary value of the reservation as recorded in VistaReserve.
-      - name: arrival_date
-        description: The scheduled arrival date in its original VistaReserve representation.
-      - name: departure_date
-        description: The scheduled departure date in its original VistaReserve representation.
-      - name: reservation_created_at
-        description: Timestamp when the booking was initiated in VistaReserve.
-      - name: booking_source
-        description: The channel or platform through which the reservation was made.
-      - name: promo_code
-        description: Promotional or discount code applied to the reservation, if any.
-      - name: number_of_guests
-        description: The number of guests included in the reservation party.
