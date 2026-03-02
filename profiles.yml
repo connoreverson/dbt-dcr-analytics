@@ -14,3 +14,5 @@ dcr_analytics:
           alias: legacyres
         - path: 'source_data/duckdb/dcr_fin_01_stategov.duckdb'
           alias: stategov
+        - path: 'source_data/duckdb/dcr_fin_02_granttrack.duckdb'
+          alias: granttrack

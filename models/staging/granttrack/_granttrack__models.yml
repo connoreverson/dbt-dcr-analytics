@@ -1,0 +1,249 @@
+version: 2
+
+models:
+  - name: stg_granttrack__grant_applications
+    description: >
+      One staged row per grant application submitted to a federal or state grant
+      program by DCR. The primary contact field is split from its source pipe-
+      delimited format (name|email|phone) into three discrete columns. Covers
+      all applications regardless of outcome — awarded, denied, pending, under
+      review, and withdrawn.
+    columns:
+      - name: hk_grant_application
+        description: Surrogate hash key for the grant application, derived from application_id.
+        tests:
+          - unique
+          - not_null
+      - name: application_id
+        description: Natural key for the grant application (e.g. APP-2021-0001).
+        tests:
+          - unique
+          - not_null
+      - name: grant_program
+        description: Name of the federal or state grant program.
+      - name: status
+        description: Application disposition.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Awarded', 'Denied', 'Pending', 'Under Review', 'Withdrawn']
+      - name: submission_date
+        description: Date the application was submitted to the grantor.
+        tests:
+          - not_null
+      - name: estimated_award_date
+        description: Projected award notification date at time of submission.
+      - name: requested_amount
+        description: Dollar amount requested in the application.
+        tests:
+          - not_null
+      - name: primary_contact_raw
+        description: Raw pipe-delimited contact string from source (name|email|phone).
+      - name: contact_name
+        description: Name component extracted from primary_contact_raw.
+      - name: contact_email
+        description: Email component extracted from primary_contact_raw; may be blank.
+      - name: contact_phone
+        description: Phone number component extracted from primary_contact_raw.
+
+  - name: stg_granttrack__active_awards
+    description: >
+      One staged row per funded grant award. Each award traces back to a grant
+      application and carries the federal award number (FAIN), performance period,
+      required non-federal match percentage, and the StateGov Financials
+      appropriation code that funds the state match obligation.
+    columns:
+      - name: hk_award
+        description: Surrogate hash key for the award, derived from award_id.
+        tests:
+          - unique
+          - not_null
+      - name: award_id
+        description: Natural key for the award (e.g. AWD-00000).
+        tests:
+          - unique
+          - not_null
+      - name: application_id
+        description: Foreign key to stg_granttrack__grant_applications.application_id.
+        tests:
+          - not_null
+      - name: award_number
+        description: Federal Award Identification Number (FAIN) assigned by the grantor.
+        tests:
+          - not_null
+      - name: award_amount
+        description: Total dollar amount of the award.
+        tests:
+          - not_null
+      - name: performance_start
+        description: First day of the award performance period.
+        tests:
+          - not_null
+      - name: performance_end
+        description: Last day of the award performance period.
+        tests:
+          - not_null
+      - name: required_match_percentage
+        description: Percentage of total project cost DCR must fund from non-federal sources.
+      - name: sgf_appropriation_code
+        description: >
+          StateGov Financials appropriation code covering the state match
+          obligation for this award.
+
+  - name: stg_granttrack__award_budget_by_fiscal_year
+    description: >
+      Grant award budgets unpivoted from the source Excel layout to long format.
+      The source table stores one pair of fiscal-year columns (budgeted, actual)
+      for each year from FY2020 through FY2025; this model normalises them to
+      one row per award per fiscal year. Amount strings are cleaned from mixed
+      source formats (dollar signs, commas, text literals such as "TBD") to
+      DECIMAL values; non-numeric text becomes null. Rows where both budgeted
+      and actual are null in the source are excluded.
+    columns:
+      - name: hk_award_budget
+        description: Surrogate hash key derived from award_id and fiscal_year.
+        tests:
+          - unique
+          - not_null
+      - name: award_id
+        description: Foreign key to stg_granttrack__active_awards.award_id.
+        tests:
+          - not_null
+      - name: award_number
+        description: FAIN, denormalised from the source award row.
+      - name: fiscal_year
+        description: Four-digit fiscal year (e.g. 2020, 2021).
+        tests:
+          - not_null
+      - name: budgeted_amount
+        description: >
+          Planned spend for the fiscal year normalised from source VARCHAR;
+          null where source contained non-numeric text or was blank.
+      - name: actual_amount
+        description: >
+          Actual spend for the fiscal year normalised from source VARCHAR;
+          null where source contained non-numeric text or was blank.
+      - name: notes
+        description: Free-text notes carried from the source award row.
+
+  - name: stg_granttrack__compliance_deadlines
+    description: >
+      One staged row per compliance reporting deadline associated with a grant
+      award. Date fields (due_date, submission_date) are normalised from mixed
+      VARCHAR source formats — ISO, US slash-delimited, long month-name text,
+      and abbreviated month-name text — to typed DATE values. Unresolvable
+      date strings yield null.
+    columns:
+      - name: hk_compliance_deadline
+        description: Surrogate hash key for the deadline, derived from deadline_id.
+        tests:
+          - unique
+          - not_null
+      - name: deadline_id
+        description: Natural key for the compliance deadline (e.g. DL-1806b4f5).
+        tests:
+          - unique
+          - not_null
+      - name: award_id
+        description: Foreign key to stg_granttrack__active_awards.award_id.
+        tests:
+          - not_null
+      - name: report_type
+        description: Type of compliance report required by the grantor.
+        tests:
+          - not_null
+      - name: status
+        description: Submission status of the report.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Submitted', 'Pending', 'Overdue']
+      - name: due_date
+        description: Normalised date the report was due to the grantor.
+      - name: submission_date
+        description: Normalised date the report was actually submitted; null if not yet submitted.
+
+  - name: stg_granttrack__match_fund_tracking
+    description: >
+      One staged row per match fund transaction recording a non-federal
+      contribution toward an award's required match. The contributors field
+      is preserved as a raw comma-separated string from the source Excel cell;
+      splitting to individual contributor rows is deferred to the integration
+      layer.
+    columns:
+      - name: hk_match_fund
+        description: Surrogate hash key for the match fund transaction, derived from match_id.
+        tests:
+          - unique
+          - not_null
+      - name: match_id
+        description: Natural key for the match fund transaction (e.g. MFT-000000).
+        tests:
+          - unique
+          - not_null
+      - name: award_id
+        description: Foreign key to stg_granttrack__active_awards.award_id.
+        tests:
+          - not_null
+      - name: match_type
+        description: Category of match contribution.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['In-Kind', 'Volunteer Labor', 'Cash']
+      - name: amount_value
+        description: Dollar value of the match contribution.
+        tests:
+          - not_null
+      - name: transaction_date
+        description: Date the match contribution was recorded.
+        tests:
+          - not_null
+      - name: description
+        description: Free-text description of the match contribution.
+      - name: contributors
+        description: >
+          Raw comma-separated list of organisations or individuals providing the
+          match. May contain one or many names; integration layer is responsible
+          for normalising to rows.
+
+  - name: stg_granttrack__reimbursement_requests
+    description: >
+      One staged row per reimbursement request submitted to a grantor for
+      eligible project expenditures. Tracks the requested and approved amounts,
+      receipt date, and cross-references the StateGov Financials encumbrance
+      covering the expenditure. Source dates and amounts are already typed
+      correctly and require no normalisation.
+    columns:
+      - name: hk_reimbursement_request
+        description: Surrogate hash key for the request, derived from request_id.
+        tests:
+          - unique
+          - not_null
+      - name: request_id
+        description: Natural key for the reimbursement request (e.g. RR-000000).
+        tests:
+          - unique
+          - not_null
+      - name: award_id
+        description: Foreign key to stg_granttrack__active_awards.award_id.
+        tests:
+          - not_null
+      - name: sgf_encumbrance_ref
+        description: >
+          StateGov Financials encumbrance identifier covering the expenditure
+          being reimbursed.
+      - name: requested_amount
+        description: Dollar amount requested for reimbursement.
+        tests:
+          - not_null
+      - name: approved_amount
+        description: >
+          Dollar amount approved by the grantor; may be less than or equal to
+          requested. Null for requests pending grantor review.
+      - name: submission_date
+        description: Date the reimbursement request was submitted to the grantor.
+        tests:
+          - not_null
+      - name: receipt_date
+        description: Date the approved reimbursement payment was received.

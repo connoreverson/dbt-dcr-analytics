@@ -1,0 +1,174 @@
+version: 2
+
+sources:
+  - name: granttrack
+    description: >
+      GrantTrack Excel Master (DCR-FIN-02). A spreadsheet-based grant management
+      system exported to DuckDB. Covers the full grant lifecycle from application
+      through award, compliance reporting, match fund tracking, and reimbursement.
+      Data quality reflects Excel origins: fiscal-year budget figures are pivoted
+      across columns, dates appear in at least four different string formats, and
+      match contributor lists are stored as comma-separated free text within a
+      single cell.
+    database: granttrack
+    schema: main
+    tables:
+      - name: grant_applications
+        description: >
+          One row per grant application submitted to a federal or state grant
+          program. Includes the primary contact stored as a pipe-delimited
+          string (name|email|phone).
+        columns:
+          - name: application_id
+            description: Unique identifier for the grant application (e.g. APP-2021-0001).
+          - name: grant_program
+            description: Name of the federal or state grant program (e.g. Land and Water Conservation Fund).
+          - name: submission_date
+            description: Date the application was submitted to the grantor.
+          - name: requested_amount
+            description: Dollar amount requested in the application.
+          - name: status
+            description: >
+              Application disposition. Values: Awarded, Denied, Pending,
+              Under Review, Withdrawn.
+          - name: estimated_award_date
+            description: Projected date of award notification at time of submission.
+          - name: primary_contact
+            description: >
+              Pipe-delimited contact string in the format name|email|phone.
+              Email field may be blank (e.g. "Jaye Hunt||+1-505-714-2271").
+
+      - name: active_awards
+        description: >
+          One row per funded grant award. Links back to grant_applications and
+          records the federal award number (FAIN), performance period, required
+          match percentage, and the StateGov appropriation code that funds the
+          state match.
+        columns:
+          - name: award_id
+            description: Unique identifier for the award (e.g. AWD-00000).
+          - name: application_id
+            description: Foreign key to grant_applications.application_id.
+          - name: award_number
+            description: Federal Award Identification Number (FAIN) assigned by the grantor.
+          - name: award_amount
+            description: Total dollar amount of the award.
+          - name: performance_start
+            description: First day of the award performance period.
+          - name: performance_end
+            description: Last day of the award performance period.
+          - name: required_match_percentage
+            description: Percentage of total project cost the DCR must fund from non-federal sources.
+          - name: sgf_appropriation_code
+            description: >
+              StateGov Financials appropriation code covering the state match
+              obligation for this award (cross-system reference to stategov.chart_of_accounts).
+
+      - name: award_budget_by_fiscal_year
+        description: >
+          Excel export with one row per award and one pair of columns per fiscal
+          year (FY2020–FY2025): budgeted and actual spend. Amounts use at least
+          three formats: plain decimal, dollar-sign with comma formatting
+          ($509,891.46), and the text literal "TBD". Rows exist only for awards
+          active in at least one fiscal year; sparse awards have null-filled year
+          columns.
+        columns:
+          - name: award_id
+            description: Foreign key to active_awards.award_id.
+          - name: award_number
+            description: Federal Award Identification Number (FAIN), denormalised from active_awards.
+          - name: fy2020_budgeted
+            description: Budgeted spend for FY2020, stored as VARCHAR with inconsistent formatting.
+          - name: fy2020_actual
+            description: Actual spend for FY2020, stored as VARCHAR with inconsistent formatting.
+          - name: fy2021_budgeted
+            description: Budgeted spend for FY2021.
+          - name: fy2021_actual
+            description: Actual spend for FY2021.
+          - name: fy2022_budgeted
+            description: Budgeted spend for FY2022.
+          - name: fy2022_actual
+            description: Actual spend for FY2022.
+          - name: fy2023_budgeted
+            description: Budgeted spend for FY2023.
+          - name: fy2023_actual
+            description: Actual spend for FY2023.
+          - name: fy2024_budgeted
+            description: Budgeted spend for FY2024.
+          - name: fy2024_actual
+            description: Actual spend for FY2024.
+          - name: fy2025_budgeted
+            description: Budgeted spend for FY2025.
+          - name: fy2025_actual
+            description: Actual spend for FY2025.
+          - name: notes
+            description: Free-text notes entered by the grants manager for the award row.
+
+      - name: compliance_deadlines
+        description: >
+          One row per compliance reporting obligation tied to an award. Due dates
+          and submission dates are stored as VARCHAR in at least four distinct
+          formats: ISO (2022-12-25), US slash (12/13/2022), long text
+          (December 10, 2010), and abbreviated month (Mar 08, 2012).
+        columns:
+          - name: deadline_id
+            description: Unique identifier for the compliance deadline (e.g. DL-1806b4f5).
+          - name: award_id
+            description: Foreign key to active_awards.award_id.
+          - name: report_type
+            description: Type of report required (e.g. Financial Status (SF-425), Progress Report).
+          - name: due_date
+            description: Date the report is due to the grantor, stored as VARCHAR in mixed formats.
+          - name: submission_date
+            description: Date the report was actually submitted, stored as VARCHAR in mixed formats.
+          - name: status
+            description: "Submission status. Values: Submitted, Pending, Overdue."
+
+      - name: match_fund_tracking
+        description: >
+          One row per match fund transaction contributing toward an award's
+          required non-federal match. The contributors column is a comma-separated
+          list of organisation and individual names within a single cell — an
+          Excel data-entry artefact. Splitting contributors to rows is deferred
+          to the integration layer.
+        columns:
+          - name: match_id
+            description: Unique identifier for the match fund transaction (e.g. MFT-000000).
+          - name: award_id
+            description: Foreign key to active_awards.award_id.
+          - name: transaction_date
+            description: Date the match contribution was recorded.
+          - name: match_type
+            description: "Category of match contribution. Values: In-Kind, Volunteer Labor, Cash."
+          - name: amount_value
+            description: Dollar value of the match contribution.
+          - name: description
+            description: Free-text description of the match contribution.
+          - name: contributors
+            description: >
+              Comma-separated list of organisations or individuals providing the
+              match (e.g. "Bradley Pharmaceuticals, Agilent Technologies, IBM").
+              May contain one or many names.
+
+      - name: reimbursement_requests
+        description: >
+          One row per reimbursement request submitted to a grantor for eligible
+          project expenditures. Tracks the requested amount, the grantor-approved
+          amount, and references the StateGov encumbrance covering the spend.
+        columns:
+          - name: request_id
+            description: Unique identifier for the reimbursement request (e.g. RR-000000).
+          - name: award_id
+            description: Foreign key to active_awards.award_id.
+          - name: submission_date
+            description: Date the reimbursement request was submitted to the grantor.
+          - name: requested_amount
+            description: Dollar amount requested for reimbursement.
+          - name: approved_amount
+            description: Dollar amount approved by the grantor; may equal or be less than requested.
+          - name: receipt_date
+            description: Date the approved reimbursement payment was received.
+          - name: sgf_encumbrance_ref
+            description: >
+              StateGov Financials encumbrance identifier covering the expenditure
+              being reimbursed (cross-system reference to stategov.encumbrances).
