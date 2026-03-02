@@ -1,0 +1,97 @@
+version: 2
+
+sources:
+  - name: legacyres
+    description: >
+      Static SQL dumps and flat files covering DCR reservations and revenue from
+      2005–2021, before the VistaReserve migration. Three incompatible export
+      formats (FlatFile 2005–2010, SQLDump 2011–2015, Export 2016–2021) result
+      in mixed date formats and varying field completeness across eras. Legacy
+      customer IDs are incompatible with current VistaReserve customer IDs.
+      Park crosswalk covers only 15 of 50 parks. Contains historical PII and
+      partial card masks.
+    database: legacyres
+    schema: main
+
+    tables:
+      - name: legacy_reservations
+        description: >
+          Historical advance bookings from 2005 through 2020. Date fields use
+          three incompatible formats by era: MMDDYYYY (FlatFile), YYYY-MM-DD
+          (SQLDump), and MM/DD/YY (Export). Guest detail is pipe-delimited in
+          the guest_info field and only populated for the FlatFile era.
+        columns:
+          - name: res_id
+            description: Primary key for the historical reservation.
+            tests:
+              - unique
+              - not_null
+          - name: legacy_cust_id
+            description: Foreign key to the legacy customer profile (not compatible with current customer IDs).
+            tests:
+              - not_null
+          - name: legacy_park_id
+            description: Foreign key to the legacy park crosswalk.
+            tests:
+              - not_null
+          - name: data_format_source
+            description: Export era identifier (FlatFile_2005_2010, SQLDump_2011_2015, Export_2016_2021).
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['FlatFile_2005_2010', 'SQLDump_2011_2015', 'Export_2016_2021']
+
+      - name: legacy_customers
+        description: >
+          Historical guest records from the pre-VistaReserve era. Contains PII
+          (name, email, phone) and partial card masks for guests who paid by
+          card. Legacy customer IDs do not map to any current system.
+        columns:
+          - name: legacy_cust_id
+            description: Primary key for the historical customer record.
+            tests:
+              - unique
+              - not_null
+
+      - name: legacy_revenue_summaries
+        description: >
+          Monthly revenue summaries by category and park covering 2005–2021.
+          Produced by park managers at month-end; grain is one row per park per
+          month per revenue category.
+        columns:
+          - name: summary_id
+            description: Primary key for the revenue summary record.
+            tests:
+              - unique
+              - not_null
+          - name: legacy_park_id
+            description: Foreign key to the legacy park crosswalk.
+            tests:
+              - not_null
+
+      - name: legacy_fee_schedule_wide
+        description: >
+          Fee schedule exported in wide format with columns for peak, off-peak,
+          and shoulder seasons. Discount percentages are stored as VARCHAR with
+          a percent sign (e.g. '15%'). Only one snapshot exists (export_date
+          2020-01-15); this represents the fee schedule in effect at the time
+          of the VistaReserve migration.
+        columns:
+          - name: facility_type
+            description: Primary key — the type of bookable facility (e.g. Campsite - Basic).
+            tests:
+              - unique
+              - not_null
+
+      - name: legacy_park_crosswalk
+        description: >
+          Mapping between legacy park IDs and current park IDs. Only covers 15
+          of 50 parks; current_park_id is null for all unmapped parks. Use with
+          caution — this crosswalk was never extended beyond the initial
+          migration cohort.
+        columns:
+          - name: legacy_park_id
+            description: Primary key — the legacy park identifier used across all legacy tables.
+            tests:
+              - unique
+              - not_null

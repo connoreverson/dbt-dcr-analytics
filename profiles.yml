@@ -10,3 +10,5 @@ dcr_analytics:
           alias: vistareserve
         - path: 'source_data/duckdb/dcr_geo_01_geoparks.duckdb'
           alias: geoparks
+        - path: 'source_data/duckdb/dcr_rev_02_legacyres.duckdb'
+          alias: legacyres

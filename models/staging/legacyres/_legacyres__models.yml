@@ -1,0 +1,189 @@
+version: 2
+
+models:
+  - name: stg_legacyres__reservations
+    description: >
+      Historical advance bookings from 2005 through 2020 (pre-VistaReserve).
+      Grain is one row per reservation. Three incompatible source date formats
+      (MMDDYYYY, YYYY-MM-DD, MM/DD/YY) are normalized to DATE. Guest headcount
+      detail — adults, children, pets, and vehicles — is extracted from a
+      pipe-delimited source field and is only populated for the FlatFile
+      2005–2010 era. Legacy customer and park IDs do not map to current system
+      identifiers without the park crosswalk.
+    columns:
+      - name: hk_reservations
+        description: Surrogate hash key for the reservation, generated from reservation_id.
+        tests:
+          - unique
+          - not_null
+      - name: reservation_id
+        description: Natural key for the historical reservation (e.g. RES-2009-000000).
+        tests:
+          - unique
+          - not_null
+      - name: legacy_customer_id
+        description: Reference to the legacy customer record. Not compatible with current VistaReserve customer IDs.
+        tests:
+          - not_null
+      - name: legacy_park_id
+        description: Reference to the park as identified in the legacy system (e.g. PRK-0001-LEGACY).
+        tests:
+          - not_null
+      - name: arrival_date
+        description: Date the guest arrived, normalized from the era-specific source format.
+        tests:
+          - not_null
+      - name: departure_date
+        description: Date the guest departed, normalized from the era-specific source format.
+        tests:
+          - not_null
+      - name: total_paid
+        description: Total amount collected for the reservation in USD.
+      - name: data_format_source
+        description: Export era identifier indicating which legacy system produced this row (FlatFile_2005_2010, SQLDump_2011_2015, Export_2016_2021).
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['FlatFile_2005_2010', 'SQLDump_2011_2015', 'Export_2016_2021']
+      - name: guest_count_adults
+        description: Number of adults in the party, extracted from the pipe-delimited guest_info field. Null for SQLDump and Export eras.
+      - name: guest_count_children
+        description: Number of children in the party. Null for SQLDump and Export eras.
+      - name: guest_count_pets
+        description: Number of pets in the party. Null for SQLDump and Export eras.
+      - name: guest_count_vehicles
+        description: Number of vehicles in the party. Null for SQLDump and Export eras.
+
+  - name: stg_legacyres__customers
+    description: >
+      Historical guest records covering registrations made before the 2021
+      VistaReserve migration. Grain is one row per unique legacy customer.
+      Contains PII (name, email, phone number) and partial card masks for
+      guests who paid by card. Legacy customer IDs do not map to any identifier
+      in the current system.
+    meta:
+      sensitivity: confidential
+      contains_pii: true
+    columns:
+      - name: hk_customers
+        description: Surrogate hash key for the customer, generated from legacy_customer_id.
+        tests:
+          - unique
+          - not_null
+      - name: legacy_customer_id
+        description: Natural key for the historical customer record (e.g. LC-000000).
+        tests:
+          - unique
+          - not_null
+      - name: first_name
+        description: Guest first name (PII).
+      - name: last_name
+        description: Guest last name (PII).
+      - name: email
+        description: Guest email address (PII).
+      - name: phone_number
+        description: Guest phone number (PII).
+      - name: partial_card_mask
+        description: Last four digits of the payment card in masked format (e.g. ****-****-****-4657). Null for guests who paid by cash or check.
+
+  - name: stg_legacyres__revenue_summaries
+    description: >
+      Monthly revenue totals by park and category covering 2005–2021, produced
+      by park managers at month-end. Grain is one row per park per month per
+      revenue category. Revenue categories (e.g. Firewood Sales, Day Use Entry)
+      do not map directly to VistaReserve transaction types; reconciliation
+      requires manual category alignment.
+    columns:
+      - name: hk_revenue_summaries
+        description: Surrogate hash key for the revenue summary, generated from summary_id.
+        tests:
+          - unique
+          - not_null
+      - name: summary_id
+        description: Natural key for the monthly summary record.
+        tests:
+          - unique
+          - not_null
+      - name: legacy_park_id
+        description: Reference to the park in the legacy system.
+        tests:
+          - not_null
+      - name: report_month
+        description: First day of the month the summary covers.
+        tests:
+          - not_null
+      - name: revenue_category
+        description: Revenue type label as entered by the park manager (e.g. Firewood Sales, Day Use Entry, Camping Reservations).
+        tests:
+          - not_null
+      - name: total_revenue
+        description: Total revenue collected for the category, park, and month in USD.
+        tests:
+          - not_null
+
+  - name: stg_legacyres__fee_schedule
+    description: >
+      Fee schedule in effect at the time of the VistaReserve migration
+      (snapshot date 2020-01-15). Grain is one row per facility type. Peak,
+      off-peak, and shoulder rates reflect seasonal pricing tiers. Discount
+      rates are stored as decimal fractions (e.g. 0.15 for 15% off).
+    columns:
+      - name: hk_fee_schedule
+        description: Surrogate hash key for the fee schedule row, generated from facility_type.
+        tests:
+          - unique
+          - not_null
+      - name: facility_type
+        description: Bookable facility type and the natural key for this table (e.g. Campsite - Basic, Cabin - Small).
+        tests:
+          - unique
+          - not_null
+      - name: base_rate_peak
+        description: Nightly base rate during peak season in USD.
+        tests:
+          - not_null
+      - name: base_rate_offpeak
+        description: Nightly base rate during off-peak season in USD.
+        tests:
+          - not_null
+      - name: base_rate_shoulder
+        description: Nightly base rate during shoulder season in USD.
+        tests:
+          - not_null
+      - name: resident_discount_rate
+        description: Discount rate applied to in-state residents, as a decimal fraction (e.g. 0.15 = 15% off). Converted from the source percent string.
+        tests:
+          - not_null
+      - name: senior_discount_rate
+        description: Discount rate applied to qualifying senior guests, as a decimal fraction (e.g. 0.25 = 25% off). Converted from the source percent string.
+        tests:
+          - not_null
+      - name: schedule_export_date
+        description: Date the fee schedule was exported from the legacy system.
+        tests:
+          - not_null
+
+  - name: stg_legacyres__park_crosswalk
+    description: >
+      Mapping between legacy park identifiers and current park IDs. Only covers
+      15 of 50 parks — the cohort migrated to VistaReserve in the initial
+      rollout. Current_park_id is null for all parks not in the crosswalk.
+      Do not use this table to assert full referential integrity between legacy
+      and current systems.
+    columns:
+      - name: hk_park_crosswalk
+        description: Surrogate hash key for the crosswalk row, generated from legacy_park_id.
+        tests:
+          - unique
+          - not_null
+      - name: legacy_park_id
+        description: Legacy park identifier and the natural key for this table (e.g. PRK-0001-LEGACY).
+        tests:
+          - unique
+          - not_null
+      - name: legacy_park_name
+        description: Human-readable park name as recorded in the legacy system, including the era suffix (e.g. TALL PINES STATE PARK (Pre-2021)).
+        tests:
+          - not_null
+      - name: current_park_id
+        description: Integer park ID in the current VistaReserve system. Null for the 35 parks not covered by this crosswalk.
