@@ -12,3 +12,5 @@ dcr_analytics:
           alias: geoparks
         - path: 'source_data/duckdb/dcr_rev_02_legacyres.duckdb'
           alias: legacyres
+        - path: 'source_data/duckdb/dcr_fin_01_stategov.duckdb'
+          alias: stategov

@@ -1,0 +1,163 @@
+version: 2
+
+sources:
+  - name: stategov
+    database: stategov
+    schema: main
+    description: >
+      StateGov Financials (DCR-FIN-01) — statewide mainframe (COBOL) financial system active since 1994.
+      Authoritative source for general ledger, accounts payable, encumbrances, and budget activity.
+      Monthly batch exports preserve pipe-delimited invoice detail in the GL memo field; the budget
+      activity log mixes appropriations, allotments, expenditures, and revenue in a single flat table
+      with YYYYMMDD text dates. Vendor TINs and bank routing numbers are masked at source.
+    tables:
+      - name: general_ledger
+        description: >
+          Monthly batch general ledger entries for the agency. Each row is one GL posting line for a
+          specific account and fiscal period. Expenditure rows include a pipe-delimited batch_detail_text
+          memo field encoding the individual invoice references that make up the batch amount.
+        columns:
+          - name: gl_entry_id
+            description: Synthetic primary key for the GL entry row.
+          - name: account_id
+            description: >
+              Compound account identifier encoding fund, division, program, and object code in the format
+              {fund_code}-DIV-{division_code}-PRG-{program_code}-OBJ-{object_code}.
+          - name: fiscal_year
+            description: State fiscal year (calendar year of fiscal year end).
+          - name: accounting_month
+            description: Accounting month number within the fiscal year (1–12).
+          - name: entry_type
+            description: Whether the entry is an Expenditure or Revenue posting.
+          - name: amount
+            description: Dollar amount of the GL entry for the period.
+          - name: batch_reference
+            description: System-generated batch identifier for the posting run.
+          - name: batch_detail_text
+            description: >
+              Pipe-delimited invoice detail memo field populated for expenditure rows only. Format is a
+              repeating 4-tuple per invoice: invoice_id|amount|description|date, concatenated without a
+              row separator. Revenue rows leave this field null.
+
+      - name: accounts_payable
+        description: >
+          Invoice-level accounts payable records. Each row is one invoice submitted by a vendor against
+          an encumbrance. Links vendors, encumbrances, and chart-of-accounts at the invoice grain.
+        columns:
+          - name: invoice_id
+            description: Unique identifier for the AP invoice.
+          - name: vendor_id
+            description: Reference to the vendor in the vendors table.
+          - name: encumbrance_id
+            description: Reference to the encumbrance that funds this invoice.
+          - name: account_id
+            description: Compound account identifier (same format as general_ledger.account_id).
+          - name: invoice_date
+            description: Date the invoice was submitted.
+          - name: payment_date
+            description: Date the invoice was paid, or null if unpaid.
+          - name: amount
+            description: Invoice dollar amount.
+          - name: status
+            description: Payment status (e.g., Paid, Pending, Voided).
+
+      - name: vendors
+        description: >
+          Master vendor registry. Each row is one vendor enrolled with the agency. Includes masked
+          taxpayer identification numbers for confidential state procurement compliance.
+        columns:
+          - name: vendor_id
+            description: Unique vendor identifier.
+          - name: vendor_name
+            description: Legal vendor name as enrolled in the statewide procurement system.
+          - name: tin_masked
+            description: >
+              Partially masked taxpayer identification number (TIN). Confidential — last four digits
+              visible; remainder masked per state data governance policy.
+          - name: vendor_type
+            description: Vendor classification (e.g., Contractor, Supplier, Utility).
+          - name: is_active
+            description: Whether the vendor is currently active in the procurement system.
+
+      - name: chart_of_accounts
+        description: >
+          Reference table defining the agency's chart of accounts. Each row maps a compound account_id
+          to its component fund, division, program, and object code dimensions with descriptive labels.
+        columns:
+          - name: account_id
+            description: Compound account identifier (same format as general_ledger.account_id).
+          - name: fund_code
+            description: Fund code component of the account hierarchy.
+          - name: fund_description
+            description: Human-readable description of the fund.
+          - name: division_code
+            description: Division code component.
+          - name: division_description
+            description: Human-readable description of the division.
+          - name: program_code
+            description: Program code component.
+          - name: program_description
+            description: Human-readable description of the program.
+          - name: object_code
+            description: Object code component identifying the expenditure or revenue type.
+          - name: object_description
+            description: Human-readable description of the object code.
+
+      - name: encumbrances
+        description: >
+          Budget commitment records. Each row is one encumbrance establishing a spending commitment
+          against a vendor and account. Tracks original committed amount and remaining balance.
+        columns:
+          - name: encumbrance_id
+            description: Unique identifier for the encumbrance.
+          - name: vendor_id
+            description: Reference to the vendor associated with the commitment.
+          - name: account_id
+            description: Compound account identifier (same format as general_ledger.account_id).
+          - name: established_date
+            description: Date the encumbrance was created.
+          - name: original_amount
+            description: Amount originally committed when the encumbrance was established.
+          - name: remaining_balance
+            description: Amount not yet liquidated against this encumbrance.
+          - name: status
+            description: Encumbrance status (e.g., Open, Liquidated, Closed).
+
+      - name: budget_activity_log
+        description: >
+          Flat export of budget activity events mixing appropriations, allotments, expenditures, and
+          revenue in one table. Each row is one budget system event. The effective_date field is stored
+          as an 8-digit YYYYMMDD text string, a legacy of the COBOL batch export format.
+        columns:
+          - name: log_sequence_id
+            description: Sequential identifier for the budget activity log entry.
+          - name: fiscal_year
+            description: State fiscal year in which the activity occurred.
+          - name: accounting_period
+            description: Accounting period (month number) within the fiscal year.
+          - name: account_id
+            description: Compound account identifier (same format as general_ledger.account_id).
+          - name: activity_type
+            description: >
+              COBOL activity type code. APPR = Appropriation, ALOT = Allotment, EXPN = Expenditure,
+              REVN = Revenue.
+          - name: effective_date
+            description: >
+              Effective date of the activity, stored as an 8-digit YYYYMMDD text string per the COBOL
+              batch export format.
+          - name: amount
+            description: Dollar amount of the budget activity.
+          - name: vendor_id
+            description: Vendor reference, populated only for expenditure activity types.
+          - name: encumbrance_ref
+            description: Encumbrance or purchase order reference, populated only for expenditure types.
+          - name: revenue_source_code
+            description: Revenue source classification code, populated only for revenue activity types.
+          - name: appropriation_auth
+            description: Legislative bill reference authorizing the appropriation, populated for APPR rows.
+          - name: allotment_period
+            description: Allotment period label (e.g., Q1, Q2, ANNUAL), populated for ALOT rows.
+          - name: batch_id
+            description: Batch processing identifier for the export run.
+          - name: entry_operator
+            description: Three-character operator code identifying the user who entered the record.

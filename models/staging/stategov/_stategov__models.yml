@@ -1,0 +1,326 @@
+version: 2
+
+models:
+  - name: stg_stategov__general_ledger
+    description: >
+      Staged general ledger entries from the StateGov Financials mainframe system (DCR-FIN-01). One row per
+      GL posting line representing a monthly batch amount for a specific account and fiscal period. Expenditure
+      rows include a raw pipe-delimited batch_detail_text memo encoding the individual invoice references
+      bundled into the batch; batch_entry_count is derived from the memo to indicate how many invoices are
+      embedded. The compound account_id is retained whole and also split into its four component dimensions
+      (fund, division, program, object) for downstream joins to the chart of accounts.
+    config:
+      meta:
+        owner: dcr-finance
+    columns:
+      - name: hk_general_ledger
+        description: Surrogate hash key derived from gl_entry_id.
+        tests:
+          - unique
+          - not_null
+      - name: gl_entry_id
+        description: Source system primary key for the GL entry row.
+        tests:
+          - not_null
+      - name: account_id
+        description: >
+          Full compound account identifier in the format {fund_code}-DIV-{division_code}-PRG-{program_code}-OBJ-{object_code}.
+          Retained for reference; downstream joins to chart_of_accounts should use the split component fields.
+      - name: account_fund_code
+        description: Fund code component extracted from the compound account_id (e.g., "301").
+      - name: account_division_code
+        description: Division code component extracted from the compound account_id (e.g., "05").
+      - name: account_program_code
+        description: Program code component extracted from the compound account_id (e.g., "100").
+      - name: account_object_code
+        description: Object code component extracted from the compound account_id (e.g., "10"), classifying the expenditure or revenue type.
+      - name: fiscal_year
+        description: State fiscal year in which the GL entry was posted.
+        tests:
+          - not_null
+      - name: accounting_month
+        description: Accounting month number within the fiscal year (1–12).
+        tests:
+          - not_null
+      - name: entry_type
+        description: Whether the posting is an Expenditure or Revenue entry.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Expenditure', 'Revenue']
+      - name: amount
+        description: Dollar amount posted in this GL entry for the period.
+        tests:
+          - not_null
+      - name: batch_reference
+        description: System-generated identifier for the batch posting run.
+      - name: batch_detail_text
+        description: >
+          Raw pipe-delimited invoice memo from the COBOL batch export. Format is a repeating 4-tuple per
+          invoice reference: invoice_id|amount|description|date. Null for Revenue entries. Passed through
+          unchanged at staging; integration models are responsible for unpacking individual invoice records.
+      - name: batch_entry_count
+        description: >
+          Number of invoice records encoded in batch_detail_text, derived by counting INV- prefixes in the
+          memo string. Null when batch_detail_text is null (i.e., Revenue entries).
+
+  - name: stg_stategov__accounts_payable
+    description: >
+      Staged accounts payable invoices from the StateGov Financials mainframe (DCR-FIN-01). One row per
+      invoice submitted by a vendor. Links vendors, encumbrances, and the chart of accounts at the invoice
+      grain. The compound account_id is split into component dimensions for downstream joins. Payment dates
+      are null for unpaid invoices.
+    config:
+      meta:
+        owner: dcr-finance
+    columns:
+      - name: hk_accounts_payable
+        description: Surrogate hash key derived from invoice_id.
+        tests:
+          - unique
+          - not_null
+      - name: invoice_id
+        description: Source system primary key for the AP invoice.
+        tests:
+          - not_null
+      - name: vendor_id
+        description: Reference to the vendor who submitted the invoice.
+        tests:
+          - not_null
+      - name: encumbrance_id
+        description: Reference to the encumbrance funding this invoice.
+      - name: account_id
+        description: Full compound account identifier (same format as stg_stategov__general_ledger).
+      - name: account_fund_code
+        description: Fund code component extracted from the compound account_id.
+      - name: account_division_code
+        description: Division code component extracted from the compound account_id.
+      - name: account_program_code
+        description: Program code component extracted from the compound account_id.
+      - name: account_object_code
+        description: Object code component extracted from the compound account_id.
+      - name: invoice_date
+        description: Date the invoice was received and entered into the AP system.
+        tests:
+          - not_null
+      - name: payment_date
+        description: Date the invoice was paid. Null for invoices with Pending or Voided status.
+      - name: amount
+        description: Invoice dollar amount as submitted by the vendor.
+        tests:
+          - not_null
+      - name: status
+        description: Current payment status of the invoice.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Paid', 'Pending', 'Voided']
+
+  - name: stg_stategov__vendors
+    description: >
+      Staged vendor master records from the StateGov Financials mainframe (DCR-FIN-01). One row per vendor
+      enrolled in the agency's statewide procurement system. Vendor taxpayer identification numbers (TINs)
+      are masked at source per state data governance policy and treated as confidential.
+    config:
+      meta:
+        owner: dcr-finance
+        sensitivity: confidential
+    columns:
+      - name: hk_vendors
+        description: Surrogate hash key derived from vendor_id.
+        tests:
+          - unique
+          - not_null
+      - name: vendor_id
+        description: Source system primary key for the vendor.
+        tests:
+          - not_null
+      - name: vendor_name
+        description: Legal name of the vendor as enrolled in the statewide procurement system.
+        tests:
+          - not_null
+      - name: vendor_type
+        description: Vendor classification indicating the nature of goods or services provided.
+        tests:
+          - not_null
+      - name: is_active
+        description: Whether the vendor is currently active and eligible to receive payments.
+        tests:
+          - not_null
+      - name: tin_masked
+        description: >
+          Partially masked taxpayer identification number. Last four digits are visible; the remainder is
+          masked per state data governance policy. Confidential — do not expose in public-facing reports.
+
+  - name: stg_stategov__chart_of_accounts
+    description: >
+      Staged chart-of-accounts reference table from the StateGov Financials mainframe (DCR-FIN-01). One row
+      per unique account, providing human-readable labels for each component dimension of the compound
+      account_id used throughout the financial system: fund, division, program, and object code.
+    config:
+      meta:
+        owner: dcr-finance
+    columns:
+      - name: hk_chart_of_accounts
+        description: Surrogate hash key derived from account_id.
+        tests:
+          - unique
+          - not_null
+      - name: account_id
+        description: Compound account identifier serving as the natural key for chart-of-accounts lookups.
+        tests:
+          - unique
+          - not_null
+      - name: fund_code
+        description: Fund code identifying the financing source (e.g., general fund, enterprise fund, federal pass-through).
+        tests:
+          - not_null
+      - name: fund_description
+        description: Human-readable name of the fund.
+        tests:
+          - not_null
+      - name: division_code
+        description: Division code identifying the agency division responsible for the account.
+        tests:
+          - not_null
+      - name: division_description
+        description: Human-readable name of the division.
+        tests:
+          - not_null
+      - name: program_code
+        description: Program code identifying the program area under the division.
+        tests:
+          - not_null
+      - name: program_description
+        description: Human-readable name of the program.
+        tests:
+          - not_null
+      - name: object_code
+        description: Object code classifying the type of expenditure or revenue (e.g., personal services, supplies, capital outlay).
+        tests:
+          - not_null
+      - name: object_description
+        description: Human-readable name of the object code.
+        tests:
+          - not_null
+
+  - name: stg_stategov__encumbrances
+    description: >
+      Staged encumbrance records from the StateGov Financials mainframe (DCR-FIN-01). One row per budget
+      commitment established against a vendor and account. Encumbrances reserve budget authority before
+      invoices are received; the remaining_balance decreases as accounts_payable invoices are liquidated.
+    config:
+      meta:
+        owner: dcr-finance
+    columns:
+      - name: hk_encumbrances
+        description: Surrogate hash key derived from encumbrance_id.
+        tests:
+          - unique
+          - not_null
+      - name: encumbrance_id
+        description: Source system primary key for the encumbrance.
+        tests:
+          - not_null
+      - name: vendor_id
+        description: Reference to the vendor against whom the commitment is established.
+        tests:
+          - not_null
+      - name: account_id
+        description: Full compound account identifier (same format as stg_stategov__general_ledger).
+      - name: account_fund_code
+        description: Fund code component extracted from the compound account_id.
+      - name: account_division_code
+        description: Division code component extracted from the compound account_id.
+      - name: account_program_code
+        description: Program code component extracted from the compound account_id.
+      - name: account_object_code
+        description: Object code component extracted from the compound account_id.
+      - name: established_date
+        description: Date on which the encumbrance was created in the financial system.
+        tests:
+          - not_null
+      - name: original_amount
+        description: Dollar amount originally committed when the encumbrance was established.
+        tests:
+          - not_null
+      - name: remaining_balance
+        description: Amount not yet liquidated by accounts_payable invoices against this encumbrance.
+        tests:
+          - not_null
+      - name: status
+        description: Current lifecycle status of the encumbrance.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Open', 'Liquidated', 'Closed']
+
+  - name: stg_stategov__budget_activity_log
+    description: >
+      Staged budget activity log from the StateGov Financials mainframe (DCR-FIN-01). One row per budget
+      system event. This flat COBOL export mixes four activity types — appropriations (APPR), allotments
+      (ALOT), expenditures (EXPN), and revenues (REVN) — in a single table. Reference fields (vendor_id,
+      encumbrance_ref, revenue_source_code, appropriation_auth, allotment_period) are sparse: each is
+      populated only for the activity_type that uses it and null otherwise. The source effective_date was
+      a YYYYMMDD text string in the COBOL export and has been normalized to a date at staging.
+    config:
+      meta:
+        owner: dcr-finance
+    columns:
+      - name: hk_budget_activity_log
+        description: Surrogate hash key derived from log_sequence_id.
+        tests:
+          - unique
+          - not_null
+      - name: log_sequence_id
+        description: Source system sequential identifier for the budget activity log entry.
+        tests:
+          - not_null
+      - name: fiscal_year
+        description: State fiscal year in which the budget activity occurred.
+        tests:
+          - not_null
+      - name: accounting_period
+        description: Accounting period (month number 1–12) within the fiscal year.
+        tests:
+          - not_null
+      - name: account_id
+        description: Full compound account identifier (same format as stg_stategov__general_ledger).
+      - name: account_fund_code
+        description: Fund code component extracted from the compound account_id.
+      - name: account_division_code
+        description: Division code component extracted from the compound account_id.
+      - name: account_program_code
+        description: Program code component extracted from the compound account_id.
+      - name: account_object_code
+        description: Object code component extracted from the compound account_id.
+      - name: activity_type
+        description: >
+          COBOL activity type code classifying the budget event. APPR = legislative appropriation,
+          ALOT = allotment to a division, EXPN = expenditure against budget, REVN = revenue receipt.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['APPR', 'ALOT', 'EXPN', 'REVN']
+      - name: effective_date
+        description: >
+          Effective date of the budget event, normalized from the COBOL YYYYMMDD text format.
+          Represents the accounting date of the transaction, which may differ from the fiscal period.
+      - name: amount
+        description: Dollar amount of the budget activity event.
+        tests:
+          - not_null
+      - name: vendor_id
+        description: Vendor reference for EXPN activity types; null for APPR, ALOT, and REVN rows.
+      - name: encumbrance_ref
+        description: Encumbrance or purchase order reference for EXPN activity types; null otherwise.
+      - name: revenue_source_code
+        description: Revenue source classification code for REVN activity types; null otherwise.
+      - name: appropriation_auth
+        description: Legislative bill reference authorizing the appropriation for APPR activity types; null otherwise.
+      - name: allotment_period
+        description: Allotment period label (Q1, Q2, Q3, Q4, ANNUAL) for ALOT activity types; null otherwise.
+      - name: batch_id
+        description: Identifier for the COBOL batch run that produced this export record.
+      - name: entry_operator
+        description: Three-character operator code of the user who entered the record in the mainframe.
