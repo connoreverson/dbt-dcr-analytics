@@ -59,3 +59,33 @@ macros:
         type: string
         description: The column expression referencing the VistaReserve integer park_id.
 
+  - name: identify_candidate_cdm
+    description: >
+      Identifies the best-matching Microsoft CDM entities for an integration model
+      by comparing the model's business columns against every entity schema across
+      the five CDM catalog seeds (asset, visits, application_common, non_profit_core,
+      dcr_extensions). Results are ranked by matched column count and coverage percentage.
+
+      Invoke via:
+        dbt run-operation identify_candidate_cdm --args '{model_name: "int_xxx"}'
+        dbt run-operation identify_candidate_cdm --args '{model_name: "int_xxx", top_n: 5}'
+
+      Infrastructure columns (surrogate keys with _sk suffix, FK references with _
+      prefix, ID columns with _id suffix) are excluded from matching so that only
+      business-content columns participate in the coverage score.
+
+      If the top candidate falls below 50% column coverage, the macro recommends
+      running the cdm-exception-request skill to generate a CDM_EXCEPTION document.
+      The model must be materialized in the warehouse before invoking this macro.
+    arguments:
+      - name: model_name
+        type: string
+        description: >
+          The integration model name to evaluate (e.g. "int_contacts"). The model
+          must exist as a materialized relation in the warehouse at call time.
+      - name: top_n
+        type: integer
+        description: >
+          Maximum number of candidate CDM entities to display, ranked by matched
+          column count then coverage percentage. Defaults to 10.
+
