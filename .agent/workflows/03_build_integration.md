@@ -12,8 +12,9 @@ description: Build Integration
 ## Steps
 1. Run skill `using-dbt-for-analytics-engineering` for integration layer
    - Selector: `integration.*`
-   - This step involves authoring SQL and YAML — do NOT auto-run. Present
-     the generated files to the user for review before proceeding.
+   - Generate SQL and YAML files, then auto-run `dbt build` and
+     `sqlfluff fix`/`lint` iteratively. Defer human review to the
+     end-of-phase qualitative peer review (Step 6).
 
 2. Enumerate integration models using dbt ls (safe, read-only)
    - Command: `dbt ls --select integration.* --resource-types model --output name`
