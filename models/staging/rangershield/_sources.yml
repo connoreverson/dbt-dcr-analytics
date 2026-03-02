@@ -1,0 +1,154 @@
+version: 2
+
+sources:
+  - name: rangershield
+    description: >
+      RangerShield CAD/RMS — the CJIS-compliant Computer-Aided Dispatch and Records
+      Management System used by DCR Law Enforcement Services. This system operates in
+      complete isolation from all other DCR platforms (air-gapped). Incident locations
+      are recorded as narrative text strings only; no geographic coordinates are stored.
+      Data is classified Restricted — Statutory due to CJIS requirements.
+    database: rangershield
+    schema: main
+    tables:
+      - name: incidents
+        description: >
+          Master incident report table. Each row is a single law-enforcement incident
+          reported by a DCR ranger. Locations are free-text narratives (e.g.,
+          "Campsite 39, Loop C, Park 39") rather than coordinates. Narrative summaries
+          are synthetic placeholder text in this dataset.
+        columns:
+          - name: incident_number
+            description: Primary identifier — year-prefixed sequential string (e.g., 2023-000001).
+          - name: reporting_officer
+            description: Badge number of the officer who authored the report.
+          - name: incident_type
+            description: >
+              Incident classification. Values: Assault, Drug Offense, DUI, Lost Person,
+              Medical Aid, Resource Damage, SAR Activation, Theft, Trespass,
+              Wildlife Encounter.
+          - name: report_timestamp
+            description: Timestamp when the incident report was entered into RangerShield.
+          - name: location_narrative
+            description: Free-text location description. No coordinate data is stored in this system.
+          - name: narrative_summary
+            description: Full narrative text of the incident report (synthetic placeholder in this dataset).
+          - name: review_status
+            description: >
+              Supervisory review state. Values: Approved, Pending Review,
+              Returned for Correction.
+
+      - name: citations
+        description: >
+          Citations issued by DCR rangers. Approximately 60 % of citations are linked
+          to a formal incident_number; the remaining 40 % are standalone field citations
+          with no associated incident report.
+        columns:
+          - name: citation_number
+            description: Primary identifier for the citation.
+          - name: incident_number
+            description: Associated incident number. Null for standalone field citations (~1,503 of 2,500 rows).
+          - name: issuing_officer
+            description: Badge number of the officer who issued the citation.
+          - name: violation_code
+            description: DCR violation code referenced on the citation (e.g., VC-4057).
+          - name: issue_timestamp
+            description: Timestamp when the citation was issued.
+          - name: fine_amount
+            description: Monetary fine assessed on the citation, in USD.
+          - name: court_disposition
+            description: >
+              Final court outcome. Values: Dismissed, Failure to Appear, Guilty, Pending.
+
+      - name: dispatch_logs
+        description: >
+          CAD radio-traffic and officer-status log entries. Each row is a single logged
+          event for a specific officer and incident. Most events have no radio transcript;
+          transcripts are recorded selectively for Dispatch and On Scene events only.
+        columns:
+          - name: log_id
+            description: Primary identifier for the log entry (UUID-prefixed string).
+          - name: incident_number
+            description: Incident this log entry belongs to.
+          - name: badge_number
+            description: Officer whose status or transmission is being logged.
+          - name: log_timestamp
+            description: Timestamp of the logged event.
+          - name: event_type
+            description: >
+              CAD event classification. Values: Clear, Dispatch, On Scene,
+              Position Update, Status Check.
+          - name: radio_traffic_transcript
+            description: >
+              Verbatim transcript of radio transmission. Null for the majority of entries
+              (~12,063 of 15,000); populated selectively for Dispatch and On Scene events.
+
+      - name: officers
+        description: >
+          RangerShield officer roster. This is an independent local dimension — it is
+          not synced from PeopleFirst HR and may drift from the authoritative HR record.
+          Covers 120 DCR law-enforcement officers across four regions.
+        columns:
+          - name: badge_number
+            description: Primary identifier and operational radio identifier for the officer.
+          - name: first_name
+            description: Officer first name.
+          - name: last_name
+            description: Officer last name.
+          - name: rank
+            description: >
+              Officer rank within DCR Law Enforcement. Values: Captain, Corporal,
+              Lieutenant, Ranger, Sergeant.
+          - name: certification_status
+            description: >
+              Current CJIS certification state. Values: Active, Suspended.
+          - name: assigned_region
+            description: Integer region code (1–4) for the officer's primary patrol assignment.
+
+      - name: officer_activity
+        description: >
+          Daily shift activity log for each officer. Records shift start/end times,
+          patrol mileage, visitor contacts, and resource checks per shift. One row
+          per officer per shift.
+        columns:
+          - name: activity_id
+            description: Primary identifier for the activity record (UUID-prefixed string).
+          - name: badge_number
+            description: Officer whose activity is being recorded.
+          - name: shift_date
+            description: Calendar date of the shift.
+          - name: shift_start_time
+            description: Timestamp when the officer's shift began.
+          - name: shift_end_time
+            description: Timestamp when the officer's shift ended.
+          - name: patrol_miles
+            description: Total patrol distance driven or walked during the shift, in miles (10.0–149.9 range).
+          - name: visitor_contacts
+            description: Count of visitor interactions recorded during the shift.
+          - name: resource_checks
+            description: Count of resource (facility/trail/campsite) inspections completed during the shift.
+
+      - name: use_of_force
+        description: >
+          Use-of-force incident documentation. Each row is a separate use-of-force
+          event tied to a parent incident. This table has only 50 rows, reflecting the
+          rarity of force applications in DCR patrol operations. Subject to mandatory
+          internal review under CJIS policy.
+        columns:
+          - name: uof_id
+            description: Primary identifier for the use-of-force record (UUID-prefixed string).
+          - name: incident_number
+            description: Parent incident this use-of-force event belongs to.
+          - name: involved_officer
+            description: Badge number of the officer who applied force.
+          - name: force_level
+            description: >
+              Classification of force applied. Values: Control Hold, OC Spray,
+              Taser Deployment.
+          - name: subject_injury
+            description: Boolean flag — true if the subject sustained an injury.
+          - name: officer_injury
+            description: Boolean flag — true if the involved officer sustained an injury.
+          - name: internal_review_status
+            description: >
+              Status of the mandatory internal review. Values: Cleared, Pending.

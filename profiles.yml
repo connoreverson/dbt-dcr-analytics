@@ -18,3 +18,5 @@ dcr_analytics:
           alias: granttrack
         - path: 'source_data/duckdb/dcr_ast_01_infratrak.duckdb'
           alias: infratrak
+        - path: 'source_data/duckdb/dcr_les_01_rangershield.duckdb'
+          alias: rangershield
