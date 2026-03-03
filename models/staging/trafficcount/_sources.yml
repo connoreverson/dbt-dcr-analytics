@@ -1,0 +1,129 @@
+version: 2
+
+sources:
+  - name: trafficcount
+    description: >
+      IoT sensor telemetry from DCR-VUM-01 (TrafficCount IoT). Captures hourly vehicle and
+      pedestrian/cyclist counts from magnetometer and infrared trail sensors installed at park
+      entrances and trailheads. Also includes pre-computed daily visitor estimates derived by
+      applying the standard 2.7 vehicle occupancy multiplier to raw vehicle counts. No PII is
+      present in this dataset — all records are anonymous sensor readings.
+    database: trafficcount
+    schema: raw_trafficcount
+    tables:
+      - name: sensor_locations
+        description: >
+          Reference table for all deployed IoT sensors. Each row represents one physical
+          sensor device installed at a park location. Links sensors to park IDs and records
+          the sensor type, deployment location, and operational status. 20 sensors total —
+          8 vehicle magnetometers at entrance gates and 12 infrared trail counters at
+          trailheads.
+        columns:
+          - name: sensor_id
+            description: Unique identifier for the sensor device (e.g., SNS-V-001, SNS-T-012).
+          - name: park_id
+            description: Foreign key to the park where the sensor is installed.
+          - name: installation_date
+            description: Date the sensor was physically installed and activated.
+          - name: sensor_type
+            description: >
+              Type of sensing technology. Either 'Vehicle Magnetometer' (detects passing
+              vehicles via magnetic field disruption) or 'Infrared Trail Counter' (detects
+              pedestrians and cyclists via beam interruption).
+          - name: location_description
+            description: >
+              Human-readable description of the sensor's position within the park. Either
+              'Main Entrance Gate - Lane 1' (vehicle sensors) or 'Main Trailhead marker'
+              (trail sensors).
+          - name: status
+            description: Current operational status of the sensor. Either 'Active' or 'Maintenance'.
+          - name: _loaded_at
+            description: Timestamp when the record was loaded into the raw extract.
+          - name: _is_deleted
+            description: Soft-delete flag from the source system.
+
+      - name: vehicle_counts
+        description: >
+          Hourly raw vehicle counts from Vehicle Magnetometer sensors at park entrance gates.
+          Each row represents one hour of vehicle detections at a single sensor. 70,088 rows
+          covering 8 vehicle sensors with approximately one year of hourly readings. Anomalous
+          readings (~0.6% of records) are flagged but retained for downstream filtering decisions.
+        columns:
+          - name: count_id
+            description: >
+              Unique identifier for the hourly count record, formatted as
+              VC-{sensor_id}-{YYYYMMDDHH} (e.g., VC-SNS-V-001-2024010100).
+          - name: sensor_id
+            description: Foreign key to sensor_locations identifying the recording sensor.
+          - name: timestamp_hour
+            description: The start of the one-hour window during which vehicles were counted.
+          - name: raw_vehicle_count
+            description: Number of vehicles detected by the magnetometer during the hour.
+          - name: is_anomaly
+            description: >
+              True when the count reading is flagged as anomalous (e.g., sensor malfunction,
+              implausible spike). Anomalous records should be excluded from visitor estimation.
+          - name: _loaded_at
+            description: Timestamp when the record was loaded into the raw extract.
+          - name: _is_deleted
+            description: Soft-delete flag from the source system.
+
+      - name: pedestrian_cyclist_counts
+        description: >
+          Hourly raw pedestrian and cyclist counts from Infrared Trail Counter sensors at
+          park trailheads. Each row represents one hour of detections at a single trail sensor.
+          105,132 rows covering 12 trail sensors with approximately one year of hourly readings.
+          Separates pedestrian and cyclist counts within the same beam-break reading session.
+          Anomalous readings (~1.3% of records) are flagged but retained.
+        columns:
+          - name: count_id
+            description: >
+              Unique identifier for the hourly count record, formatted as
+              PC-{sensor_id}-{YYYYMMDDHH} (e.g., PC-SNS-T-001-2024010100).
+          - name: sensor_id
+            description: Foreign key to sensor_locations identifying the recording sensor.
+          - name: timestamp_hour
+            description: The start of the one-hour window during which trail users were counted.
+          - name: raw_pedestrian_count
+            description: Number of pedestrian beam-break events recorded during the hour.
+          - name: raw_cyclist_count
+            description: Number of cyclist beam-break events recorded during the hour.
+          - name: is_anomaly
+            description: >
+              True when either count in the reading is flagged as anomalous. Anomalous records
+              should be excluded from visitation analysis.
+          - name: _loaded_at
+            description: Timestamp when the record was loaded into the raw extract.
+          - name: _is_deleted
+            description: Soft-delete flag from the source system.
+
+      - name: derived_visitor_metrics
+        description: >
+          Pre-computed daily total visitor estimates, derived by summing non-anomalous hourly
+          vehicle counts and applying the standard DCR 2.7 vehicle occupancy multiplier. Each
+          row represents one sensor's estimated visitor contribution for one calendar day.
+          7,320 rows covering vehicle sensors over approximately one year. The multiplier value
+          is recorded per row to preserve auditability of the calculation method.
+        columns:
+          - name: metric_id
+            description: >
+              Unique identifier for the daily metric record, formatted as
+              DVM-{sensor_id}-{YYYYMMDD} (e.g., DVM-SNS-V-001-20240101).
+          - name: sensor_id
+            description: Foreign key to sensor_locations for the vehicle sensor that produced this estimate.
+          - name: target_date
+            description: The calendar date for which the visitor estimate was computed.
+          - name: estimated_total_visitors
+            description: >
+              Total visitors estimated for the day at this sensor location, calculated as
+              sum(hourly vehicle count) × vehicle_multiplier_used.
+          - name: vehicle_multiplier_used
+            description: >
+              The occupancy multiplier applied to vehicle counts to estimate total visitors.
+              DCR standard is 2.7 persons per vehicle. Recorded here for calculation auditability.
+          - name: calculation_timestamp
+            description: Timestamp when the daily estimate was computed (typically next-day at 02:00).
+          - name: _loaded_at
+            description: Timestamp when the record was loaded into the raw extract.
+          - name: _is_deleted
+            description: Soft-delete flag from the source system.

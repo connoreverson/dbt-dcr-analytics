@@ -24,3 +24,5 @@ dcr_analytics:
           alias: biosurvey
         - path: 'source_data/duckdb/dcr_hcm_01_peoplefirst.duckdb'
           alias: peoplefirst
+        - path: 'source_data/duckdb/dcr_vum_01_trafficcount.duckdb'
+          alias: trafficcount

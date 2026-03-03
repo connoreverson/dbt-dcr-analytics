@@ -1,0 +1,199 @@
+version: 2
+
+models:
+  - name: stg_trafficcount__sensor_locations
+    description: >
+      Reference table for IoT sensor devices deployed across DCR parks. Each row represents
+      one physical sensor — either a Vehicle Magnetometer at an entrance gate or an Infrared
+      Trail Counter at a trailhead. Provides the park affiliation and operational status needed
+      to join hourly count streams back to park-level geography in the integration layer.
+    columns:
+      - name: hk_sensor
+        description: Surrogate key for the sensor record, generated from sensor_id.
+        data_tests:
+          - unique
+          - not_null
+      - name: sensor_id
+        description: Natural key for the sensor device (e.g., SNS-V-001, SNS-T-012).
+        data_tests:
+          - unique
+          - not_null
+      - name: park_id
+        description: Identifier of the park where the sensor is installed. FK to parks.
+        data_tests:
+          - not_null
+      - name: installation_date
+        description: Date the sensor device was installed and activated.
+        data_tests:
+          - not_null
+      - name: sensor_type
+        description: Type of sensor technology deployed at this location.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values:
+                - Vehicle Magnetometer
+                - Infrared Trail Counter
+      - name: location_description
+        description: Descriptive label for the sensor's physical position within the park.
+        data_tests:
+          - not_null
+      - name: status
+        description: Current operational status of the sensor.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values:
+                - Active
+                - Maintenance
+      - name: is_deleted
+        description: Soft-delete flag carried from the source system.
+        data_tests:
+          - not_null
+
+  - name: stg_trafficcount__vehicle_counts
+    description: >
+      Hourly raw vehicle counts from Vehicle Magnetometer sensors at DCR park entrance gates.
+      Each row is one sensor's count for one hour window. At approximately 70,000 rows, this
+      represents roughly one year of hourly readings across 8 vehicle sensors. Anomalous
+      readings are flagged via is_anomaly and should be excluded before applying the 2.7
+      occupancy multiplier to estimate total visitors.
+    columns:
+      - name: hk_vehicle_count
+        description: Surrogate key for the hourly vehicle count record, generated from count_id.
+        data_tests:
+          - unique
+          - not_null
+      - name: count_id
+        description: >
+          Natural key for the hourly record, formatted as VC-{sensor_id}-{YYYYMMDDHH}.
+        data_tests:
+          - unique
+          - not_null
+      - name: sensor_id
+        description: FK to stg_trafficcount__sensor_locations identifying the recording sensor.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_trafficcount__sensor_locations')
+              field: sensor_id
+      - name: timestamp_hour
+        description: Start of the one-hour window during which vehicles were counted.
+        data_tests:
+          - not_null
+      - name: raw_vehicle_count
+        description: Number of vehicles detected by the magnetometer during the hour.
+        data_tests:
+          - not_null
+      - name: is_anomaly
+        description: >
+          True when the reading is flagged as anomalous. Approximately 0.6% of records.
+          Exclude anomalous rows when computing visitor estimates.
+        data_tests:
+          - not_null
+      - name: is_deleted
+        description: Soft-delete flag carried from the source system.
+        data_tests:
+          - not_null
+
+  - name: stg_trafficcount__pedestrian_cyclist_counts
+    description: >
+      Hourly raw pedestrian and cyclist counts from Infrared Trail Counter sensors at DCR
+      park trailheads. Each row captures both pedestrian and cyclist beam-break events for
+      a single sensor and hour window. At approximately 105,000 rows, this covers roughly
+      one year across 12 trail sensors. Separate count columns allow downstream models to
+      report trail user modes independently or in aggregate.
+    columns:
+      - name: hk_pedestrian_cyclist_count
+        description: Surrogate key for the hourly count record, generated from count_id.
+        data_tests:
+          - unique
+          - not_null
+      - name: count_id
+        description: >
+          Natural key for the hourly record, formatted as PC-{sensor_id}-{YYYYMMDDHH}.
+        data_tests:
+          - unique
+          - not_null
+      - name: sensor_id
+        description: FK to stg_trafficcount__sensor_locations identifying the recording sensor.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_trafficcount__sensor_locations')
+              field: sensor_id
+      - name: timestamp_hour
+        description: Start of the one-hour window during which trail users were counted.
+        data_tests:
+          - not_null
+      - name: raw_pedestrian_count
+        description: Number of pedestrian beam-break events recorded during the hour.
+        data_tests:
+          - not_null
+      - name: raw_cyclist_count
+        description: Number of cyclist beam-break events recorded during the hour.
+        data_tests:
+          - not_null
+      - name: is_anomaly
+        description: >
+          True when either count in the reading is flagged as anomalous. Approximately
+          1.3% of records. Exclude anomalous rows from visitation analysis.
+        data_tests:
+          - not_null
+      - name: is_deleted
+        description: Soft-delete flag carried from the source system.
+        data_tests:
+          - not_null
+
+  - name: stg_trafficcount__derived_visitor_metrics
+    description: >
+      Pre-computed daily visitor estimates for vehicle sensor locations. Each row is one
+      sensor's daily total, calculated by summing non-anomalous hourly vehicle counts and
+      multiplying by the recorded vehicle occupancy multiplier (2.7 persons per vehicle).
+      The 7,320 rows span approximately one year across 8 vehicle sensors. The
+      vehicle_multiplier_used column is retained to support auditability of the estimation
+      methodology, as the multiplier could change over time.
+    columns:
+      - name: hk_visitor_metric
+        description: Surrogate key for the daily metric record, generated from metric_id.
+        data_tests:
+          - unique
+          - not_null
+      - name: metric_id
+        description: >
+          Natural key for the daily metric, formatted as DVM-{sensor_id}-{YYYYMMDD}.
+        data_tests:
+          - unique
+          - not_null
+      - name: sensor_id
+        description: FK to stg_trafficcount__sensor_locations for the contributing vehicle sensor.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_trafficcount__sensor_locations')
+              field: sensor_id
+      - name: target_date
+        description: The calendar date for which the daily visitor estimate was computed.
+        data_tests:
+          - not_null
+      - name: estimated_total_visitors
+        description: >
+          Estimated total visitors for the day at this sensor location. Derived as
+          sum(hourly vehicle counts) × vehicle_multiplier_used, excluding anomalous readings.
+        data_tests:
+          - not_null
+      - name: vehicle_multiplier_used
+        description: >
+          The occupancy multiplier applied to raw vehicle counts. DCR standard is 2.7 persons
+          per vehicle. Stored per row to preserve audit trail of the estimation calculation.
+        data_tests:
+          - not_null
+      - name: calculation_timestamp
+        description: >
+          Timestamp when this daily estimate was computed, typically the following day at 02:00.
+        data_tests:
+          - not_null
+      - name: is_deleted
+        description: Soft-delete flag carried from the source system.
+        data_tests:
+          - not_null
