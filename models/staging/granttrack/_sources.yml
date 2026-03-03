@@ -10,6 +10,12 @@ sources:
       across columns, dates appear in at least four different string formats, and
       match contributor lists are stored as comma-separated free text within a
       single cell.
+    meta:
+      freshness_policy: >
+        Freshness thresholds are not configured. Source data is loaded from a
+        static DuckDB file generated at project setup time. In production,
+        this irregularly-updated Excel export source should define thresholds
+        appropriate to the grant reporting cadence (typically quarterly).
     database: granttrack
     schema: main
     tables:

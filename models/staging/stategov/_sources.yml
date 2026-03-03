@@ -10,6 +10,12 @@ sources:
       Monthly batch exports preserve pipe-delimited invoice detail in the GL memo field; the budget
       activity log mixes appropriations, allotments, expenditures, and revenue in a single flat table
       with YYYYMMDD text dates. Vendor TINs and bank routing numbers are masked at source.
+    meta:
+      freshness_policy: >
+        Freshness thresholds are not configured. Source data is loaded from a
+        static DuckDB file generated at project setup time. In production,
+        this nightly mainframe batch source should define warn_after: {count:
+        30, period: hour} and error_after: {count: 48, period: hour}.
     tables:
       - name: general_ledger
         description: >

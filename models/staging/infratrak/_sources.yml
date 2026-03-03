@@ -10,6 +10,12 @@ sources:
       portfolio is absent from this source. Data quality within the onboarded
       regions is high and reflects SaaS platform conventions: consistent typing,
       UUID-style identifiers, and no denormalisation artefacts.
+    meta:
+      freshness_policy: >
+        Freshness thresholds are not configured. Source data is loaded from a
+        static DuckDB file generated at project setup time. In production,
+        this SaaS EAM platform syncs on work order completion cadence and
+        should define warn_after: {count: 48, period: hour}.
     database: infratrak
     schema: main
     tables:

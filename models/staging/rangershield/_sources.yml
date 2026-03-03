@@ -8,6 +8,12 @@ sources:
       complete isolation from all other DCR platforms (air-gapped). Incident locations
       are recorded as narrative text strings only; no geographic coordinates are stored.
       Data is classified Restricted — Statutory due to CJIS requirements.
+    meta:
+      freshness_policy: >
+        Freshness thresholds are not configured. Source data is loaded from a
+        static DuckDB file generated at project setup time. In production,
+        this near-real-time incident system should define warn_after: {count:
+        4, period: hour} and error_after: {count: 12, period: hour}.
     database: rangershield
     schema: main
     tables:

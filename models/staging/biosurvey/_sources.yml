@@ -11,6 +11,12 @@ sources:
       co-locates flora, fauna, and water quality observations in one flat export. This
       structure was common in early MS Access designs before the database was partially
       normalized in later eras.
+    meta:
+      freshness_policy: >
+        Freshness thresholds are not configured. Source data is loaded from a
+        static DuckDB file generated at project setup time. In production,
+        field survey data is uploaded seasonally; warn_after: {count: 90,
+        period: day} would be appropriate.
     database: biosurvey
     schema: main
     tables:

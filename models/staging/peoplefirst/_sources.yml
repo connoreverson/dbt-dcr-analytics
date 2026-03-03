@@ -12,6 +12,12 @@ sources:
       hashed at staging using md5() — the underlying `employee_id` pseudonym is the
       stable identifier used in all downstream models. SSN last-4 is excluded entirely
       from the analytics layer.
+    meta:
+      freshness_policy: >
+        Freshness thresholds are not configured. Source data is loaded from a
+        static DuckDB file generated at project setup time. In production,
+        this daily HR sync should define warn_after: {count: 36, period:
+        hour} and error_after: {count: 48, period: hour}.
     database: peoplefirst
     schema: raw_peoplefirst
     tables:

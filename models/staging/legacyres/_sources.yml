@@ -10,6 +10,11 @@ sources:
       customer IDs are incompatible with current VistaReserve customer IDs.
       Park crosswalk covers only 15 of 50 parks. Contains historical PII and
       partial card masks.
+    meta:
+      freshness_policy: >
+        Freshness thresholds are not applicable. This is a frozen historical
+        archive (2005–2021) loaded from a static DuckDB file. The source data
+        will never update; no freshness check is meaningful.
     database: legacyres
     schema: main
 

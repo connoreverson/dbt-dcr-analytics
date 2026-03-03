@@ -8,6 +8,13 @@ sources:
       entrances and trailheads. Also includes pre-computed daily visitor estimates derived by
       applying the standard 2.7 vehicle occupancy multiplier to raw vehicle counts. No PII is
       present in this dataset — all records are anonymous sensor readings.
+    meta:
+      freshness_policy: >
+        Freshness thresholds are not configured. Source data is loaded from a
+        static DuckDB file generated at project setup time. In production,
+        this hourly IoT telemetry source should define warn_after: {count: 2,
+        period: hour} and error_after: {count: 6, period: hour} — stale
+        sensor data would directly mislead visitation metric calculations.
     database: trafficcount
     schema: raw_trafficcount
     tables:
