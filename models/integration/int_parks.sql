@@ -12,7 +12,7 @@ cdm_geo as (
     select
         {{ dbt_utils.generate_surrogate_key(['geo_park_id']) }} as parks_sk,
         geo_park_id as accountnumber,
-        park_name as name,
+        park_name as name,  -- noqa: RF04
         gis_steward as description,
         total_acres,
         cast(null as varchar) as classification,
@@ -30,7 +30,7 @@ cdm_vista as (
     select
         {{ dbt_utils.generate_surrogate_key(['park_id']) }} as parks_sk,
         park_id as accountnumber,
-        park_name as name,
+        park_name as name,  -- noqa: RF04
         null as description,
         cast(null as decimal(10, 2)) as total_acres,
         classification,

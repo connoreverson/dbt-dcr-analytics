@@ -10,16 +10,21 @@ relationships as (
 ),
 
 staging as (
-    select unique_id, name as resource_name
+    select
+        unique_id,
+        name as resource_name
     from nodes
     where resource_type = 'model' and starts_with(name, 'stg_')
 ),
 
 violating_staging as (
-    select distinct s.unique_id, s.resource_name
-    from staging s
-    inner join relationships r on s.unique_id = r.child
+    select
+        s.unique_id,
+        s.resource_name
+    from staging as s
+    inner join relationships as r on s.unique_id = r.child
     where not (contains(r.parent, 'source.') or (contains(r.parent, 'model.') and contains(r.parent, '.base_')))
+    group by s.unique_id, s.resource_name
 )
 
 select * from violating_staging

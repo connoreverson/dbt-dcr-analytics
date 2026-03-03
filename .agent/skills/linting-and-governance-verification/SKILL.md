@@ -24,11 +24,23 @@ There are two verification paths depending on the scope of work:
 
 Always run `fix` before `lint`. Most violations are auto-remediable; `lint` after `fix` shows only the residuals you must address manually.
 
-```bash
-# Step 1: auto-fix what sqlfluff can
-sqlfluff fix models/ --dialect duckdb --templater dbt
+**Scope to the layer under review.** Phase-gate linting must target only the layer being gated — not `models/` (the whole project). Using `models/` during a staging or integration phase gate surfaces pre-existing violations from other layers and creates noise that makes it unclear whether the current phase is actually clean.
 
-# Step 2: see only unfixable residuals
+```bash
+# Phase 1 gate (staging)
+sqlfluff fix models/staging/ --dialect duckdb --templater dbt
+sqlfluff lint models/staging/ --dialect duckdb --templater dbt
+
+# Phase 2 gate (integration)
+sqlfluff fix models/integration/ --dialect duckdb --templater dbt
+sqlfluff lint models/integration/ --dialect duckdb --templater dbt
+
+# Phase 3 gate (marts)
+sqlfluff fix models/marts/ --dialect duckdb --templater dbt
+sqlfluff lint models/marts/ --dialect duckdb --templater dbt
+
+# Phase 4 final sweep only — use full project scope
+sqlfluff fix models/ --dialect duckdb --templater dbt
 sqlfluff lint models/ --dialect duckdb --templater dbt
 ```
 
