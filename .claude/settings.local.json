@@ -20,7 +20,10 @@
       "Bash(dbt debug:*)",
       "Bash(dbt ls:*)",
       "Bash(dbt run-operation:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(source:*)",
+      "Bash(python -c:*)",
+      "Bash(python scripts/inspect_source.py:*)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
