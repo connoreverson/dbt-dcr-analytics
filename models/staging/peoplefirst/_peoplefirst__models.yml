@@ -1,0 +1,356 @@
+version: 2
+
+models:
+  - name: stg_peoplefirst__employees
+    description: >
+      Staged permanent employee roster for DCR. One row per employee across all
+      regions and positions. PII fields (names, email, phone) are replaced with
+      md5 hashes at this layer; ssn_last4 is excluded entirely. The employee_id
+      pseudonym is the stable identifier used by all downstream integration models.
+      Employees without a separation_date are currently active (607 of 687).
+    columns:
+      - name: hk_employee
+        description: Surrogate hash key derived from employee_id.
+        tests:
+          - unique
+          - not_null
+      - name: employee_id
+        description: Pseudonymous identifier for the employee (EMP-{uuid8}). Business key used across HR tables.
+        tests:
+          - unique
+          - not_null
+      - name: first_name_hash
+        description: md5 hash of the employee's given name. PII field — raw name is excluded from the analytics layer.
+        tests:
+          - not_null
+      - name: last_name_hash
+        description: md5 hash of the employee's surname. PII field — raw name is excluded from the analytics layer.
+        tests:
+          - not_null
+      - name: email_hash
+        description: md5 hash of the employee's work email address. PII field — raw value excluded from the analytics layer.
+        tests:
+          - not_null
+      - name: phone_hash
+        description: md5 hash of the employee's work phone number. PII field — raw value excluded from the analytics layer.
+        tests:
+          - not_null
+      - name: hire_date
+        description: Date the employee began employment with DCR.
+        tests:
+          - not_null
+      - name: separation_date
+        description: Date the employee left DCR. Null for active employees (607 of 687 rows).
+      - name: position_id
+        description: Current position held by the employee, references stg_peoplefirst__positions.position_id.
+        tests:
+          - not_null
+      - name: is_deleted
+        description: True for the 7 records soft-deleted in the source system.
+        tests:
+          - not_null
+
+  - name: stg_peoplefirst__positions
+    description: >
+      Staged position catalog representing 800 authorized roles across DCR. A position
+      is the funded slot; an employee is the person filling it. Positions span 10 job
+      classifications across General Fund, Enterprise Fund, and Grant Funded sources.
+      Inactive positions (is_active = False) are retained for historical workforce
+      planning analysis.
+    columns:
+      - name: hk_position
+        description: Surrogate hash key derived from position_id.
+        tests:
+          - unique
+          - not_null
+      - name: position_id
+        description: Primary identifier for the position (POS-{sequence}).
+        tests:
+          - unique
+          - not_null
+      - name: job_classification
+        description: Job classification title for the position.
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - Administrative Assistant
+                - Biologist
+                - GIS Analyst
+                - Maintenance Worker I
+                - Maintenance Worker II
+                - Maintenance Worker III
+                - Park Manager
+                - Park Ranger I
+                - Park Ranger II
+                - State Park Peace Officer
+      - name: pay_grade
+        description: Pay grade bracket (GR-{nn} format).
+        tests:
+          - not_null
+      - name: org_unit_id
+        description: Organizational unit this position belongs to.
+        tests:
+          - not_null
+      - name: funding_source
+        description: Funding mechanism for the position.
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - Enterprise Fund
+                - General Fund
+                - Grant Funded
+      - name: is_active
+        description: True if the position is currently funded. False for 36 defunded or abolished positions.
+        tests:
+          - not_null
+      - name: is_deleted
+        description: True for 16 records soft-deleted in the source system.
+        tests:
+          - not_null
+
+  - name: stg_peoplefirst__org_units
+    description: >
+      Staged organizational unit reference table with 20 units covering DCR headquarters
+      and four regional divisions. Org units are the structural nodes in the employee
+      hierarchy — each position and each seasonal hire belongs to one org unit. Region 1
+      contains headquarters units; regions 2–4 are field regions.
+    columns:
+      - name: hk_org_unit
+        description: Surrogate hash key derived from org_unit_id.
+        tests:
+          - unique
+          - not_null
+      - name: org_unit_id
+        description: Short code identifier for the organizational unit (e.g., HQ-EXEC, R1-ADMIN).
+        tests:
+          - unique
+          - not_null
+      - name: org_unit_name
+        description: Full descriptive name of the organizational unit.
+        tests:
+          - unique
+          - not_null
+      - name: region_id
+        description: Integer region identifier (1–4). Region 1 covers headquarters units.
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4]
+      - name: is_deleted
+        description: Soft-delete flag. No deleted org unit records in the current extract.
+        tests:
+          - not_null
+
+  - name: stg_peoplefirst__payroll
+    description: >
+      Staged bi-weekly payroll disbursement records for all permanent employees.
+      16,488 rows covering 24 pay periods (approximately one calendar year). Each row
+      is the payroll record for one employee in one pay period, recording gross pay,
+      deductions, taxes withheld, and net pay. Financial amounts in this table are
+      sensitive but not PII; downstream access should be restricted to HR and finance
+      roles.
+    columns:
+      - name: hk_payroll
+        description: Surrogate hash key derived from payroll_id.
+        tests:
+          - unique
+          - not_null
+      - name: payroll_id
+        description: "Composite identifier in the format PAY-{employee_id}-{pay_period_end_YYYYMMDD}."
+        tests:
+          - unique
+          - not_null
+      - name: employee_id
+        description: Employee receiving this disbursement, references stg_peoplefirst__employees.employee_id.
+        tests:
+          - not_null
+      - name: pay_period_start
+        description: First date of the pay period.
+        tests:
+          - not_null
+      - name: pay_period_end
+        description: Last date of the pay period.
+        tests:
+          - not_null
+      - name: gross_pay
+        description: Total earnings before deductions and taxes for the pay period.
+        tests:
+          - not_null
+      - name: deductions
+        description: Pre-tax and post-tax benefit deductions applied during the pay period.
+        tests:
+          - not_null
+      - name: taxes_withheld
+        description: Federal, state, and local taxes withheld during the pay period.
+        tests:
+          - not_null
+      - name: net_pay
+        description: Take-home pay after all deductions and taxes.
+        tests:
+          - not_null
+      - name: is_deleted
+        description: Soft-delete flag. No deleted payroll records observed in the current extract.
+        tests:
+          - not_null
+
+  - name: stg_peoplefirst__benefits
+    description: >
+      Staged benefits enrollment and accrued leave hours for permanent employees.
+      One row per employee (687 total). Covers health plan enrollment, retirement
+      tier classification, and aggregate leave hour balances as of the last payroll
+      cycle. The leave_balances staging model provides a more granular point-in-time
+      view of leave by type.
+    columns:
+      - name: hk_benefit
+        description: Surrogate hash key derived from employee_id.
+        tests:
+          - unique
+          - not_null
+      - name: employee_id
+        description: Employee whose benefits are recorded. One row per employee.
+        tests:
+          - unique
+          - not_null
+      - name: health_plan_type
+        description: Current health insurance plan enrollment.
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - HMO Family
+                - HMO Individual
+                - PPO Family
+                - PPO Individual
+                - Waived
+      - name: retirement_tier
+        description: State retirement system tier assigned at hire.
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - Tier 1
+                - Tier 2
+                - Tier 3
+      - name: annual_leave_hours
+        description: Accrued annual leave hours as of the last payroll cycle.
+        tests:
+          - not_null
+      - name: sick_leave_hours
+        description: Accrued sick leave hours as of the last payroll cycle.
+        tests:
+          - not_null
+      - name: comp_time_hours
+        description: Accrued compensatory time hours as of the last payroll cycle.
+        tests:
+          - not_null
+      - name: is_deleted
+        description: Soft-delete flag. No deleted benefit records in the current extract.
+        tests:
+          - not_null
+
+  - name: stg_peoplefirst__leave_balances
+    description: >
+      Point-in-time leave balance snapshot by employee and leave type, as of
+      2026-03-02. 2,207 rows across five leave types: Annual, Sick, Compensatory,
+      Military, and Medical. Annual, Sick, and Compensatory balances are present for
+      most active employees; Military and Medical balances appear only for employees
+      with qualifying events. This is the authoritative source for per-type leave
+      analytics and distinguishes it from the aggregate totals in the benefits model.
+    columns:
+      - name: hk_leave_balance
+        description: Surrogate hash key derived from leave_balance_id.
+        tests:
+          - unique
+          - not_null
+      - name: leave_balance_id
+        description: "Composite identifier in the format LB-{employee_id}-{LEAVE_TYPE_UPPER}."
+        tests:
+          - unique
+          - not_null
+      - name: employee_id
+        description: Employee whose leave balance is recorded, references stg_peoplefirst__employees.employee_id.
+        tests:
+          - not_null
+      - name: leave_type
+        description: Type of leave for this balance row.
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - Annual
+                - Compensatory
+                - Medical
+                - Military
+                - Sick
+      - name: balance_amount
+        description: Leave balance in hours as of the as_of_date.
+        tests:
+          - not_null
+      - name: as_of_date
+        description: Snapshot date for this balance record. All rows in the current extract are dated 2026-03-02.
+        tests:
+          - not_null
+      - name: is_deleted
+        description: Soft-delete flag. No deleted leave balance records in the current extract.
+        tests:
+          - not_null
+
+  - name: stg_peoplefirst__seasonal_workforce
+    description: >
+      Staged seasonal employee records for 600 hires across four park seasons
+      (2021–2024). Seasonal staff are contracted for peak operations (April–October)
+      and are tracked in a separate table from permanent employees. All records include
+      a separation date. Name fields are hashed at staging; the seasonal_emp_id is the
+      stable identifier. The system_onboard_date is typically 1–3 weeks after
+      actual_start_date, reflecting the administrative lag in HR system entry.
+    columns:
+      - name: hk_seasonal_employee
+        description: Surrogate hash key derived from seasonal_emp_id.
+        tests:
+          - unique
+          - not_null
+      - name: seasonal_emp_id
+        description: Identifier for the seasonal employee (SEAS-{uuid8}).
+        tests:
+          - unique
+          - not_null
+      - name: first_name_hash
+        description: md5 hash of the seasonal employee's given name. PII field — raw name excluded from the analytics layer.
+        tests:
+          - not_null
+      - name: last_name_hash
+        description: md5 hash of the seasonal employee's surname. PII field — raw name excluded from the analytics layer.
+        tests:
+          - not_null
+      - name: org_unit_id
+        description: Organizational unit the seasonal employee worked in, references stg_peoplefirst__org_units.org_unit_id.
+        tests:
+          - not_null
+      - name: season_year
+        description: Calendar year of the seasonal assignment.
+        tests:
+          - not_null
+          - accepted_values:
+              values: [2021, 2022, 2023, 2024]
+      - name: actual_start_date
+        description: Date the seasonal employee actually began work.
+        tests:
+          - not_null
+      - name: system_onboard_date
+        description: Date the employee record was created in PeopleFirst, typically 1–3 weeks after actual_start_date.
+        tests:
+          - not_null
+      - name: separation_date
+        description: Date the seasonal contract ended. Present for all 600 records.
+        tests:
+          - not_null
+      - name: hourly_rate
+        description: Contracted hourly wage for the seasonal assignment.
+        tests:
+          - not_null
+      - name: is_deleted
+        description: True for 29 records representing cancelled contracts or data entry corrections.
+        tests:
+          - not_null

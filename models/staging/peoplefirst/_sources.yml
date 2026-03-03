@@ -1,0 +1,181 @@
+version: 2
+
+sources:
+  - name: peoplefirst
+    description: >
+      PeopleFirst HR — DCR's Human Capital Management system covering permanent
+      employees, seasonal workforce, positions, organizational structure, benefits,
+      payroll records, and leave balances. The system maintains two schemas: `main`
+      contains a simplified read replica used for day-to-day reporting; `raw_peoplefirst`
+      contains the full extract with complete column sets and system metadata. Staging
+      reads exclusively from `raw_peoplefirst`. PII fields (names, email, phone) are
+      hashed at staging using md5() — the underlying `employee_id` pseudonym is the
+      stable identifier used in all downstream models. SSN last-4 is excluded entirely
+      from the analytics layer.
+    database: peoplefirst
+    schema: raw_peoplefirst
+    tables:
+      - name: employees
+        description: >
+          Permanent employee roster for DCR. One row per employee. Covers 687 staff
+          across all regions and functional units. Employees without a separation_date
+          (88% of rows) are active; separated employees retain their record for
+          historical analysis. PII columns (first_name, last_name, email, phone,
+          ssn_last4) are excluded or hashed at staging.
+        columns:
+          - name: employee_id
+            description: Pseudonymous identifier for the employee (EMP-{uuid8} format). Stable across system updates.
+          - name: first_name
+            description: Employee given name. PII — hashed to first_name_hash at staging.
+          - name: last_name
+            description: Employee surname. PII — hashed to last_name_hash at staging.
+          - name: ssn_last4
+            description: Last four digits of Social Security Number. PII — excluded from analytics layer at staging.
+          - name: email
+            description: Work email address. PII — hashed to email_hash at staging.
+          - name: phone
+            description: Work phone number. PII — hashed to phone_hash at staging.
+          - name: hire_date
+            description: Date the employee began employment with DCR.
+          - name: separation_date
+            description: Date the employee separated from DCR. Null for active employees (607 of 687 rows).
+          - name: position_id
+            description: Current position held by the employee, references positions.position_id.
+          - name: _is_deleted
+            description: Soft-delete flag from the source system. True for 7 records marked as logically deleted.
+
+      - name: positions
+        description: >
+          Position catalog for DCR, representing 800 funded and unfilled roles across
+          all organizational units. A position is the authorized slot; an employee is
+          the person filling it. Positions with is_active = False (36 of 800) have been
+          defunded or abolished but are retained for historical reference.
+        columns:
+          - name: position_id
+            description: Primary identifier for the position (POS-{sequence} format).
+          - name: job_classification
+            description: "Job classification title. Values: Administrative Assistant, Biologist, GIS Analyst, Maintenance Worker I, Maintenance Worker II, Maintenance Worker III, Park Manager, Park Ranger I, Park Ranger II, State Park Peace Officer."
+          - name: pay_grade
+            description: Pay grade bracket for the position (GR-{nn} format).
+          - name: org_unit_id
+            description: Organizational unit this position belongs to, references org_units.org_unit_id.
+          - name: funding_source
+            description: "Funding mechanism for the position. Values: Enterprise Fund, General Fund, Grant Funded."
+          - name: is_active
+            description: True if the position is currently funded and active. False for defunded or abolished positions (36 of 800).
+          - name: _is_deleted
+            description: Soft-delete flag. True for 16 records marked as logically deleted in the source.
+
+      - name: org_units
+        description: >
+          Organizational unit reference table with 20 units spanning DCR headquarters
+          functions and four regional divisions. Region IDs 1-4 correspond to the four
+          DCR geographic regions. Each org unit maps to a single region.
+        columns:
+          - name: org_unit_id
+            description: Short code identifier for the organizational unit (e.g., HQ-EXEC, R1-ADMIN).
+          - name: org_unit_name
+            description: Full descriptive name of the organizational unit.
+          - name: region_id
+            description: Integer region identifier (1–4). Region 1 includes headquarters units.
+
+      - name: payroll
+        description: >
+          Bi-weekly payroll disbursement records covering all permanent employees.
+          16,488 rows spanning 24 pay periods. Each row represents one employee's
+          gross pay, deductions, tax withholdings, and net pay for a single pay period.
+          Financial amounts are not PII but are considered sensitive — access should be
+          limited to HR and finance roles in production.
+        columns:
+          - name: payroll_id
+            description: Composite identifier in the format PAY-{employee_id}-{pay_period_end_YYYYMMDD}.
+          - name: employee_id
+            description: Employee receiving this payroll disbursement, references employees.employee_id.
+          - name: pay_period_start
+            description: First date of the pay period.
+          - name: pay_period_end
+            description: Last date of the pay period.
+          - name: gross_pay
+            description: Total earnings before deductions and taxes for the pay period.
+          - name: deductions
+            description: Pre-tax and post-tax benefit deductions applied during the pay period.
+          - name: taxes_withheld
+            description: Federal, state, and local taxes withheld during the pay period.
+          - name: net_pay
+            description: Take-home pay after all deductions and taxes.
+          - name: _is_deleted
+            description: Soft-delete flag. No deleted payroll records observed in current extract.
+
+      - name: benefits
+        description: >
+          Current benefits enrollment and accrued leave hours for each permanent
+          employee. One row per employee (687 total). The leave hour balances in this
+          table reflect the HR system's aggregate view; the leave_balances table
+          provides the same data broken out by leave type at a point-in-time snapshot.
+        columns:
+          - name: employee_id
+            description: Employee identifier, references employees.employee_id. One row per employee.
+          - name: health_plan_type
+            description: "Current health insurance enrollment. Values: HMO Family, HMO Individual, PPO Family, PPO Individual, Waived."
+          - name: retirement_tier
+            description: "State retirement system tier. Values: Tier 1, Tier 2, Tier 3."
+          - name: annual_leave_hours
+            description: Accrued annual leave hours as of the last payroll cycle.
+          - name: sick_leave_hours
+            description: Accrued sick leave hours as of the last payroll cycle.
+          - name: comp_time_hours
+            description: Accrued compensatory time hours as of the last payroll cycle.
+          - name: _is_deleted
+            description: Soft-delete flag. No deleted benefit records observed in current extract.
+
+      - name: leave_balances
+        description: >
+          Point-in-time snapshot of employee leave balances by leave type, as of
+          2026-03-02. 2,207 rows covering five leave types across active employees.
+          Employees may have balances for Annual, Sick, and Compensatory leave;
+          Military and Medical leave balances are present only for employees with
+          qualifying events (roughly 60 employees each). This table is more granular
+          than the benefits table and is the authoritative source for leave analytics.
+        columns:
+          - name: leave_balance_id
+            description: "Composite identifier in the format LB-{employee_id}-{LEAVE_TYPE_UPPER}."
+          - name: employee_id
+            description: Employee whose leave balance is recorded, references employees.employee_id.
+          - name: leave_type
+            description: "Type of leave. Values: Annual, Compensatory, Medical, Military, Sick."
+          - name: balance_amount
+            description: Leave balance in hours as of the as_of_date.
+          - name: as_of_date
+            description: Snapshot date for this balance record. All rows in the current extract are dated 2026-03-02.
+          - name: _is_deleted
+            description: Soft-delete flag. No deleted balance records observed in current extract.
+
+      - name: seasonal_workforce
+        description: >
+          Seasonal employee records covering 600 seasonal hires across four seasons
+          (2021–2024). Seasonal employees are contracted annually for park operations
+          during peak visitation periods (April–October). They are tracked separately
+          from permanent staff and are not in the employees table. All seasonal records
+          include separation dates (end of season). 29 records are soft-deleted,
+          representing cancelled contracts or data entry corrections.
+        columns:
+          - name: seasonal_emp_id
+            description: Identifier for the seasonal employee (SEAS-{uuid8} format).
+          - name: first_name
+            description: Seasonal employee given name. PII — hashed to first_name_hash at staging.
+          - name: last_name
+            description: Seasonal employee surname. PII — hashed to last_name_hash at staging.
+          - name: org_unit_id
+            description: Organizational unit the seasonal employee worked in, references org_units.org_unit_id.
+          - name: season_year
+            description: Calendar year of the seasonal assignment (2021–2024).
+          - name: actual_start_date
+            description: Date the seasonal employee actually began work (may differ from system_onboard_date).
+          - name: system_onboard_date
+            description: Date the employee was entered into PeopleFirst, typically 1–3 weeks after actual_start_date.
+          - name: separation_date
+            description: Date the seasonal employee's contract ended. All seasonal employees have a separation date.
+          - name: hourly_rate
+            description: Contracted hourly wage rate for the seasonal assignment.
+          - name: _is_deleted
+            description: Soft-delete flag. True for 29 records representing cancelled contracts or corrections.

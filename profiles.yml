@@ -22,3 +22,5 @@ dcr_analytics:
           alias: rangershield
         - path: 'source_data/duckdb/dcr_nrm_01_biosurvey.duckdb'
           alias: biosurvey
+        - path: 'source_data/duckdb/dcr_hcm_01_peoplefirst.duckdb'
+          alias: peoplefirst
