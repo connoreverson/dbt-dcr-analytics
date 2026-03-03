@@ -4,6 +4,9 @@ int_parks,Park,stg_geoparks__parks_master,name,park_name
 int_parks,Park,stg_geoparks__parks_master,description,gis_steward
 int_parks,Park,stg_vistareserve__parks,accountnumber,park_id
 int_parks,Park,stg_vistareserve__parks,name,park_name
+int_parks,Park,stg_infratrak__parks,accountnumber,park_id
+int_parks,Park,stg_infratrak__parks,name,park_name
+int_parks,Park,stg_infratrak__parks,infratrak_park_id,park_id
 int_contacts,Contact,stg_vistareserve__customer_profiles,contact_id,customer_id
 int_contacts,Contact,stg_vistareserve__customer_profiles,first_name,first_name
 int_contacts,Contact,stg_vistareserve__customer_profiles,last_name,last_name

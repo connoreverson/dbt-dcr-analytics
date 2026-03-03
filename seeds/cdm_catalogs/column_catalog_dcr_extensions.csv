@@ -12,3 +12,4 @@ Park,total_acres,numeric,false,false,Total geographic area of the park in acres.
 Park,classification,varchar,false,false,The park's administrative classification.
 Park,region_id,varchar,false,false,The numeric identifier of the organizational region to which this park belongs.
 Park,source_system,varchar,false,false,The authoritative operational system code from which this park record originates.
+Park,infratrak_park_id,integer,false,false,The integer park identifier from InfraTrak (DCR-AST-01). Null for parks not yet onboarded (Regions 3 and 4).

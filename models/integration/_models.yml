@@ -3,9 +3,11 @@ version: 2
 models:
   - name: int_parks
     description: >
-      Integration model harmonizing park records from GeoParks (DCR-GEO-01) and VistaReserve
-      (DCR-REV-01) into the custom CDM Park entity. Grain: one row per unique park, deduplicated
-      via fuzzy name matching with GeoParks designated as the system of record.
+      Integration model harmonizing park records from GeoParks (DCR-GEO-01), VistaReserve
+      (DCR-REV-01), and InfraTrak (DCR-AST-01) into the custom CDM Park entity. Grain: one row
+      per unique park, deduplicated via fuzzy name matching with GeoParks as the system of record.
+      InfraTrak coverage is limited to Regions 1 and 2 (28 of 50 parks); the infratrak_park_id
+      column is preserved to support downstream joins to work orders and condition assessments.
     meta:
       testing_rationale: >
         Tests protect against duplicate park accounts and ensure the primary key is never null.
@@ -42,9 +44,14 @@ models:
           Total geographic area of the park in acres. Sourced from GeoParks where available;
           populated from VistaReserve if GeoParks has no entry for this park.
       - name: classification
-        description: The park's administrative classification (e.g., State Park, Recreation Area). Sourced from VistaReserve.
+        description: The park's administrative classification (e.g., State Park, Recreation Area). Sourced from VistaReserve or InfraTrak.
       - name: region_id
-        description: The numeric identifier of the organizational region to which this park belongs. Sourced from VistaReserve.
+        description: The numeric identifier of the organizational region to which this park belongs. Sourced from VistaReserve or InfraTrak.
+      - name: infratrak_park_id
+        description: >
+          The integer park identifier from InfraTrak (DCR-AST-01), preserved after deduplication to
+          enable downstream joins to work order and condition assessment integration models. Null for
+          parks not yet onboarded into InfraTrak (Regions 3 and 4).
 
   - name: int_contacts
     description: >

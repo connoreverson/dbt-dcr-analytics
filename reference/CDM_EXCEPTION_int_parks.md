@@ -13,7 +13,7 @@
 
 **Entity name:** Park (a named, bounded unit of public land managed by DCR)
 **Grain:** One row per park unit (expected: 50 rows)
-**Source systems:** GeoParks (parks_master), VistaReserve (parks)
+**Source systems:** GeoParks (parks_master), VistaReserve (parks), InfraTrak (parks — Regions 1 & 2 only, 28 of 50 parks)
 **Business definition:** A state park is a geographically bounded area of public land with a legal name, physical location, measurable acreage, an operational classification (state park, state reservation, urban park, etc.), and a regional administrative assignment. Parks are the fundamental organizational unit for revenue reporting, visitor tracking, and resource allocation at DCR.
 
 ---
@@ -84,8 +84,8 @@ The Microsoft CDM was designed for commercial CRM, healthcare, and financial ser
 | Column | Data Type | Source | CDM Lineage | Role |
 |---|---|---|---|---|
 | `parks_sk` | `VARCHAR` | Generated | Surrogate key (SQL-INT-06) | PK |
-| `accountnumber` | `VARCHAR` | GeoParks `geo_park_id` / VistaReserve `park_id` | Modeled after `Account.accountNumber` — retained as a cross-system business key identifier | BK |
-| `name` | `VARCHAR` | Both sources: `park_name` | Standard CDM attribute (`name` appears in Account, Contact, and many entities as a display name) | Descriptive |
+| `accountnumber` | `VARCHAR` | GeoParks `geo_park_id` / VistaReserve `park_id` / InfraTrak `park_id` | Modeled after `Account.accountNumber` — retained as a cross-system business key identifier | BK |
+| `name` | `VARCHAR` | All three sources: `park_name` | Standard CDM attribute (`name` appears in Account, Contact, and many entities as a display name) | Descriptive |
 | `description` | `VARCHAR` | GeoParks: `gis_steward` | Standard CDM attribute | Descriptive |
 | `address1_city` | `VARCHAR` | GeoParks (future) | Borrowed from `Account.addressCity` address pattern | Location |
 | `address1_stateorprovince` | `VARCHAR` | GeoParks (future) | Borrowed from `Account.addressStateOrProvince` | Location |
@@ -93,8 +93,9 @@ The Microsoft CDM was designed for commercial CRM, healthcare, and financial ser
 | `address1_latitude` | `DECIMAL(10,6)` | GeoParks (future) | Borrowed from `Account.addressLatitude` | Location |
 | `address1_longitude` | `DECIMAL(10,6)` | GeoParks (future) | Borrowed from `Account.addressLongitude` | Location |
 | `total_acres` | `DECIMAL(10,2)` | GeoParks: `total_acres` | **Custom extension** — no CDM equivalent | Domain-specific |
-| `classification` | `VARCHAR` | VistaReserve: `classification` | **Custom extension** — park operational type (state park, state reservation, urban park) | Domain-specific |
-| `region_id` | `INTEGER` | VistaReserve: `region_id` | **Custom extension** — DCR administrative region assignment | Domain-specific |
+| `classification` | `VARCHAR` | VistaReserve: `classification` / InfraTrak: `classification` | **Custom extension** — park operational type (state park, state reservation, urban park) | Domain-specific |
+| `region_id` | `INTEGER` | VistaReserve: `region_id` / InfraTrak: `region_id` | **Custom extension** — DCR administrative region assignment | Domain-specific |
+| `infratrak_park_id` | `INTEGER` | InfraTrak: `park_id` | **Custom extension** — InfraTrak-native park identifier, preserved post-deduplication for downstream joins to work orders and condition assessments. Null for parks in Regions 3–4 not yet onboarded into InfraTrak. | Domain-specific |
 | `source_system` | `VARCHAR` | Generated | Infrastructure column — identifies the winning source system after deduplication | Audit |
 
 ### 4c. Normalization and Relationships
