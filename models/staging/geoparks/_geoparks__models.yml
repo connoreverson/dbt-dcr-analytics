@@ -1,6 +1,63 @@
 version: 2
 
 models:
+  - name: stg_geoparks__infrastructure_features
+    description: >
+      GeoParks GIS layer cataloging all discrete physical infrastructure elements within DCR park
+      boundaries — trails, roads, buildings, bridges, boat ramps, campsites, utility corridors,
+      and parking areas. Geometry is preserved as WKT. Positional accuracy varies by feature
+      class; utility corridors carry a documented 5+ meter horizontal error. This layer served
+      as the baseline for InfraTrak's initial asset registry load in 2020 but has not been
+      synchronized since. Grain: one row per GIS feature (feature_id).
+    columns:
+      - name: hk_infrastructure_features
+        description: Surrogate hash key derived from feature_id.
+        tests:
+          - unique
+          - not_null
+      - name: feature_id
+        description: Primary key identifying a physical infrastructure element in GeoParks.
+        tests:
+          - unique
+          - not_null
+      - name: geo_park_id
+        description: >
+          Foreign key to stg_geoparks__parks_master. Identifies the park unit that contains
+          this feature.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_geoparks__parks_master')
+              field: geo_park_id
+      - name: feature_class
+        description: >
+          Broad classification of the infrastructure type. Enum values: Trail, Road, Building,
+          Bridge, Campsite, Boat Ramp, Parking Area, Utility Corridor.
+        tests:
+          - not_null
+      - name: sub_type
+        description: Secondary classification refining feature_class (e.g., Gravel for trails, Telecom for corridors).
+      - name: status
+        description: Operational lifecycle status of the feature — Active or Inactive/Abandoned.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Active', 'Inactive/Abandoned']
+      - name: installation_year
+        description: Year the feature was originally constructed or installed per GIS records.
+      - name: geometry_wkt
+        description: >
+          Spatial geometry in Well-Known Text format. Linear features (trails, roads, corridors)
+          are LINESTRING; point structures may be POINT or POLYGON.
+        tests:
+          - not_null
+      - name: positional_accuracy_meters
+        description: >
+          Estimated horizontal positional accuracy in meters. Utility corridors carry a
+          documented 5+ meter error; trail and building geometries are generally sub-meter.
+      - name: last_updated
+        description: Date the GIS team last reviewed or updated this feature's record.
+
   - name: stg_geoparks__parks_master
     description: >
       The authoritative, legal definition of all 50 state park boundaries managed in the Enterprise GIS.

@@ -40,3 +40,20 @@ FinancialTransaction,performance_end,date,false,false,The end date of the award 
 FinancialTransaction,award_fiscal_year_budget,numeric,false,false,GrantTrack budgeted amount for this award in the GL entry fiscal year. Null for non-grant entries.
 FinancialTransaction,award_fiscal_year_actual,numeric,false,false,GrantTrack recorded actual spending for this award in the GL entry fiscal year. Null for non-grant entries.
 FinancialTransaction,source_system,varchar,false,false,The authoritative operational system code for this record (DCR-FIN-01).
+PhysicalAsset,physical_assets_sk,varchar,true,false,The canonical integration surrogate key for the physical asset record. Unique within each source system; not globally unique across InfraTrak and GeoParks.
+PhysicalAsset,asset_id,varchar,false,false,The native identifier from the originating source system. AST-{park}-{seq} format for InfraTrak; INF-{uuid} format for GeoParks.
+PhysicalAsset,parks_sk,varchar,false,true,Foreign key to int_parks. Identifies the park unit that owns or contains this asset.
+PhysicalAsset,feature_class,varchar,false,false,Primary classification of the asset type. InfraTrak values include Trail Road Bridge Dam Campsite Cabin Restroom. GeoParks values include Trail Road Building Bridge Campsite Boat Ramp Parking Area Utility Corridor.
+PhysicalAsset,sub_type,varchar,false,false,Secondary classification refining feature_class. Populated for GeoParks records (e.g. Gravel for trails Telecom for corridors). Null for InfraTrak records.
+PhysicalAsset,description,varchar,false,false,Free-text description of the asset from InfraTrak. Null for GeoParks records.
+PhysicalAsset,installation_year,integer,false,false,Year the asset was originally constructed or installed.
+PhysicalAsset,replacement_value,numeric,false,false,Estimated full replacement cost in USD from InfraTrak. Null for GeoParks records.
+PhysicalAsset,expected_lifespan_years,integer,false,false,Design lifespan in years from InfraTrak. Used for depreciation and capital renewal forecasting. Null for GeoParks records.
+PhysicalAsset,point_latitude,numeric,false,false,WGS84 decimal latitude of the asset point location from InfraTrak. Null for GeoParks records which carry geometry_wkt.
+PhysicalAsset,point_longitude,numeric,false,false,WGS84 decimal longitude of the asset point location from InfraTrak. Null for GeoParks records which carry geometry_wkt.
+PhysicalAsset,geometry_wkt,varchar,false,false,Spatial geometry in Well-Known Text format from GeoParks. Supports LINESTRING and POLYGON for linear and area features. Null for InfraTrak records which carry point coordinates.
+PhysicalAsset,positional_accuracy_meters,numeric,false,false,Estimated horizontal positional accuracy in meters from GeoParks. Utility corridors carry a documented 5+ meter error. Null for InfraTrak records.
+PhysicalAsset,last_updated,date,false,false,Date the GIS team last reviewed or updated this feature in GeoParks. Null for InfraTrak records.
+PhysicalAsset,status,varchar,false,false,Operational lifecycle status from GeoParks — Active or Inactive/Abandoned. Null for InfraTrak records.
+PhysicalAsset,is_visible_in_survey,boolean,false,false,EAM survey scope flag from InfraTrak. True if this asset is included in condition assessment cycles. Null for GeoParks records.
+PhysicalAsset,source_system,varchar,false,false,Source system code identifying the originating system. DCR-AST-01 for InfraTrak Lifecycle; DCR-GEO-01 for GeoParks Enterprise.

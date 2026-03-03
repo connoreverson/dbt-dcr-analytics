@@ -1,6 +1,129 @@
 version: 2
 
 models:
+  - name: int_physical_assets
+    description: >
+      Integration model combining physical infrastructure records from InfraTrak Lifecycle
+      (DCR-AST-01) and GeoParks Enterprise (DCR-GEO-01) into the custom CDM PhysicalAsset entity.
+      Grain: one row per physical asset or GIS infrastructure feature. Records from both sources
+      are preserved as distinct rows — the VistaReserve cross-system crosswalk that nominally
+      linked InfraTrak asset tags to GeoParks feature IDs uses legacy identifier formats that do
+      not match either system's current records. InfraTrak contributes EAM lifecycle data (replacement value,
+      lifespan, condition assessment linkage) for Regions 1 and 2 (2,602 records). GeoParks
+      contributes GIS geometry (WKT) and classification for all 50 parks (10,913 records). Both
+      populations carry parks_sk to support park-level aggregation in downstream marts.
+    meta:
+      cdm_entity: PhysicalAsset
+      cdm_entity_rationale: >
+        See reference/CDM_EXCEPTION_int_physical_assets.md. No standard CDM entity covers
+        government physical infrastructure with lifecycle, geometry, and condition attributes.
+        A custom PhysicalAsset entity extending Asset.FunctionalLocation is documented there.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - source_system
+            - asset_id
+    columns:
+      - name: physical_assets_sk
+        description: >
+          Canonical integration surrogate key for this physical asset record. Generated from
+          the source-system native identifier (asset_tag for InfraTrak; feature_id for GeoParks).
+          Scoped to a single source system — use the combination of source_system and asset_id
+          to identify a record across both systems.
+        tests:
+          - not_null
+      - name: asset_id
+        description: >
+          Native identifier from the originating source system. InfraTrak records carry the
+          AST-{park}-{seq} asset tag format; GeoParks records carry the INF-{uuid} feature ID
+          format. Scoped to the originating source system; not guaranteed to be distinct across
+          both source populations.
+        tests:
+          - not_null
+      - name: parks_sk
+        description: >
+          Foreign key to int_parks. Identifies the park unit that owns or contains this asset.
+          Joined via infratrak_park_id for InfraTrak records and via geo_park_id for GeoParks
+          records. Null for assets whose park could not be resolved.
+        tests:
+          - relationships:
+              to: ref('int_parks')
+              field: parks_sk
+      - name: feature_class
+        description: >
+          Primary classification of the asset type. Values reflect the originating system's
+          taxonomy: InfraTrak categories include Cabin, Trail, Dam, Road, Bridge, Campsite,
+          Restroom, Picnic Shelter, Electrical Pedestal, Water Treatment System. GeoParks
+          classes include Trail, Road, Building, Bridge, Campsite, Boat Ramp, Parking Area,
+          Utility Corridor.
+        tests:
+          - not_null
+      - name: sub_type
+        description: >
+          Secondary classification refining feature_class. Populated from InfraTrak asset_category
+          (same as feature_class; InfraTrak does not have a sub_type) and from GeoParks sub_type
+          (e.g., Gravel for trails, Telecom for utility corridors). Null for InfraTrak records.
+      - name: description
+        description: >
+          Free-text description of the asset. Populated for InfraTrak records (e.g.,
+          "Restroom at Tall Pines State Park"). Null for GeoParks records — GIS features
+          carry only classification attributes, not narrative descriptions.
+      - name: installation_year
+        description: Year the asset was originally constructed or installed.
+      - name: replacement_value
+        description: >
+          Estimated full replacement cost of the asset in USD, as recorded in InfraTrak.
+          Null for GeoParks records — GIS features do not carry financial valuation data.
+      - name: expected_lifespan_years
+        description: >
+          Design lifespan of the asset in years, as recorded in InfraTrak.
+          Null for GeoParks records.
+      - name: point_latitude
+        description: >
+          Decimal latitude of the asset's representative point location.
+          Populated for InfraTrak records. Null for GeoParks records, which carry
+          geometry_wkt instead (including linear features that cannot be represented
+          as a single point).
+      - name: point_longitude
+        description: >
+          Decimal longitude of the asset's representative point location.
+          Populated for InfraTrak records. Null for GeoParks records.
+      - name: geometry_wkt
+        description: >
+          Spatial geometry in Well-Known Text format. Populated for GeoParks records.
+          Null for InfraTrak records, which carry point_latitude and point_longitude instead.
+          GeoParks geometry supports linear features (LINESTRING for trails, roads) and
+          polygonal structures in addition to points.
+      - name: positional_accuracy_meters
+        description: >
+          Estimated horizontal positional accuracy of the geometry in meters.
+          Populated for GeoParks records. Utility corridors carry a documented 5+ meter error.
+          Null for InfraTrak records.
+      - name: last_updated
+        description: >
+          Date the GIS team last reviewed or updated this feature's record in GeoParks.
+          Null for InfraTrak records, which do not carry a comparable audit timestamp at
+          the asset level.
+      - name: status
+        description: >
+          Operational lifecycle status of the asset. Values: Active, Inactive/Abandoned.
+          Populated for GeoParks records. Null for InfraTrak records — InfraTrak does not
+          model feature retirement in the assets table (decommissioning is tracked via
+          work orders).
+      - name: is_visible_in_survey
+        description: >
+          Boolean flag indicating whether this asset is included in InfraTrak's condition
+          survey scope. Populated for InfraTrak records. Null for GeoParks records — GIS
+          features are not subject to EAM condition surveys.
+      - name: source_system
+        description: >
+          Source system code identifying which operational system produced this record.
+          DCR-AST-01 for InfraTrak Lifecycle records; DCR-GEO-01 for GeoParks Enterprise records.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['DCR-AST-01', 'DCR-GEO-01']
+
   - name: int_parks
     description: >
       Integration model harmonizing park records from GeoParks (DCR-GEO-01), VistaReserve

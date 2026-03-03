@@ -13,9 +13,9 @@ sources:
       - name: parks_master
         description: >
           Master list of 50 legal park boundaries and their total acreage.
-          The primary key (geo_park_id) is the authoritative identifier for 
-          downstream integration models. NOTE: This table does not contain a 
-          timestamp column, so automated freshness constraints are omitted, 
+          The primary key (geo_park_id) is the authoritative identifier for
+          downstream integration models. NOTE: This table does not contain a
+          timestamp column, so automated freshness constraints are omitted,
           but manual verification should accommodate a 1-3 year update lag.
         columns:
           - name: geo_park_id
@@ -27,3 +27,49 @@ sources:
             description: Official legal name of the park unit.
           - name: total_acres
             description: GIS-calculated acreage of the park boundary.
+
+      - name: infrastructure_features
+        description: >
+          GIS layer cataloging every discrete physical infrastructure element within DCR park boundaries.
+          Includes buildings, trails, roads, bridges, boat ramps, campsites, electrical infrastructure,
+          and utility corridors. Geometry is stored as WKT (Well-Known Text), supporting both
+          point and linear feature types. Positional accuracy varies by feature class — utility
+          corridors carry a documented 5+ meter error. Some layers lag 1–3 years behind
+          construction reality. NOTE: There is no ongoing synchronization with InfraTrak; this
+          layer served as the baseline load for InfraTrak's initial asset registry in 2020 but
+          has diverged since then.
+        columns:
+          - name: feature_id
+            description: >
+              Primary key for the GeoParks infrastructure feature. Uses the INF- prefix.
+              NOTE: The cross-system crosswalk in VistaReserve references legacy GEO-* identifiers
+              that predate the current INF- scheme; that crosswalk cannot be used to join to
+              current InfraTrak asset records.
+            tests:
+              - unique
+              - not_null
+          - name: geo_park_id
+            description: Foreign key to parks_master. Identifies the park unit that contains this feature.
+            tests:
+              - not_null
+          - name: feature_class
+            description: >
+              Broad classification of the infrastructure type (Trail, Road, Building, Bridge,
+              Campsite, Boat Ramp, Parking Area, Utility Corridor).
+          - name: sub_type
+            description: Secondary classification refining feature_class (e.g., Gravel trail, Telecom corridor).
+          - name: status
+            description: Operational status of the feature — Active or Inactive/Abandoned.
+          - name: installation_year
+            description: Year the feature was originally constructed or installed.
+          - name: geometry_wkt
+            description: >
+              Spatial geometry of the feature in Well-Known Text format.
+              Linear features (trails, roads, corridors) are LINESTRING; structures may be POINT or POLYGON.
+          - name: positional_accuracy_meters
+            description: >
+              Estimated horizontal positional accuracy of the geometry in meters. Utility corridors
+              carry a documented error of 5+ meters; trail and boundary geometries are generally
+              sub-meter accurate.
+          - name: last_updated
+            description: Date the GIS team last reviewed or updated this feature record.
