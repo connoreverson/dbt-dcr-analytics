@@ -90,3 +90,33 @@ VisitorCount,vehicle_multiplier_used,numeric,false,false,Vehicle occupancy multi
 VisitorCount,calculation_timestamp,timestamp,false,false,Timestamp when the TrafficCount vendor system calculated this estimate.
 VisitorCount,sensor_type,varchar,false,false,IoT sensor technology classification. Values: Vehicle Magnetometer Pedestrian/Cyclist Infrared.
 VisitorCount,location_description,varchar,false,false,Human-readable description of sensor installation location (e.g. Main Entrance Gate North Trailhead).
+Employee,employees_sk,varchar,true,false,Canonical integration surrogate key for this employee record. Generated from employee_id.
+Employee,employee_id,varchar,false,false,Native identifier from PeopleFirst HR. Format: EMP-{uuid fragment}. Business key for this entity.
+Employee,first_name_hash,varchar,false,false,MD5 hash of the employee's first name. PeopleFirst is Confidential-rated; clear-text PII is hashed at staging.
+Employee,last_name_hash,varchar,false,false,MD5 hash of the employee's last name.
+Employee,email_hash,varchar,false,false,MD5 hash of the employee's work email address.
+Employee,phone_hash,varchar,false,false,MD5 hash of the employee's phone number.
+Employee,hire_date,date,false,false,Date the employee was hired into DCR classified service under their current position.
+Employee,separation_date,date,false,false,Date the employee separated from DCR service. Null for currently active employees.
+Employee,position_id,varchar,false,false,Identifier of the classified position slot this employee occupies. FK within the PeopleFirst source boundary.
+Employee,job_classification,varchar,false,false,Civil service job class title for this position (e.g. Maintenance Worker I Biologist Park Ranger).
+Employee,pay_grade,varchar,false,false,Government pay grade for this position (e.g. GR-15 GR-23). Determines the salary band.
+Employee,funding_source,varchar,false,false,Funding mechanism for this position (e.g. General Fund Grant Special Revenue).
+Employee,position_is_active,boolean,false,false,Whether the position slot is currently active and budgeted in PeopleFirst.
+Employee,org_unit_id,varchar,false,false,Identifier for the DCR organizational unit this position belongs to (e.g. R2-RECR HQ-EXEC). Finest-grained duty station available.
+Employee,org_unit_name,varchar,false,false,Human-readable name of the organizational unit (e.g. Region 2 - Recreation Headquarters - Finance).
+Employee,region_id,integer,false,false,DCR administrative region (1-4) to which this org unit belongs. Coarsest geographic attribution available; PeopleFirst does not record park-specific duty stations.
+Employee,source_system,varchar,false,false,Source system code for this record. Always DCR-HCM-01 (PeopleFirst HR).
+OfficerShift,officer_shifts_sk,varchar,true,false,Canonical integration surrogate key for this patrol shift record. Generated from activity_id.
+OfficerShift,activity_id,varchar,false,false,Native identifier from RangerShield officer_activity. Format: ACT-{uuid fragment}. Business key for this entity.
+OfficerShift,badge_number,varchar,false,true,Law enforcement badge number of the officer who logged this shift. FK to stg_rangershield__officers within the RangerShield source boundary.
+OfficerShift,shift_date,date,false,false,Calendar date on which this patrol shift occurred.
+OfficerShift,shift_start_time,timestamp,false,false,Timestamp when the officer's patrol shift began as logged by RangerShield CAD.
+OfficerShift,shift_end_time,timestamp,false,false,Timestamp when the officer's patrol shift ended. May be on the following calendar day for overnight shifts.
+OfficerShift,patrol_miles,numeric,false,false,Distance patrolled during this shift in statute miles. Recorded manually at shift close.
+OfficerShift,visitor_contacts,integer,false,false,Count of documented visitor interactions during this shift. Does not include enforcement actions (citations).
+OfficerShift,resource_checks,integer,false,false,Count of natural resource condition checks performed during this shift.
+OfficerShift,rank,varchar,false,false,Officer's law enforcement rank. Values: Ranger Corporal Sergeant Lieutenant Captain. Sourced from current roster snapshot.
+OfficerShift,certification_status,varchar,false,false,Officer's CJIS/POST certification status from current roster. Values: Active Suspended Expired. Not historically tracked per-shift.
+OfficerShift,assigned_region,integer,false,false,DCR administrative region (1-4) to which the officer is assigned. Coarsest geographic attribution from RangerShield; no park-level assignment available.
+OfficerShift,source_system,varchar,false,false,Source system code for this record. Always DCR-LES-01 (RangerShield CAD/RMS).

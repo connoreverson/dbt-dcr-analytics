@@ -674,3 +674,216 @@ models:
           Human-readable description of where this sensor is physically installed
           (e.g., "Main Entrance Gate", "North Trailhead"). Sourced from
           stg_trafficcount__sensor_locations.
+
+  - name: int_employees
+    description: >
+      Integration model denormalizing three PeopleFirst HR staging models — employees,
+      positions, and org_units — into a single record per active DCR employee. Grain:
+      one row per active classified employee (soft-deleted records excluded). PII fields
+      (name, email, phone) are carried as MD5 hashes; PeopleFirst is a Confidential-rated
+      system (SSN, salary, medical leave). Duty station is recorded at the org-unit level
+      only — PeopleFirst does not track park-specific assignments, so no parks_sk is
+      produced. Seasonal workers (stg_peoplefirst__seasonal_workforce) are excluded from
+      this model and require a separate integration model. 680 active employee records.
+    meta:
+      cdm_entity: Employee
+      cdm_entity_rationale: >
+        No standard CDM entity covers government civil service employees with pay-grade
+        classification, org-unit duty stations, and government benefits structure. The CDM
+        Worker entity (HCM module) would be the appropriate mapping, but the HCM manifest
+        is not included in the curated catalog for this project. See
+        reference/CDM_EXCEPTION_int_employees.md for the full candidate evaluation and the
+        custom Employee entity definition.
+      testing_rationale: >
+        The surrogate key is generated from employee_id. Uniqueness on employees_sk is the
+        primary data quality guarantee. The position_id and org_unit_id FK tests use
+        relationships tests to confirm no orphaned position or org unit references exist
+        after the is_deleted filter.
+    columns:
+      - name: employees_sk
+        description: >
+          Canonical integration surrogate key for this employee record, generated from
+          the PeopleFirst employee_id.
+        tests:
+          - unique
+          - not_null
+      - name: employee_id
+        description: >
+          Native identifier from PeopleFirst. Format: EMP-{uuid fragment}. Used as the
+          business key for this entity across HR reporting and downstream workforce marts.
+        tests:
+          - unique
+          - not_null
+      - name: first_name_hash
+        description: >
+          MD5 hash of the employee's first name. PeopleFirst is a Confidential-rated system;
+          clear-text PII is hashed at the staging layer and not reconstructed at integration.
+      - name: last_name_hash
+        description: MD5 hash of the employee's last name.
+      - name: email_hash
+        description: MD5 hash of the employee's work email address.
+      - name: phone_hash
+        description: MD5 hash of the employee's phone number.
+      - name: hire_date
+        description: >
+          Date the employee was hired into DCR classified service under their current
+          position. Null values are unexpected for active employees and indicate a data
+          quality gap in PeopleFirst.
+        tests:
+          - not_null
+      - name: separation_date
+        description: >
+          Date the employee separated from DCR service. Null for currently active
+          employees. This model filters is_deleted = true records, so all rows represent
+          either active employees or employees whose separation has not yet been marked
+          as deleted in PeopleFirst.
+      - name: position_id
+        description: >
+          Foreign key to stg_peoplefirst__positions. Identifies the classified position
+          slot this employee occupies. A position defines the job classification, pay
+          grade, and org unit.
+        tests:
+          - not_null
+      - name: job_classification
+        description: >
+          The civil service job class title for this employee's position (e.g., Maintenance
+          Worker I, Biologist, Park Ranger). Sourced from PeopleFirst positions.
+        tests:
+          - not_null
+      - name: pay_grade
+        description: >
+          Government pay grade for this position (e.g., GR-15, GR-23). Determines the
+          salary band for the position. Sourced from PeopleFirst positions.
+        tests:
+          - not_null
+      - name: funding_source
+        description: >
+          The funding mechanism for this position (e.g., General Fund, Grant, Special
+          Revenue). Sourced from PeopleFirst positions. Used to distinguish grant-funded
+          positions from appropriated headcount.
+      - name: position_is_active
+        description: >
+          Whether the position slot is currently active and budgeted in PeopleFirst. An
+          employee may be assigned to an inactive position if the position was deactivated
+          after hire; downstream workforce models should filter or annotate these cases.
+      - name: org_unit_id
+        description: >
+          Identifier for the DCR organizational unit this employee's position belongs to
+          (e.g., R2-RECR, HQ-EXEC). Sourced from PeopleFirst org_units. The org unit is
+          the finest-grained duty station available in PeopleFirst.
+        tests:
+          - not_null
+      - name: org_unit_name
+        description: >
+          Human-readable name of the organizational unit (e.g., Region 2 - Recreation,
+          Headquarters - Finance). Sourced from PeopleFirst org_units.
+      - name: region_id
+        description: >
+          DCR administrative region (1–4) to which this org unit belongs. Sourced from
+          PeopleFirst org_units. This is the coarsest available geographic attribution
+          for an employee; PeopleFirst does not record park-specific duty stations.
+          Downstream marts that require employee-to-park linkage must use region_id as
+          a 1:M relationship to int_parks.region_id.
+      - name: source_system
+        description: Source system code for this record. Always DCR-HCM-01 (PeopleFirst HR).
+
+  - name: int_officer_shifts
+    description: >
+      Integration model combining RangerShield CAD/RMS officer activity logs with the
+      officer roster into the custom CDM OfficerShift entity. Grain: one row per officer
+      per shift (activity_id from RangerShield officer_activity). This model is isolated
+      from all non-RangerShield integration models per CJIS governance requirements — no
+      parks_sk or cross-domain foreign keys are produced at this layer. Officer assignment
+      is captured at the region level (assigned_region) only. 3,000 shift records from
+      the active officer roster. Incidents, citations, dispatch logs, and use-of-force
+      records are separate RangerShield entities not covered by this model.
+    meta:
+      cdm_entity: OfficerShift
+      cdm_entity_rationale: >
+        No standard CDM entity covers law enforcement patrol shift metrics — patrol miles,
+        visitor contacts, resource checks, officer rank, and certification status have no
+        CDM analog in any available manifest. The CDM does not include a public safety or
+        law enforcement module. CJIS air-gap compliance additionally prohibits cross-domain
+        joins at this layer, making CDM integration with non-LE entities structurally
+        impossible. See reference/CDM_EXCEPTION_int_officer_shifts.md for the full
+        candidate evaluation and the custom OfficerShift entity definition.
+      testing_rationale: >
+        activity_id uniqueness is the primary data quality guarantee. The badge_number FK
+        test confirms all shift records resolve to a known officer in the roster. No
+        parks_sk test is applied because this model intentionally produces no park FK.
+    columns:
+      - name: officer_shifts_sk
+        description: >
+          Canonical integration surrogate key for this patrol shift record, generated
+          from the RangerShield activity_id.
+        tests:
+          - unique
+          - not_null
+      - name: activity_id
+        description: >
+          Native identifier for this shift record from RangerShield officer_activity.
+          Format: ACT-{uuid fragment}. Used as the business key for this entity.
+        tests:
+          - unique
+          - not_null
+      - name: badge_number
+        description: >
+          The law enforcement badge number of the officer who logged this shift.
+          Foreign key to stg_rangershield__officers within the RangerShield source
+          boundary. Not joined to any non-RangerShield integration model.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_rangershield__officers')
+              field: badge_number
+      - name: shift_date
+        description: >
+          Calendar date on which this patrol shift occurred. The shift may span midnight
+          (shift_end_time may be on the following day for overnight shifts).
+        tests:
+          - not_null
+      - name: shift_start_time
+        description: >
+          Timestamp when the officer's patrol shift began. Logged by the RangerShield
+          CAD system when the officer checks in for duty.
+        tests:
+          - not_null
+      - name: shift_end_time
+        description: >
+          Timestamp when the officer's patrol shift ended. May be on the calendar day
+          following shift_date for overnight shifts.
+        tests:
+          - not_null
+      - name: patrol_miles
+        description: >
+          Distance patrolled by the officer during this shift, in statute miles. Recorded
+          manually by the officer in RangerShield at shift close.
+      - name: visitor_contacts
+        description: >
+          Count of documented visitor interactions during this shift — informational
+          contacts, compliance checks, and interpretive encounters as logged in
+          RangerShield. Does not include enforcement actions (citations).
+      - name: resource_checks
+        description: >
+          Count of natural resource condition checks performed during this shift — trail
+          condition assessments, water feature inspections, and resource impact documentation
+          as logged in RangerShield.
+      - name: rank
+        description: >
+          The officer's law enforcement rank at the time of the shift. Values: Ranger,
+          Corporal, Sergeant, Lieutenant, Captain. Sourced from the RangerShield officer
+          roster; not historically tracked per-shift.
+      - name: certification_status
+        description: >
+          The officer's CJIS/POST certification status as of the current roster snapshot.
+          Values: Active, Suspended, Expired. Officers with Suspended or Expired status
+          in the current roster may have had Active status at the time of a historical shift.
+      - name: assigned_region
+        description: >
+          The DCR administrative region (1–4) to which the officer is assigned for patrol
+          duties. Sourced from the RangerShield officer roster. Region is the coarsest
+          geographic attribution available from RangerShield; no park-level assignment
+          is recorded for officers in this system.
+      - name: source_system
+        description: >
+          Source system code for this record. Always DCR-LES-01 (RangerShield CAD/RMS).
