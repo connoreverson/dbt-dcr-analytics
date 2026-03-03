@@ -76,7 +76,12 @@ Review existing YAML files (normally colocated with the model's `original_file_p
 
 ### Step 2: Sample Raw Data
 
-Preview rows from each source table:
+Preview rows from each source table. It is highly recommended to use the `inspect_source.py` utility first to get a quick overview of total row count, uniqueness, cardinality, and data types before writing dbt SQL.
+
+```bash
+# Get table overview and data quality hints
+python scripts/inspect_source.py --type duckdb --conn path/to.duckdb --table schema.table_name
+```
 
 ```bash
 dbt show --inline "SELECT * FROM {{ source('source_name', 'table_name') }}" --limit 50 --output json

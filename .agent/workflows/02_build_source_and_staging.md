@@ -10,7 +10,10 @@ description: Build Source and Staging
 - Workflow 01 complete (environment active, seeds loaded)
 
 ## Steps
-1. Run skill `using-dbt-for-analytics-engineering` for source/staging layer
+1. Inspect the source data
+   - Run `python scripts/inspect_source.py --type duckdb --conn path/to.duckdb` to understand the table schemas.
+   - Run `python scripts/inspect_source.py --type duckdb --conn path/to.duckdb --table <schema>.<table_name>` to understand specific columns, cardinality, and data quality issues for a given table.
+2. Run skill `using-dbt-for-analytics-engineering` for source/staging layer
    - Selector: `models/staging`
 2. Run skill `linting-and-governance-verification`
    - Scope: full-project sweep (`models/staging`)

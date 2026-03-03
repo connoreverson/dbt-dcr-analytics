@@ -133,6 +133,7 @@ Read these before making substantive decisions:
 22. **CDM column mappings must be semantically correct.** Do not map unrelated fields to satisfy column count requirements (e.g., mapping `total_acres` to `yomi_name` is semantically wrong). If no appropriate CDM column exists for a staging column, document the gap and drop the column at integration per SQL-INT-05 — do not force a bad mapping.
 23. **Wire macros or remove them.** If you build a macro that generates SQL for models, either have the models call the macro or remove it. An orphaned macro that exists alongside hand-written SQL that duplicates its logic is the worst of both worlds — it creates maintenance drift and confuses future developers.
 24. **Auto-run safe automated commands.** When you need to execute routine commands during model authoring, debugging, or reviewing (e.g., `dbt compile`, `dbt build`, `dbt run`, `dbt test`, `dbt show`, `dbt ls`, `python scripts/check_model.py`, `python scripts/review_model.py`), ALWAYS set `SafeToAutoRun` or the equivalent tool parameter to `true`. This applies even if you need to prepend `.venv` activation commands. This prevents unnecessary permission prompts and makes compiling and evaluating models seamlessly efficient.
+25. **Inspect sources automatically.** Before generating or checking staging models and performing data discovery, run `python scripts/inspect_source.py --type <duckdb|bigquery> --conn <path_to_db> --table <schema.table_name>` to understand table uniqueness, cardinality, and schemas.
 
 ## Technology Stack
 

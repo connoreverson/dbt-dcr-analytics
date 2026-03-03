@@ -7,3 +7,5 @@ mimesis~=11.0.0
 duckdb>=1.0.0
 rich~=13.0.0
 questionary~=2.1.1
+pandas~=2.2.0
+google-cloud-bigquery~=3.13.0

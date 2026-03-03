@@ -55,7 +55,7 @@ Per Operating Principle 14, CDM metadata must be queried via dbt seeds and SQL â
 
 Before staging any system, confirm that the generated DuckDB files contain all tables listed in the Data Inventory's "Key tables" section.
 
-**Step 1:** For each of the 8 new systems, run `dbt show --inline "select table_name from information_schema.tables where table_schema = '<schema>'" --limit 50` (or the DuckDB equivalent) and cross-reference against `reference/data_inventory_summary.md`.
+**Step 1:** For each of the 8 new systems, use the Python inspection script: run `python scripts/inspect_source.py --type duckdb --conn path/to.duckdb`. If a specific table needs checking for column/data quality mapping, pass `--table schema.table_name`. Cross-reference the output against `reference/data_inventory_summary.md`.
 **Step 2:** If any expected tables are missing from a DuckDB file, flag the gap and generate the missing source data before proceeding to staging.
 
 **Agent Invocation:**
