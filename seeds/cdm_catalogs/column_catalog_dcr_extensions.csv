@@ -57,3 +57,36 @@ PhysicalAsset,last_updated,date,false,false,Date the GIS team last reviewed or u
 PhysicalAsset,status,varchar,false,false,Operational lifecycle status from GeoParks — Active or Inactive/Abandoned. Null for InfraTrak records.
 PhysicalAsset,is_visible_in_survey,boolean,false,false,EAM survey scope flag from InfraTrak. True if this asset is included in condition assessment cycles. Null for GeoParks records.
 PhysicalAsset,source_system,varchar,false,false,Source system code identifying the originating system. DCR-AST-01 for InfraTrak Lifecycle; DCR-GEO-01 for GeoParks Enterprise.
+EcologicalSurvey,ecological_surveys_sk,varchar,true,false,Canonical integration surrogate key. Includes observation type prefix for cross-type uniqueness within this model.
+EcologicalSurvey,observation_id,varchar,false,false,Native identifier from the originating BioSurvey table. FFS-seq format for flora/fauna surveys; test_id for water quality; observation_id for invasive species.
+EcologicalSurvey,site_id,varchar,false,true,Foreign key to stg_biosurvey__survey_sites. Identifies the named ecological monitoring station.
+EcologicalSurvey,parks_sk,varchar,false,true,Foreign key to int_parks. Resolved from survey_sites.park_id via infratrak_park_id.
+EcologicalSurvey,observation_type,varchar,false,false,Discriminator identifying the ecological observation sub-type. Values: flora_fauna water_quality invasive_species.
+EcologicalSurvey,observation_date,date,false,false,Date the field observation or sampling event was conducted.
+EcologicalSurvey,species_code,varchar,false,false,Species identifier from BioSurvey species codes. Populated for flora_fauna and invasive_species. Null for water_quality.
+EcologicalSurvey,observer_name,varchar,false,false,Name of the field biologist. Populated for flora_fauna records. Null for other types.
+EcologicalSurvey,latitude,numeric,false,false,WGS84 decimal latitude of the observation point. Populated for flora_fauna and invasive_species. Null for water_quality.
+EcologicalSurvey,longitude,numeric,false,false,WGS84 decimal longitude of the observation point. Populated for flora_fauna and invasive_species. Null for water_quality.
+EcologicalSurvey,count_estimate,integer,false,false,Estimated count of observed individuals. Populated for flora_fauna. Null for other types.
+EcologicalSurvey,density_estimate_per_hectare,numeric,false,false,Estimated density in individuals per hectare. Populated for flora_fauna. Null for other types.
+EcologicalSurvey,extent_square_meters,numeric,false,false,Measured spatial extent of invasive species infestation in square meters. Populated for invasive_species. Null for other types.
+EcologicalSurvey,treatment_applied,varchar,false,false,Treatment method applied to invasive species occurrence. Populated for invasive_species. Null for other types.
+EcologicalSurvey,treatment_date,date,false,false,Date the treatment was applied. Populated for treated invasive_species records. Null for other types.
+EcologicalSurvey,dissolved_oxygen_mgl,numeric,false,false,Dissolved oxygen in mg/L. Populated for water_quality. Null for other types.
+EcologicalSurvey,ph_level,numeric,false,false,Water pH on 0-14 scale. Populated for water_quality. Null for other types.
+EcologicalSurvey,ecoli_cfu_100ml,integer,false,false,E. coli colony-forming units per 100 mL. Populated for water_quality. Null for other types.
+EcologicalSurvey,turbidity_ntu,numeric,false,false,Water turbidity in NTU. Populated for water_quality. Null for other types.
+EcologicalSurvey,temperature_celsius,numeric,false,false,Water temperature in Celsius. Populated for water_quality. Null for other types.
+EcologicalSurvey,nitrogen_mgl,numeric,false,false,Total nitrogen in mg/L. Populated for water_quality under 2005+ protocols. May be null for pre-2005 records.
+EcologicalSurvey,phosphorus_mgl,numeric,false,false,Total phosphorus in mg/L. Populated for water_quality under 2005+ protocols. May be null for pre-2005 records.
+EcologicalSurvey,protocol_era,varchar,false,false,Water quality testing protocol version. Values: pre-2005 2005-2018 2018+. Populated for water_quality. Null for other types.
+VisitorCount,visitor_counts_sk,varchar,true,false,Canonical integration surrogate key for the daily visitor count estimate. Generated from metric_id.
+VisitorCount,metric_id,varchar,false,false,Native identifier from TrafficCount derived_visitor_metrics. Format: DVM-{sensor_id}-{YYYYMMDD}.
+VisitorCount,sensor_id,varchar,false,true,Foreign key to stg_trafficcount__sensor_locations. Identifies the IoT sensor.
+VisitorCount,parks_sk,varchar,false,true,Foreign key to int_parks. Resolved from sensor_locations.park_id (varchar integer) via infratrak_park_id.
+VisitorCount,target_date,date,false,false,Calendar date for which this daily visitor estimate was calculated.
+VisitorCount,estimated_total_visitors,integer,false,false,Estimated total person-visits for this sensor on this date. Vehicle counts multiplied by vehicle_multiplier_used plus pedestrian and cyclist counts.
+VisitorCount,vehicle_multiplier_used,numeric,false,false,Vehicle occupancy multiplier applied in this estimate. Standard value is 2.7 from a 2019 study; not revalidated since. Preserved for sensitivity analysis.
+VisitorCount,calculation_timestamp,timestamp,false,false,Timestamp when the TrafficCount vendor system calculated this estimate.
+VisitorCount,sensor_type,varchar,false,false,IoT sensor technology classification. Values: Vehicle Magnetometer Pedestrian/Cyclist Infrared.
+VisitorCount,location_description,varchar,false,false,Human-readable description of sensor installation location (e.g. Main Entrance Gate North Trailhead).

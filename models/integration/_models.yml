@@ -437,3 +437,240 @@ models:
               field: customer_assets_sk
       - name: _park_sk
         description: Foreign key linking the reservation to the park, derived from the booked asset's parent park.
+
+  - name: int_ecological_surveys
+    description: >
+      Integration model unifying three ecological observation types from BioSurvey_Legacy
+      (DCR-NRM-01) into the custom CDM EcologicalSurvey entity. Grain: one row per ecological
+      observation event — a flora/fauna species sighting, a water quality sampling event, or an
+      invasive species field observation. All three types are linked to a named survey site, which
+      carries an integer park_id resolved to parks_sk via int_parks. Type-specific columns are null
+      for the other observation types; the observation_type column identifies the active schema.
+      9,550 flora/fauna records, 2,450 water quality tests, and 2,500 invasive species observations
+      (14,500 total) from surveys spanning 1993 to present.
+    meta:
+      cdm_entity: EcologicalSurvey
+      cdm_entity_rationale: >
+        No standard CDM entity covers ecological field survey observations — neither species
+        presence/abundance data, water quality parameters, nor invasive species treatment records.
+        See reference/CDM_EXCEPTION_int_ecological_surveys.md for the full candidate evaluation
+        and the custom EcologicalSurvey entity definition.
+      testing_rationale: >
+        The surrogate key includes the observation type as a prefix to guarantee cross-type
+        uniqueness. The unique_combination_of_columns test confirms that no (type, id) pair
+        appears more than once in the union output.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - observation_type
+            - observation_id
+    columns:
+      - name: ecological_surveys_sk
+        description: >
+          Canonical integration surrogate key for this ecological observation record. Generated
+          from the observation type and the native source identifier, so the key is globally
+          distinct across all three observation types in this model.
+        tests:
+          - unique
+          - not_null
+      - name: observation_id
+        description: >
+          Native identifier from the originating BioSurvey table. FFS-{seq} format for flora
+          and fauna surveys; test_id format for water quality tests; observation_id format for
+          invasive species observations.
+        tests:
+          - not_null
+      - name: site_id
+        description: >
+          Foreign key to stg_biosurvey__survey_sites. Identifies the named ecological monitoring
+          station where this observation was recorded.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_biosurvey__survey_sites')
+              field: site_id
+      - name: parks_sk
+        description: >
+          Foreign key to int_parks. Resolved from the survey site's integer park_id via
+          infratrak_park_id. Null if the site's park_id has no matching record in int_parks.
+        tests:
+          - relationships:
+              to: ref('int_parks')
+              field: parks_sk
+      - name: observation_type
+        description: >
+          Discriminator identifying the ecological observation type for this row.
+          flora_fauna: species presence and abundance survey.
+          water_quality: abiotic water parameter sampling event.
+          invasive_species: regulated invasive organism occurrence and treatment record.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['flora_fauna', 'water_quality', 'invasive_species']
+      - name: observation_date
+        description: Date the field observation or sampling event was conducted.
+        tests:
+          - not_null
+      - name: species_code
+        description: >
+          Species identifier from the BioSurvey species codes reference table. Populated for
+          flora_fauna and invasive_species records. Null for water_quality records, which
+          measure abiotic parameters and are not species-specific.
+      - name: observer_name
+        description: >
+          Name of the field biologist who conducted the survey. Populated for flora_fauna records.
+          Null for water_quality and invasive_species records, which do not track individual
+          observers in BioSurvey_Legacy.
+      - name: latitude
+        description: >
+          WGS84 decimal latitude of the observation point. Populated for flora_fauna and
+          invasive_species records, which capture GPS coordinates at the observation level.
+          Null for water_quality records — location is inherited from the survey site.
+      - name: longitude
+        description: >
+          WGS84 decimal longitude of the observation point. Populated for flora_fauna and
+          invasive_species records. Null for water_quality records.
+      - name: count_estimate
+        description: >
+          Estimated count of individuals observed during the survey. Populated for flora_fauna
+          records. Null for water_quality and invasive_species records.
+      - name: density_estimate_per_hectare
+        description: >
+          Estimated density of the observed species in individuals per hectare. Populated for
+          flora_fauna records. Null for other observation types.
+      - name: extent_square_meters
+        description: >
+          Measured spatial extent of the invasive species infestation in square meters.
+          Populated for invasive_species records. Null for flora_fauna and water_quality records.
+      - name: treatment_applied
+        description: >
+          Treatment method applied to the invasive species occurrence (e.g., Herbicide Application,
+          Manual Removal). Populated for invasive_species records. Null for other types.
+      - name: treatment_date
+        description: >
+          Date the treatment was applied to the invasive species occurrence. Populated for
+          invasive_species records where treatment occurred. Null for untreated observations
+          and for other observation types.
+      - name: dissolved_oxygen_mgl
+        description: >
+          Dissolved oxygen concentration in milligrams per liter. Populated for water_quality
+          records. Null for flora_fauna and invasive_species records.
+      - name: ph_level
+        description: >
+          Water acidity/alkalinity on the pH scale (0–14). Populated for water_quality records.
+          Null for other observation types.
+      - name: ecoli_cfu_100ml
+        description: >
+          E. coli colony-forming units per 100 milliliters of water sample. Populated for
+          water_quality records. The staging model normalizes the legacy text values
+          (">2000", "TNTC") to integer upper bounds. Null for other observation types.
+      - name: turbidity_ntu
+        description: >
+          Water turbidity in Nephelometric Turbidity Units. Populated for water_quality records.
+          Null for other observation types.
+      - name: temperature_celsius
+        description: >
+          Water temperature in degrees Celsius at the time of sampling. Populated for
+          water_quality records. Null for other observation types.
+      - name: nitrogen_mgl
+        description: >
+          Total nitrogen concentration in milligrams per liter. Populated for water_quality
+          records collected under the 2005-2018 and 2018+ protocol eras; may be null for
+          pre-2005 records where this parameter was not measured.
+      - name: phosphorus_mgl
+        description: >
+          Total phosphorus concentration in milligrams per liter. Populated for water_quality
+          records collected under the 2005-2018 and 2018+ protocol eras. Null for pre-2005 records.
+      - name: protocol_era
+        description: >
+          The water quality testing protocol version under which this sample was collected.
+          Values: pre-2005, 2005-2018, 2018+. Relevant for longitudinal analysis because
+          the three eras use different instruments and parameter sets, limiting direct comparisons.
+          Populated for water_quality records. Null for other observation types.
+
+  - name: int_visitor_counts
+    description: >
+      Integration model combining daily visitor count estimates from TrafficCount_IoT
+      (DCR-VUM-01) with sensor metadata into the custom CDM VisitorCount entity. Grain: one row
+      per sensor per day. The vehicle occupancy multiplier (2.7) is applied by the TrafficCount
+      vendor's derived_visitor_metrics calculation and is preserved per record to support
+      sensitivity analysis. Only active, non-deleted records are included. Covers 20 sensors at
+      8 park entrances and 12 trailheads from the 2024 pilot; 85% of parks have no sensor coverage.
+    meta:
+      cdm_entity: VisitorCount
+      cdm_entity_rationale: >
+        No standard CDM entity covers automated IoT visitor counting with an occupancy
+        multiplier. See reference/CDM_EXCEPTION_int_visitor_counts.md for the full candidate
+        evaluation and the custom VisitorCount entity definition.
+      testing_rationale: >
+        Row count tests are omitted because the source derived_visitor_metrics includes
+        soft-deleted records filtered out in this model.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - sensor_id
+            - target_date
+    columns:
+      - name: visitor_counts_sk
+        description: >
+          Canonical integration surrogate key for this visitor count record, generated from
+          the TrafficCount metric_id.
+        tests:
+          - unique
+          - not_null
+      - name: metric_id
+        description: >
+          Native identifier for the daily visitor estimate record from TrafficCount derived
+          metrics. Format: DVM-{sensor_id}-{YYYYMMDD}.
+        tests:
+          - not_null
+      - name: sensor_id
+        description: >
+          Foreign key to stg_trafficcount__sensor_locations. Identifies the IoT sensor that
+          generated the raw counts underlying this daily estimate.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_trafficcount__sensor_locations')
+              field: sensor_id
+      - name: parks_sk
+        description: >
+          Foreign key to int_parks. Resolved from the sensor's integer park_id via
+          infratrak_park_id. Identifies the park where this sensor is installed.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('int_parks')
+              field: parks_sk
+      - name: target_date
+        description: The calendar date for which this daily visitor estimate was calculated.
+        tests:
+          - not_null
+      - name: estimated_total_visitors
+        description: >
+          Estimated total person-visits for this sensor on this date, calculated by the
+          TrafficCount vendor system. Vehicle counts are multiplied by vehicle_multiplier_used;
+          pedestrian and cyclist counts are added directly.
+        tests:
+          - not_null
+      - name: vehicle_multiplier_used
+        description: >
+          The vehicle occupancy multiplier applied in this estimate's calculation. The standard
+          value is 2.7, inherited from a 2019 occupancy study; this multiplier has not been
+          revalidated since. Preserved per record to support downstream sensitivity analysis.
+        tests:
+          - not_null
+      - name: calculation_timestamp
+        description: >
+          Timestamp when the TrafficCount vendor system calculated this daily estimate.
+          Used for audit traceability and to detect restatements.
+      - name: sensor_type
+        description: >
+          Classification of the IoT sensor technology. Values include Vehicle Magnetometer
+          (installed at entrance gates) and Pedestrian/Cyclist Infrared (installed at
+          trailheads). Sourced from stg_trafficcount__sensor_locations.
+      - name: location_description
+        description: >
+          Human-readable description of where this sensor is physically installed
+          (e.g., "Main Entrance Gate", "North Trailhead"). Sourced from
+          stg_trafficcount__sensor_locations.
