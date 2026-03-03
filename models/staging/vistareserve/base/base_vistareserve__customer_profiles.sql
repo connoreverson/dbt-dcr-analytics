@@ -12,20 +12,24 @@ ranked as (
             order by created_at desc
         ) as row_num
     from source
+),
+
+final as (
+    select
+        customer_id,
+        first_name,
+        last_name,
+        email,
+        phone,
+        address_state,
+        is_veteran,
+        is_senior,
+        has_annual_pass,
+        created_at,
+        merged_into_customer_id,
+        preferences_json
+    from ranked
+    where row_num = 1
 )
 
-select
-    customer_id,
-    first_name,
-    last_name,
-    email,
-    phone,
-    address_state,
-    is_veteran,
-    is_senior,
-    has_annual_pass,
-    created_at,
-    merged_into_customer_id,
-    preferences_json
-from ranked
-where row_num = 1
+select * from final
