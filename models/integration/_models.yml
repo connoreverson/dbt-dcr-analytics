@@ -53,6 +53,110 @@ models:
           enable downstream joins to work order and condition assessment integration models. Null for
           parks not yet onboarded into InfraTrak (Regions 3 and 4).
 
+  - name: int_financial_transactions
+    description: >
+      Integration model linking StateGov Financials (DCR-FIN-01) general ledger entries
+      with GrantTrack (DCR-FIN-02) award data. Grain: one row per GL entry, enriched with
+      chart of accounts labels (fund, division, program, object code descriptions) and
+      optional grant attribution where the entry's fund code matches an active federal award.
+      Entries with no matching award carry null grant fields. The batch_detail_text field
+      (pipe-delimited invoice memo) is preserved raw; unpacking is a mart-layer responsibility.
+    meta:
+      cdm_entity: FinancialTransaction
+      cdm_entity_rationale: >
+        No standard CDM entity covers public-sector general ledger entries. See
+        reference/CDM_EXCEPTION_int_financial_transactions.md for the full evaluation and
+        justification for the custom FinancialTransaction entity.
+      testing_rationale: >
+        Tests protect financial ledger integrity by ensuring every GL entry is uniquely
+        represented and that amounts are never null.
+    tests:
+      - dbt_expectations.expect_table_row_count_to_equal_other_table:
+          compare_model: ref('stg_stategov__general_ledger')
+    columns:
+      - name: financials_sk
+        description: The canonical integration surrogate key for the general ledger entry.
+        meta:
+          testing_rationale: Duplicate GL entries would inflate expenditure aggregations.
+        tests:
+          - unique
+          - not_null
+      - name: gl_entry_id
+        description: The original business-recognized identifier for the GL entry from StateGov Financials.
+        tests:
+          - not_null
+      - name: fiscal_year
+        description: The fiscal year in which the GL entry was recorded.
+      - name: accounting_month
+        description: The accounting month (1–12) within the fiscal year for this GL entry.
+      - name: entry_type
+        description: >
+          The classification of the GL entry (e.g., appropriation, allotment, expenditure, revenue)
+          as encoded by the StateGov mainframe batch process.
+      - name: amount
+        description: The monetary value of the GL entry in USD.
+        tests:
+          - not_null
+      - name: account_id
+        description: >
+          The compound account identifier from StateGov Financials, formatted as
+          {fund}-DIV-{division}-PRG-{program}-OBJ-{object}.
+      - name: account_fund_code
+        description: The fund component of the compound account identifier, used to link GL entries to federal grant awards.
+      - name: account_division_code
+        description: The division component of the compound account identifier.
+      - name: account_program_code
+        description: The program component of the compound account identifier.
+      - name: account_object_code
+        description: The object code component of the compound account identifier, classifying the type of expenditure or revenue.
+      - name: fund_description
+        description: Human-readable description of the fund, sourced from the StateGov chart of accounts.
+      - name: division_description
+        description: Human-readable description of the division, sourced from the StateGov chart of accounts.
+      - name: program_description
+        description: Human-readable description of the program, sourced from the StateGov chart of accounts.
+      - name: object_description
+        description: Human-readable description of the object code, classifying the nature of the expenditure or revenue.
+      - name: batch_reference
+        description: The batch identifier from the StateGov mainframe for audit traceability.
+      - name: batch_detail_text
+        description: >
+          Raw pipe-delimited invoice memo from the StateGov batch export
+          (format: INV|amount|description|date, repeating). Preserved as-is;
+          unpacking to individual invoice rows is a mart-layer responsibility.
+      - name: batch_entry_count
+        description: Derived count of invoice records embedded in the batch_detail_text memo field.
+      - name: award_id
+        description: >
+          The GrantTrack award identifier for the federal award funding this GL entry.
+          Null for entries funded by general-fund appropriations with no matching award.
+      - name: award_number
+        description: The official award number assigned by the federal grantor. Null for non-grant entries.
+      - name: award_amount
+        description: >
+          The total ceiling amount of the federal award associated with this GL entry's fund code.
+          Null for non-grant entries.
+      - name: required_match_percentage
+        description: >
+          The minimum percentage of the award amount that DCR must fund from non-federal sources
+          as a match contribution. Null for non-grant entries.
+      - name: performance_start
+        description: The start date of the award's performance period. Null for non-grant entries.
+      - name: performance_end
+        description: The end date of the award's performance period. Null for non-grant entries.
+      - name: award_fiscal_year_budget
+        description: >
+          The budgeted amount from GrantTrack for this award in the GL entry's fiscal year.
+          Null for non-grant entries or when GrantTrack has no budget row for this year.
+      - name: award_fiscal_year_actual
+        description: >
+          GrantTrack's recorded actual spending for this award in the GL entry's fiscal year.
+          Note: a 2–5% reconciliation gap vs. SGF actuals is a known quality issue
+          (see reference/data_inventory_summary.md, DCR-FIN-02).
+          Null for non-grant entries or when GrantTrack has no actuals for this year.
+      - name: source_system
+        description: The authoritative operational system code for this record (DCR-FIN-01, StateGov Financials).
+
   - name: int_contacts
     description: >
       Integration model harmonizing customer profiles from VistaReserve (DCR-REV-01) into

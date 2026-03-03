@@ -13,3 +13,30 @@ Park,classification,varchar,false,false,The park's administrative classification
 Park,region_id,varchar,false,false,The numeric identifier of the organizational region to which this park belongs.
 Park,source_system,varchar,false,false,The authoritative operational system code from which this park record originates.
 Park,infratrak_park_id,integer,false,false,The integer park identifier from InfraTrak (DCR-AST-01). Null for parks not yet onboarded (Regions 3 and 4).
+FinancialTransaction,financials_sk,varchar,true,false,The canonical integration surrogate key for the general ledger entry.
+FinancialTransaction,gl_entry_id,varchar,false,false,The original business-recognized identifier for the GL entry from StateGov Financials.
+FinancialTransaction,fiscal_year,integer,false,false,The fiscal year in which the GL entry was recorded.
+FinancialTransaction,accounting_month,integer,false,false,The accounting month (1-12) within the fiscal year for this GL entry.
+FinancialTransaction,entry_type,varchar,false,false,The classification of the GL entry (Expenditure or Revenue).
+FinancialTransaction,amount,numeric,false,false,The monetary value of the GL entry in USD.
+FinancialTransaction,account_id,varchar,false,false,The compound account identifier in fund-DIV-division-PRG-program-OBJ-object format.
+FinancialTransaction,account_fund_code,varchar,false,false,The fund component of the compound account identifier.
+FinancialTransaction,account_division_code,varchar,false,false,The division component of the compound account identifier.
+FinancialTransaction,account_program_code,varchar,false,false,The program component of the compound account identifier.
+FinancialTransaction,account_object_code,varchar,false,false,The object code classifying the type of expenditure or revenue.
+FinancialTransaction,fund_description,varchar,false,false,Human-readable description of the fund from the StateGov chart of accounts.
+FinancialTransaction,division_description,varchar,false,false,Human-readable description of the division from the StateGov chart of accounts.
+FinancialTransaction,program_description,varchar,false,false,Human-readable description of the program from the StateGov chart of accounts.
+FinancialTransaction,object_description,varchar,false,false,Human-readable description of the object code from the StateGov chart of accounts.
+FinancialTransaction,batch_reference,varchar,false,false,The StateGov mainframe batch identifier for audit traceability.
+FinancialTransaction,batch_detail_text,varchar,false,false,Raw pipe-delimited invoice memo from the StateGov batch export. Preserved as-is; unpacking is a mart-layer responsibility.
+FinancialTransaction,batch_entry_count,integer,false,false,Derived count of invoice records embedded in the batch_detail_text memo field.
+FinancialTransaction,award_id,varchar,false,true,The GrantTrack award identifier. Null for GL entries not funded by a federal grant.
+FinancialTransaction,award_number,varchar,false,false,The official federal award number from GrantTrack. Null for non-grant entries.
+FinancialTransaction,award_amount,numeric,false,false,The total ceiling amount of the federal award. Null for non-grant entries.
+FinancialTransaction,required_match_percentage,numeric,false,false,The minimum non-federal match percentage required for the award. Null for non-grant entries.
+FinancialTransaction,performance_start,date,false,false,The start date of the award performance period. Null for non-grant entries.
+FinancialTransaction,performance_end,date,false,false,The end date of the award performance period. Null for non-grant entries.
+FinancialTransaction,award_fiscal_year_budget,numeric,false,false,GrantTrack budgeted amount for this award in the GL entry fiscal year. Null for non-grant entries.
+FinancialTransaction,award_fiscal_year_actual,numeric,false,false,GrantTrack recorded actual spending for this award in the GL entry fiscal year. Null for non-grant entries.
+FinancialTransaction,source_system,varchar,false,false,The authoritative operational system code for this record (DCR-FIN-01).
