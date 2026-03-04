@@ -9,6 +9,10 @@ models:
       class; utility corridors carry a documented 5+ meter horizontal error. This layer served
       as the baseline for InfraTrak's initial asset registry load in 2020 but has not been
       synchronized since. Grain: one row per GIS feature (feature_id).
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure uniqueness. The geo_park_id foreign key is verified
+        properly to link features to their master park boundaries.
     columns:
       - name: hk_infrastructure_features
         description: Surrogate hash key derived from feature_id.
@@ -63,6 +67,9 @@ models:
       The authoritative, legal definition of all 50 state park boundaries managed in the Enterprise GIS.
       This model serves as the ground-truth dimension for park existence and acreage.
       Grain: One row per geo_park_id.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure dimension table uniqueness and non-nullity.
     columns:
       - name: hk_parks_master
         description: Surrogate hash key derived from geo_park_id. Uniquely identifies a park record from GeoParks.

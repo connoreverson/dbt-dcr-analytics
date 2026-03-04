@@ -8,8 +8,13 @@ models:
       categories including buildings, roads, trails, bridges, dams, and utility
       infrastructure. Geographic coordinates (latitude, longitude) represent each
       asset's centroid or primary access point in decimal degrees. This source
+      centroid or primary access point in decimal degrees. This source
       reflects only the Phase 1 deployment area; approximately 40% of DCR's
       physical assets (Regions 3 and 4) are not represented.
+    meta:
+      testing_rationale: >
+        Primary keys are tested for uniqueness. The park_id foreign key is verified
+        properly to link assets to their master park dimensions without orphaning.
     columns:
       - name: hk_asset
         description: Surrogate hash key for the asset, derived from asset_tag.
@@ -73,8 +78,13 @@ models:
       (best) using a standardised inspection protocol. The FCI ≥ 70 threshold
       defines "good" condition for capital planning purposes; assets below this
       threshold contribute to the deferred maintenance backlog. Inspection
+      threshold contribute to the deferred maintenance backlog. Inspection
       frequency varies by asset criticality: dams and water treatment systems
       are assessed annually; standard facilities operate on a three-year cycle.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure uniqueness. The asset_tag foreign key is tested
+        to ensure all assessments are linked to valid assets.
     columns:
       - name: hk_condition_assessment
         description: Surrogate hash key for the assessment, derived from assessment_id.
@@ -121,6 +131,10 @@ models:
       maintenance backlog figure used in DCR's legislative budget requests. The
       total understates the true statewide backlog by approximately 40% because
       Regions 3 and 4 are not in InfraTrak.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure uniqueness. The asset_tag foreign key is checked
+        to ensure backlog dollars map back to valid assets.
     columns:
       - name: hk_deferred_maintenance
         description: Surrogate hash key for the backlog record, derived from backlog_id.
@@ -157,6 +171,10 @@ models:
       complete relative to the full DCR workforce in PeopleFirst HR
       (DCR-HCM-01). Provisioning is managed manually through access requests
       rather than automated identity federation.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure employee dimension uniqueness to prevent
+        labor hour fan-outs when joining to work orders.
     columns:
       - name: hk_employee
         description: Surrogate hash key for the employee, derived from employee_id.
@@ -200,6 +218,9 @@ models:
       in work orders. This table is distinct from the parks dimension in
       GeoParks Enterprise (DCR-GEO-01); crosswalk tables exist but have drifted
       since 2022.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure dimension table uniqueness.
     columns:
       - name: hk_park
         description: Surrogate hash key for the park, derived from park_id.
@@ -241,6 +262,10 @@ models:
       maintenance activities result in a closed work order; Region 2 closes
       approximately 70%, attributed to mobile app connectivity issues in canyon
       parks.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure uniqueness of maintenance work orders. The
+        asset_tag foreign key is verified to ensure costs map back to valid assets.
     columns:
       - name: hk_work_order
         description: Surrogate hash key for the work order, derived from wo_id.

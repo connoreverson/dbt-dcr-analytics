@@ -7,6 +7,10 @@ models:
       incident types from trespass and DUI to search-and-rescue activations and
       wildlife encounters. Incident locations are recorded as free-text narratives
       only — no geographic coordinates exist in this CJIS air-gapped system.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure uniqueness. The incident_type and review_status
+        fields are validated against accepted enums to prevent downstream grouping errors.
     columns:
       - name: hk_incident
         description: Surrogate key derived from incident_number.
@@ -69,6 +73,10 @@ models:
       One row per citation issued by a DCR ranger. Approximately 40 % of citations
       are standalone field citations with no linked incident report; the remainder
       are associated with a formal incident_number.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to verify citation count distinctness. The court_disposition
+        field is strictly tested against its accepted statuses.
     columns:
       - name: hk_citation
         description: Surrogate key derived from citation_number.
@@ -117,6 +125,10 @@ models:
       generates multiple log entries (Dispatch, On Scene, Position Updates, Clear).
       Radio transcripts are recorded selectively — approximately 80 % of entries
       have no transcript, which is expected for non-verbal status events.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure uniqueness of log lines. The event_type is
+        validated against accepted values to support downstream chronological rollups.
     columns:
       - name: hk_dispatch_log
         description: Surrogate key derived from log_id.
@@ -162,6 +174,10 @@ models:
       One row per DCR law-enforcement officer in the RangerShield roster. This is a
       locally maintained dimension independent of PeopleFirst HR and may contain
       stale or divergent records relative to the HR system of record.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure uniqueness of the officer dimension table.
+        Rank and certification_status are both tested against expected enums.
     columns:
       - name: hk_officer
         description: Surrogate key derived from badge_number.
@@ -210,6 +226,10 @@ models:
       One row per officer per shift. Records daily operational metrics for each
       ranger's shift: mileage driven or walked on patrol, visitor contacts made,
       and resource inspections completed. Patrol miles range from 10.0 to 149.9.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure uniqueness. The patrol_miles numeric field
+        is tested to ensure it falls within realistic operating bounds (10-150 miles).
     columns:
       - name: hk_officer_activity
         description: Surrogate key derived from activity_id.
@@ -260,6 +280,10 @@ models:
       50 rows, reflecting the infrequency of force application in park law
       enforcement. All records are subject to mandatory internal review under
       CJIS policy.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure uniqueness. The categorical force level and
+        internal review status fields are tested against their accepted enumerations.
     columns:
       - name: hk_use_of_force
         description: Surrogate key derived from uof_id.

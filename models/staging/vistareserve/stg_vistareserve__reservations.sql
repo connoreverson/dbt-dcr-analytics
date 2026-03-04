@@ -8,9 +8,9 @@ final as (
 
     select
         --  hash key
-        
-            
-            {{ dbt_utils.generate_surrogate_key(['source.reservation_id']) }}
+
+
+        {{ dbt_utils.generate_surrogate_key(['source.reservation_id']) }}
             as hk_reservations,
         --  ids
         cast(source.asset_id as varchar) as asset_id,

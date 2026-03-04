@@ -6,6 +6,10 @@ models:
       Pre-processes the VistaReserve customer profiles to deduplicate profiles heavily affected by point-of-sale collisions.
       Utilizes a window function to isolate and retain only the most recently updated version of each profile.
       Grain: One row per customer_id.
+    meta:
+      testing_rationale: >
+        Tests verify that the window function successfully deduplicates the source data before it enters the staging layer, 
+        ensuring that customer_id remains a unique primary key despite point-of-sale collisions.
     columns:
       - name: customer_id
         description: System-generated identifier for the customer.
@@ -18,6 +22,10 @@ models:
       Calculates business logic on the crosswalk mapping, primarily determining how long it has been
       since each row was manually verified by comparing the verified date to current_date.
       Grain: One row per vista_asset_id.
+    meta:
+      testing_rationale: >
+        Tests verify that the import from source preserves the expected one-to-one mapping for assets and 
+        that no null identifiers are introduced during the base transformation.
     columns:
       - name: vista_asset_id
         description: Foreign key identifying the asset within VistaReserve.
