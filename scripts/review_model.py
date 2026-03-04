@@ -5,6 +5,11 @@ import json
 import subprocess
 from pathlib import Path
 
+try:
+    from dbt.cli.main import dbtRunner, dbtRunnerResult
+except ImportError:
+    dbtRunner = None
+
 # Add project root to path so we can import from scripts
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from scripts.check_model import run_checks
@@ -22,19 +27,22 @@ def get_layer(model_name):
     return "unknown"
 
 def run_automated_checks(model_name, is_agent=False):
-    print(f"Running automated checks for {model_name}...")
+    print(f"\n[{model_name}] Running automated checks...")
     try:
         results = run_checks(model_name, quiet=is_agent)
         # Convert CheckResult objects into the dict format
         return [{"rule": r.name, "status": r.status, "messages": r.messages} for r in results]
     except Exception as e:
-        print(f"Error running check_model: {e}")
+        print(f"[{model_name}] Error running check_model: {e}")
         return []
 
 def get_model_metadata(model_name):
+    """Returns (sql_content, yaml_content, sql_path, yaml_path) for a model."""
     manifest_path = Path("target/manifest.json")
     sql_content = "SQL content not found."
     yaml_content = "YAML content not found."
+    sql_path = None
+    yaml_path = None
     
     if manifest_path.exists():
         with open(manifest_path, "r", encoding="utf-8") as f:
@@ -53,70 +61,160 @@ def get_model_metadata(model_name):
                 with open(sql_path, "r", encoding="utf-8") as f:
                     sql_content = f.read()
                     
-            # Get YAML block
+            # Get YAML block and supplemental YAMLs
             patch_path = node.get("patch_path")
+            
+            # --- Expanded YAML Context Gathering ---
+            yaml_parts = []
+            
+            # 1. Get the primary model YAML
             if patch_path:
                 yaml_file_path = patch_path.split("://")[-1]
+                yaml_path = yaml_file_path
                 if os.path.exists(yaml_file_path):
-                    import yaml
+                     try:
+                         with open(yaml_file_path, "r", encoding="utf-8") as f:
+                             yaml_parts.append(f"# {yaml_file_path}\n" + f.read())
+                     except Exception as e:
+                         yaml_parts.append(f"# Error reading {yaml_file_path}: {e}")
+            
+            # 2. Get local _sources.yml if it exists
+            if sql_path:
+                model_dir = Path(sql_path).parent
+                source_yaml = model_dir / "_sources.yml"
+                if source_yaml.exists():
                     try:
-                        with open(yaml_file_path, "r", encoding="utf-8") as f:
-                            parsed_yaml = yaml.safe_load(f)
-                        models = parsed_yaml.get("models", [])
-                        for m in models:
-                            if m.get("name") == model_name:
-                                yaml_content = yaml.dump([m], sort_keys=False)
-                                break
+                        with open(source_yaml, "r", encoding="utf-8") as f:
+                            yaml_parts.append(f"# {source_yaml}\n" + f.read())
                     except Exception as e:
-                        yaml_content = f"Error reading YAML: {e}"
+                        pass
+            
+            # 3. Get generic macro / seed context (if relevant to the project structure)
+            # Find any _seeds.yml or _macros.yml near the root directories
+            for supplemental_file in ["seeds/_seeds.yml", "macros/_macros.yml"]:
+                supp_path = Path(supplemental_file)
+                if supp_path.exists():
+                    try:
+                        with open(supp_path, "r", encoding="utf-8") as f:
+                            yaml_parts.append(f"# {supp_path}\n" + f.read())
+                    except Exception:
+                        pass
                         
-    return sql_content, yaml_content
+            if yaml_parts:
+                yaml_content = "\n\n".join(yaml_parts)
+            else:
+                yaml_content = "YAML content not found."
+                        
+    return sql_content, yaml_content, sql_path, yaml_path
 
-def main():
-    parser = argparse.ArgumentParser(description="Interactive review of a dbt model against qualitative standards.")
-    parser.add_argument("--select", "-s", type=str, required=True, help="dbt model name (e.g. int_parks)")
-    parser.add_argument("--agent", action="store_true", help="Agent mode: generate a markdown template instead of interactive prompt")
-    args = parser.parse_args()
-    
-    model_name = args.select
-    
-    # Run automated checks
-    auto_results = run_automated_checks(model_name, is_agent=args.agent)
+def process_model(model_name, args, rules):
+    print(f"\n{'='*60}")
+    print(f"  Evaluating Model: {model_name}")
+    print(f"{'='*60}")
+
+    # Run automated checks for context
+    auto_results = run_automated_checks(model_name, is_agent=args.agent or args.export_yaml)
     fails = [r for r in auto_results if r.get("status") == "FAIL"]
     
     if fails:
         print(f"\n[!] WARNING: {model_name} failed {len(fails)} automated checks.")
-        for f in fails:
-            print(f"\n  - {f['rule']}")
-            for msg in f.get('messages', [])[:5]:
+        for f_item in fails:
+            print(f"\n  - {f_item['rule']}")
+            for msg in f_item.get('messages', [])[:5]:
                 print(f"      {msg}")
-            if len(f.get('messages', [])) > 5:
-                print(f"      ... and {len(f.get('messages', [])) - 5} more lines")
+            if len(f_item.get('messages', [])) > 5:
+                print(f"      ... and {len(f_item.get('messages', [])) - 5} more lines")
         print("\nYou should probably fix these before qualitative review.\n")
     else:
         print(f"\n[+] {model_name} passed all automated checks.\n")
-        
-    # Load standards
-    standards_path = Path("reference/dbt_project_standards.json")
-    if not standards_path.exists():
-        print(f"Standards JSON not found at {standards_path}. Run python scripts/parse_standards.py first.")
-        sys.exit(1)
-        
-    with open(standards_path, "r", encoding="utf-8") as f:
-        rules = json.load(f)
-        
+
     layer = get_layer(model_name)
     manual_rules = [r for r in rules if not r.get("is_automated") and r.get("layer") in ["all", layer]]
     
     if not manual_rules:
-        print(f"No manual rules found for layer: {layer}.")
-        sys.exit(0)
+        print(f"[{model_name}] No manual rules found for layer: {layer}.")
+        return
         
-    print(f"You will be asked to evaluate {len(manual_rules)} manual rules.\n")
+    print(f"[{model_name}] {len(manual_rules)} manual rules to evaluate.\n")
         
+    if args.export_yaml:
+        # Export mode: generate a single YAML review file per model
+        try:
+            import yaml
+        except ImportError:
+            print(f"[{model_name}] The 'pyyaml' package is required for YAML export. Please 'pip install pyyaml'.")
+            return
+            
+        # Setup a custom representer for multiline block scalars (|)
+        class LiteralStr(str):
+            pass
+            
+        def literal_presenter(dumper, data):
+            if '\n' in data:
+                return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
+            return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+            
+        yaml.add_representer(LiteralStr, literal_presenter)
+        
+        sql_content, yaml_content, sql_path, yaml_path = get_model_metadata(model_name)
+        reviews_dir = Path(args.reviews_dir) if args.reviews_dir else Path("tmp/reviews")
+        reviews_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Build context block
+        context = {
+            "sql_path": sql_path or "Path not found",
+            "yaml_path": yaml_path or "Path not found"
+        }
+        if args.inline:
+            context["sql"] = LiteralStr(sql_content) if sql_content else ""
+            context["yaml"] = LiteralStr(yaml_content) if yaml_content else ""
+        
+        # Build rules list with empty evaluation slots
+        rules_list = []
+        for rule in manual_rules:
+            desc = rule.get('description', '')
+            rule_entry = {
+                "id": rule['id'],
+                "title": rule['title'],
+                "description": LiteralStr(desc) if '\n' in desc else desc,
+                "evaluation": {
+                    "status": "",
+                    "rationale": "",
+                    "evidence": [
+                        {"file": "", "start_line": None, "end_line": None}
+                    ]
+                }
+            }
+            rules_list.append(rule_entry)
+        
+        review_doc = {
+            "model": model_name,
+            "layer": layer,
+            "context": context,
+            "instructions": LiteralStr(
+                "SCOPE: Read ONLY the two files listed in context (sql_path and yaml_path). "
+                "Do NOT read other project files, search the codebase, run commands, or consult external references. "
+                "Evaluate each rule based solely on what is visible in those two files.\n\n"
+                "TASK: For each rule below, fill in the evaluation fields:\n"
+                "  - status: PASS, FAIL, or SKIP (use SKIP only if the rule is structurally inapplicable)\n"
+                "  - rationale: 1-2 sentences explaining your judgment\n"
+                "  - evidence: cite the file path and start_line/end_line of the relevant code. "
+                "Add multiple evidence entries if the rule applies to more than one location.\n\n"
+                "SAVE this file in place when complete. Do not create other files or reports."
+            ),
+            "rules": rules_list
+        }
+        
+        out_path = reviews_dir / f"{model_name}.yml"
+        with open(out_path, "w", encoding="utf-8") as f:
+            yaml.dump(review_doc, f, sort_keys=False, allow_unicode=True)
+                
+        print(f"[+] [{model_name}] Review file exported to {out_path}")
+        return
+
     if args.agent:
-        # Agent mode: generate template
-        sql_content, yaml_content = get_model_metadata(model_name)
+        # Agent mode: generate markdown template
+        sql_content, yaml_content, _, _ = get_model_metadata(model_name)
         
         template_lines = [f"# Qualitative Review Template for {model_name}"]
         template_lines.append(f"Model Layer: {layer}\n")
@@ -131,7 +229,7 @@ def main():
             template_lines.append(f"## {rule['id']} - {rule['title']}")
             if rule.get('description'):
                 template_lines.append(f"**Description:**\n{rule['description']}\n")
-            template_lines.append(f"Result: [ ] PASS / [ ] FAIL")
+            template_lines.append(f"Result: [ ] PASS / [ ] FAIL / [ ] SKIP")
             template_lines.append(f"Rationale: \n\n")
             
         out_path = Path(f"tmp/review_{model_name}.md")
@@ -140,13 +238,11 @@ def main():
             f.write("\n".join(template_lines))
             
         print(f"\n[Agent Mode] Template generated at {out_path}.")
-        print("Please read the template, fill it out, and save it.")
-        print("Refer to reference/dbt_project_standards.json for full rule descriptions if needed.")
-        sys.exit(0)
+        return
         
     # Human mode
     if questionary is None:
-        print("The 'questionary' package is required for interactive mode. Please 'pip install questionary' or use --agent.")
+        print("The 'questionary' package is required for interactive mode. Please 'pip install questionary', or use --agent or --export-yaml.")
         sys.exit(1)
         
     print(f"Starting interactive review for {model_name} ({layer} layer)...\n")
@@ -192,6 +288,48 @@ def main():
             f.write("\n")
             
     print(f"\nReview complete. Summary saved to {summary_path}")
+
+def main():
+    parser = argparse.ArgumentParser(description="Qualitative review of dbt models against project standards.")
+    parser.add_argument("--select", "-s", type=str, required=True, help="dbt selection string (e.g. models/integration or int_parks)")
+    parser.add_argument("--agent", action="store_true", help="Agent mode: generate a markdown template instead of interactive prompt")
+    parser.add_argument("--export-yaml", action="store_true", help="Export a single YAML review file per model for LLM evaluation")
+    parser.add_argument("--inline", action="store_true", help="When used with --export-yaml, embed full SQL and YAML content inline")
+    parser.add_argument("--reviews-dir", type=str, help="Output directory for review files (default: tmp/reviews)", default=None)
+    args = parser.parse_args()
+    
+    # Load standards once
+    standards_path = Path("reference/dbt_project_standards.json")
+    if not standards_path.exists():
+        print(f"Standards JSON not found at {standards_path}. Run python scripts/parse_standards.py first.")
+        sys.exit(1)
+        
+    with open(standards_path, "r", encoding="utf-8") as f:
+        rules = json.load(f)
+
+    # Use dbtRunner to resolve the selector
+    if dbtRunner is None:
+        print("dbt logic missing. Make sure dbt-core is installed.")
+        sys.exit(1)
+
+    print(f"Resolving model selection: {args.select} (excluding packages)...")
+    dbt = dbtRunner()
+    res: dbtRunnerResult = dbt.invoke(["ls", "-s", args.select, "--exclude", "package:*", "--resource-types", "model", "--quiet"])
+    
+    if not res.success or not res.result:
+        print(f"Could not resolve any models for selection '{args.select}'")
+        sys.exit(1)
+        
+    resolved_models = [m.split('.')[-1] for m in res.result if isinstance(m, str)]
+    
+    if not resolved_models:
+        print(f"No model nodes found for selection '{args.select}'")
+        sys.exit(1)
+        
+    print(f"Resolved {len(resolved_models)} models: {', '.join(resolved_models)}")
+
+    for model_name in resolved_models:
+        process_model(model_name, args, rules)
 
 if __name__ == "__main__":
     main()
