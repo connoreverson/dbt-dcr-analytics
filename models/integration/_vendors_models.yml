@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: int_vendors
+    description: >
+      Integration model standardizing StateGov Financials (DCR-FIN-01) vendors
+      into the CDM Account entity representing financial vendors.
+    meta:
+      testing_rationale: "Ensures vendor SK is unique to prevent fan-outs."
+    columns:
+      - name: vendors_sk
+        description: "Canonical integration surrogate key for the vendor."
+        tests:
+          - unique
+          - not_null
+      - name: vendor_id
+        description: "The business identifier from StateGov."
+        tests:
+          - not_null
+      - name: vendor_name
+        description: "The legal name or DBA of the vendor."
+      - name: vendor_type
+        description: "Categorical division of vendor types."
+      - name: is_active
+        description: "Boolean indicating if the vendor is cleared for new payments."
+      - name: tin_masked
+        description: "Masked taxpayer identification number."
+      - name: source_system
+        description: "The origin system for the vendor record."

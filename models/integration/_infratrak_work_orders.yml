@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: int_work_orders
+    description: >
+      Integration model standardizing InfraTrak work orders into the CDM WorkOrder entity.
+      Grain: one row per physical maintenance work order.
+    meta:
+      testing_rationale: "Ensures unique integration tracking of work orders to prevent downstream fan-outs."
+    columns:
+      - name: work_orders_sk
+        description: "Canonical integration surrogate key for the work order."
+        tests:
+          - unique
+          - not_null
+      - name: wo_id
+        description: "The business identifier for the work order from InfraTrak."
+        tests:
+          - not_null
+      - name: asset_tag
+        description: "The InfraTrak asset tag associated with the work order."
+      - name: parks_sk
+        description: "Foreign key linking the work order to the park where it occurred."
+        tests:
+          - relationships:
+              to: ref('int_parks')
+              field: parks_sk
+      - name: primary_assignee
+        description: "The employee or team assigned to the work order."
+      - name: wo_type
+        description: "Classification of the work order type (e.g., Routine, Emergency)."
+      - name: status
+        description: "The current status of the work order."
+      - name: labor_hours
+        description: "Number of labor hours charged to the work order."
+      - name: material_cost
+        description: "Cost of materials for the work order."
+      - name: total_cost
+        description: "Total cost associated with the work order."
+      - name: reported_date
+        description: "Date the work order was reported or initiated."
+      - name: completed_date
+        description: "Date the work order was marked completed."
+      - name: source_system
+        description: "The origin system for the record."
