@@ -10,16 +10,21 @@ relationships as (
 ),
 
 marts as (
-    select unique_id, name as resource_name 
-    from nodes 
-    where resource_type = 'model' 
-      and (starts_with(name, 'fct_') or starts_with(name, 'dim_'))
+    select
+        unique_id,
+        name as resource_name
+    from nodes
+    where
+        resource_type = 'model'
+        and (starts_with(name, 'fct_') or starts_with(name, 'dim_'))
 ),
 
 violating_marts as (
-    select m.unique_id, m.resource_name
-    from marts m
-    inner join relationships r on m.unique_id = r.child
+    select
+        m.unique_id,
+        m.resource_name
+    from marts as m
+    inner join relationships as r on m.unique_id = r.child
     where contains(r.parent, 'model.') and contains(r.parent, '.stg_')
 )
 

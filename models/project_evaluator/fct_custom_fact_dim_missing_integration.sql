@@ -11,18 +11,22 @@ relationships as (
 
 marts as (
     select * from nodes
-    where resource_type = 'model'
-      and (starts_with(name, 'fct_') or starts_with(name, 'dim_'))
+    where
+        resource_type = 'model'
+        and (starts_with(name, 'fct_') or starts_with(name, 'dim_'))
 ),
 
 missing_integration as (
-    select m.unique_id, m.name as resource_name
-    from marts m
+    select
+        m.unique_id,
+        m.name as resource_name
+    from marts as m
     where not exists (
-        select 1 
-        from relationships r 
-        where r.child = m.unique_id 
-          and contains(r.parent, 'model.') and contains(r.parent, '.int_')
+        select 1
+        from relationships as r
+        where
+            r.child = m.unique_id
+            and contains(r.parent, 'model.') and contains(r.parent, '.int_')
     )
 )
 
