@@ -12,30 +12,52 @@ fct_pos_transactions as (
     select * from {{ ref('fct_pos_transactions') }}
 ),
 
+-- Truncate dates for grouping
+res_prepared as (
+    select
+        parks_sk,
+        date_trunc('month', check_in_date) as report_month,
+        reservations_sk,
+        reservation_amount,
+        nights_stayed
+    from fct_reservations
+),
+
 -- Aggregate reservations to park-month
 res_agg as (
     select
         parks_sk,
-        date_trunc('month', check_in_date) as report_month,
+        report_month,
         count(reservations_sk) as total_reservations,
         sum(reservation_amount) as total_reservation_revenue,
         avg(reservation_amount) as avg_reservation_value,
         sum(nights_stayed) as total_nights_stayed,
         avg(nights_stayed) as avg_nights_per_reservation
-    from fct_reservations
+    from res_prepared
     group by 1, 2
+),
+
+-- Truncate POS dates for grouping
+pos_prepared as (
+    select
+        parks_sk,
+        date_trunc('month', transaction_created_at) as report_month,
+        transactions_sk,
+        transaction_amount,
+        quantity
+    from fct_pos_transactions
 ),
 
 -- Aggregate POS to park-month
 pos_agg as (
     select
         parks_sk,
-        date_trunc('month', transaction_created_at) as report_month,
+        report_month,
         count(transactions_sk) as total_pos_transactions,
         sum(transaction_amount) as total_pos_revenue,
         avg(transaction_amount) as avg_pos_transaction_value,
         sum(quantity) as total_pos_items_sold
-    from fct_pos_transactions
+    from pos_prepared
     group by 1, 2
 ),
 

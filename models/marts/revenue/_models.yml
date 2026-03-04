@@ -7,6 +7,10 @@ models:
       and VistaReserve. Grain: One row per unique park.
     meta:
       testing_rationale: Duplicate park records would cause fan-outs in revenue aggregation and misstate physical inventory counts.
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 0
+          max_value: 10000
     config:
       contract:
         enforced: true
@@ -50,6 +54,9 @@ models:
       - name: acreage_size_tier
         data_type: varchar
         description: Categorical grouping of park size.
+      - name: infratrak_park_id
+        data_type: integer
+        description: The integer park identifier from InfraTrak.
 
   - name: dim_customers
     description: >
@@ -104,6 +111,10 @@ models:
       Grain: One row per unique customer asset.
     meta:
       testing_rationale: Duplicated bookable assets would artificially inflate total park capacity metrics and cause double-counting in utilization reports.
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 0
+          max_value: 100000
     config:
       contract:
         enforced: true
