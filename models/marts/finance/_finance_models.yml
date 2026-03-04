@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: dim_vendors
+    config:
+      contract:
+        enforced: true
+    description: "Contractors, suppliers, and entities that receive payments or disbursements from DCR."
+    meta:
+      testing_rationale: "Ensures the surrogate key is unique and non-null to prevent duplicate vendor records from fanning out downstream financial joins."
+    columns:
+      - name: vendor_sk
+        description: "Surrogate key for the vendor."
+        data_type: varchar
+        tests:
+          - unique
+          - not_null
+      - name: vendor_id
+        description: "The business identifier assigned to the vendor in the state accounting system."
+        data_type: varchar
+      - name: vendor_name
+        description: "The legal name or DBA of the vendor."
+        data_type: varchar
+      - name: vendor_type
+        description: "Categorical division of vendor types (e.g., corporate, non-profit, individual)."
+        data_type: varchar
+      - name: is_active
+        description: "Boolean indicating if the vendor is cleared for new payments."
+        data_type: boolean
+      - name: tin_masked
+        description: "Masked taxpayer identification number."
+        data_type: varchar
+      - name: source_system
+        description: "The origin system for the vendor record."
+        data_type: varchar

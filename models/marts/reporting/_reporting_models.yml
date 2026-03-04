@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: rpt_agency_performance
+    config:
+      contract:
+        enforced: true
+    description: "Aggregation view mapping finance, operations, and visitation data points by month and by park."
+    meta:
+      testing_rationale: "Requires the month-park combo to be distinct to prevent duplicate aggregation lines on user dashboards."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - parks_sk
+            - report_month
+    columns:
+      - name: performance_sk
+        description: "Surrogate key for the monthly park snapshot."
+        data_type: varchar
+        tests:
+          - unique
+          - not_null
+      - name: report_month
+        description: "The month focal date representing the first of each month."
+        data_type: date
+      - name: parks_sk
+        description: "The focal park evaluated."
+        data_type: varchar
+      - name: total_expenditures
+        description: "Summary of gross financial expenditures linked to this park."
+        data_type: decimal(38,2)
+      - name: total_visitors
+        description: "Summary of visitation estimates recorded for this park this month."
+        data_type: hugeint
+      - name: total_incidents
+        description: "Summary of maintenance operations orders recorded for this park this month."
+        data_type: bigint

@@ -1,0 +1,172 @@
+version: 2
+
+models:
+  - name: dim_date
+    config:
+      contract:
+        enforced: true
+    description: "Role-playing date dimension to provide consistent calendar and fiscal calendar attributes for analysis across facts."
+    columns:
+      - name: date_sk
+        description: "Primary key for the date dimension."
+        data_type: date
+        tests:
+          - unique
+          - not_null
+      - name: full_date
+        description: "The actual calendar date."
+        data_type: date
+      - name: calendar_year
+        description: "The calendar year."
+        data_type: bigint
+      - name: calendar_month
+        description: "The calendar month number."
+        data_type: bigint
+      - name: day_of_month
+        description: "The day of the month number."
+        data_type: bigint
+      - name: calendar_quarter
+        description: "The calendar quarter number."
+        data_type: bigint
+      - name: fiscal_year
+        description: "The state fiscal year, running July 1 to June 30."
+        data_type: integer
+
+      - name: fiscal_month
+        description: "The state fiscal month."
+        data_type: integer
+      - name: fiscal_quarter
+        description: "The state fiscal quarter."
+        data_type: integer
+      - name: day_name
+        description: "The name of the day of the week."
+        data_type: varchar
+      - name: month_name
+        description: "The name of the month."
+        data_type: varchar
+
+  - name: dim_assets
+    config:
+      contract:
+        enforced: true
+    description: "Physical assets, vehicles, and infrastructure located across DCR parks, managed in InfraTrak and GeoParks."
+    meta:
+      testing_rationale: "Ensures the surrogate key is strictly unique and non-null to prevent downstream fan-outs during dimension joins."
+    columns:
+      - name: asset_sk
+        description: "Surrogate key for the physical asset."
+        data_type: varchar
+        tests:
+          - unique
+          - not_null
+      - name: asset_id
+        description: "The business identifier from the source system (e.g. AST-0000)."
+        data_type: varchar
+      - name: parks_sk
+        description: "Foreign key linking the asset to the park it is located in."
+        data_type: varchar
+      - name: feature_class
+        description: "The primary category or classification of the asset."
+        data_type: varchar
+      - name: sub_type
+        description: "The secondary sub-type or detailed classification of the asset."
+        data_type: varchar
+      - name: description
+        description: "A free-text description of the asset."
+        data_type: varchar
+      - name: installation_year
+        description: "The year the asset was constructed or installed."
+        data_type: integer
+      - name: replacement_value
+        description: "Estimated financial cost to replace the asset."
+        data_type: decimal(12,2)
+      - name: expected_lifespan_years
+        description: "The number of years the asset is expected to remain in service."
+        data_type: integer
+      - name: point_latitude
+        description: "Geographic point latitude of the asset."
+        data_type: decimal(9,6)
+      - name: point_longitude
+        description: "Geographic point longitude of the asset."
+        data_type: decimal(9,6)
+      - name: geometry_wkt
+        description: "Well-Known Text geometry of the asset (lines, polygons, etc.)."
+        data_type: varchar
+      - name: positional_accuracy_meters
+        description: "Estimated positional accuracy of the spatial data in meters."
+        data_type: decimal(5,2)
+      - name: last_updated
+        description: "Date the record was last modified in the source system."
+        data_type: date
+      - name: status
+        description: "Current operational or lifecycle status."
+        data_type: varchar
+      - name: is_visible_in_survey
+        description: "Boolean indicating if the asset is visible or accessible."
+        data_type: boolean
+      - name: source_system
+        description: "The code of the system where the asset originated."
+        data_type: varchar
+
+  - name: dim_employees
+    config:
+      contract:
+        enforced: true
+    description: "DCR personnel records, spanning active and inactive employees, for use as a dimension across operations and financial facts."
+    meta:
+      testing_rationale: "Ensures the surrogate key is unique and non-null to prevent duplicate employee records from fanning out downstream joins."
+    columns:
+      - name: employee_sk
+        description: "Surrogate key for the employee."
+        data_type: varchar
+        tests:
+          - unique
+          - not_null
+      - name: employee_id
+        description: "The business identifier for the employee."
+        data_type: varchar
+      - name: first_name_hash
+        description: "Obfuscated hash of the employee's first name."
+        data_type: varchar
+      - name: last_name_hash
+        description: "Obfuscated hash of the employee's last name."
+        data_type: varchar
+      - name: email_hash
+        description: "Obfuscated hash of the employee's email."
+        data_type: varchar
+      - name: phone_hash
+        description: "Obfuscated hash of the employee's phone number."
+        data_type: varchar
+      - name: hire_date
+        description: "The date the employee was hired."
+        data_type: date
+      - name: separation_date
+        description: "The date the employee left the department."
+        data_type: date
+      - name: position_id
+        description: "The business identifier for the employee's position."
+        data_type: varchar
+      - name: job_classification
+        description: "The standardized job title or classification for the position."
+        data_type: varchar
+      - name: pay_grade
+        description: "The civil service pay band for the position."
+        data_type: varchar
+      - name: funding_source
+        description: "The specific fund code or account that pays the position."
+        data_type: varchar
+      - name: position_is_active
+        description: "Boolean indicating if the position is currently active or abolished."
+        data_type: boolean
+      - name: org_unit_id
+        description: "The business identifier for the organizational unit."
+        data_type: varchar
+      - name: org_unit_name
+        description: "The descriptive name of the organizational unit."
+        data_type: varchar
+      - name: region_id
+        description: "The numeric region identifier the employee or unit belongs to."
+        data_type: integer
+      - name: source_system
+        description: "The origin system of the employee record."
+        data_type: varchar

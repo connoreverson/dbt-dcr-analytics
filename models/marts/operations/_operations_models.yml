@@ -1,0 +1,71 @@
+version: 2
+
+models:
+  - name: fct_incidents_and_maintenance
+    config:
+      contract:
+        enforced: true
+    description: "Fact model relating officer activity and work orders to dim_parks, acting as a unified operations ledger."
+    meta:
+      testing_rationale: "Requires relationships to valid dimensions and strictly checks bounds of facts."
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 0
+          max_value: 50000
+    columns:
+      - name: incidents_and_maintenance_sk
+        description: "Primary surrogate key for the operational event."
+        data_type: varchar
+        tests:
+          - unique
+          - not_null
+      - name: event_sk
+        description: "Source surrogate key from the respective integration model."
+        data_type: varchar
+        tests:
+          - not_null
+      - name: source_record_id
+        description: "The business identifier for the source event."
+        data_type: varchar
+      - name: parks_sk
+        description: "Foreign key to dim_parks. Null for events not localized to a single park."
+        data_type: varchar
+      - name: assigned_region
+        description: "The region ID for officer assignments where park granularity is absent."
+        data_type: varchar
+      - name: start_date
+        description: "Date the event started."
+        data_type: date
+      - name: end_date
+        description: "Date the event ended."
+        data_type: date
+      - name: event_category
+        description: "Top level categorization of the operational event (e.g. Law Enforcement Shift or Maintenance Work Order)."
+        data_type: varchar
+      - name: event_type
+        description: "Specific type of the event."
+        data_type: varchar
+      - name: event_status
+        description: "Current lifecycle status of the event."
+        data_type: varchar
+      - name: labor_hours
+        description: "Number of man-hours expended during this event."
+        data_type: decimal(6,2)
+      - name: financial_cost
+        description: "Total material or financial cost of the event."
+        data_type: decimal(10,2)
+      - name: visitor_contacts
+        description: "Number of visitor contacts made (law enforcement)."
+        data_type: integer
+      - name: resource_checks
+        description: "Number of resource checks made (law enforcement)."
+        data_type: integer
+      - name: patrol_miles
+        description: "Miles patrolled during the shift."
+        data_type: decimal(10,2)
+      - name: source_system
+        description: "The system of record."
+        data_type: varchar
+      - name: event_date
+        description: "A coalesced focal date for the event's occurrence."
+        data_type: date
