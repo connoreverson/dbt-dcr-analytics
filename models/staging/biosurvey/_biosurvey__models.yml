@@ -9,6 +9,10 @@ models:
       rows; water chemistry columns are null for Flora and Fauna rows. The nesting_status
       string 'None' is normalized to NULL. The ecoli_count field is cast to integer
       from the legacy VARCHAR storage.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure uniqueness. The observation_type discriminator
+        is validated against expected values to ensure proper filtering downstream.
     columns:
       - name: hk_observation
         description: Surrogate key derived from raw_id.
@@ -81,6 +85,10 @@ models:
       schema. Covers field surveys from 1993 onward across 255 survey sites. Latitude
       and longitude are null for approximately 60% of records — pre-GPS surveys
       (roughly pre-2010) used written site descriptions only.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to verify unique survey records. Foreign keys (site_id,
+        species_code) are tested to ensure surveys join cleanly to dimensions.
     columns:
       - name: hk_flora_fauna_survey
         description: Surrogate key derived from survey_id.
@@ -130,6 +138,10 @@ models:
       locations within DCR parks, identified by structured codes in the format
       S-{park_number}-{sequence}. Used as a reference dimension by flora/fauna,
       water quality, and invasive species observation models.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure dimension table uniqueness. The park_id
+        foreign key is validated to prevent orphaned sites.
     columns:
       - name: hk_survey_site
         description: Surrogate key derived from site_id.
@@ -158,6 +170,10 @@ models:
       9 fauna and 9 flora — tracked across all survey programs. Three flora species
       are currently classified invasive; none are classified endangered. Species codes
       follow a structured format: FL- for flora, FA- for fauna.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure species dimension uniqueness. The category
+        field is validated against accepted values.
     columns:
       - name: hk_species
         description: Surrogate key derived from species_code.
@@ -196,12 +212,16 @@ models:
       - name: alternate_names
         description: Pipe-delimited list of alternate common names. Null if none exist.
 
-  - name: stg_biosurvey__endangered_species_monitoring
+  - name: stg_biosurvey__endangered_species_observations
     description: >
-      Annual population monitoring records for endangered species at survey sites.
-      This model is currently empty — no monitoring records have been entered into the
+      Endangered species observations containing the ID, date, location (lat/lon), status, and survey notes.
+      Each row represents a single endangered species observation event.cords have been entered into the
       source system. The schema is staged to support forward compatibility when annual
       survey data becomes available.
+    meta:
+      testing_rationale: >
+        Primary keys are tested for uniqueness. Foreign keys (site_id, species_code)
+        are verified to ensure referential integrity for reporting.
     columns:
       - name: hk_endangered_monitoring
         description: Surrogate key derived from monitoring_id.
@@ -248,6 +268,10 @@ models:
       treatment type, and treatment date. Approximately 60% of observations (1,504 of
       2,500) have no treatment applied — these are untreated sites awaiting management
       action. GPS coordinates are recorded only for sites where treatment was applied.
+    meta:
+      testing_rationale: >
+        Primary keys are tested for uniqueness. Treatment statuses are validated against
+        expected enum values.
     columns:
       - name: hk_invasive_observation
         description: Surrogate key derived from observation_id.
@@ -300,6 +324,11 @@ models:
       protocol eras (1993–present), each with different laboratory standards and
       measurement methods. The protocol_era column enables era-aware analysis and
       flags records where cross-era direct comparisons may be unreliable.
+    meta:
+      testing_rationale: >
+        Primary keys are tested for distinctness and non-nullity. The protocol_era
+        column is strictly tested against expected valid states to prevent mixing
+        incompatible measurements downstream.
     columns:
       - name: hk_water_quality_test
         description: Surrogate key derived from test_id.

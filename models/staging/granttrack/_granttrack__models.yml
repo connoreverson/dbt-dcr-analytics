@@ -8,6 +8,10 @@ models:
       delimited format (name|email|phone) into three discrete columns. Covers
       all applications regardless of outcome — awarded, denied, pending, under
       review, and withdrawn.
+    meta:
+      testing_rationale: >
+        Primary keys are tested for uniqueness to ensure the grant application
+        dimension remains one row per application.
     columns:
       - name: hk_grant_application
         description: Surrogate hash key for the grant application, derived from application_id.
@@ -52,6 +56,10 @@ models:
       application and carries the federal award number (FAIN), performance period,
       required non-federal match percentage, and the StateGov Financials
       appropriation code that funds the state match obligation.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure uniqueness. The application_id foreign key
+        is tested to ensure every active award traces back to a recorded application.
     columns:
       - name: hk_award
         description: Surrogate hash key for the award, derived from award_id.
@@ -99,6 +107,10 @@ models:
       source formats (dollar signs, commas, text literals such as "TBD") to
       DECIMAL values; non-numeric text becomes null. Rows where both budgeted
       and actual are null in the source are excluded.
+    meta:
+      testing_rationale: >
+        The primary key is tested to ensure exactly one budget row per award per fiscal year
+        after the unpivot operation. The award_id foreign key is verified against active awards.
     columns:
       - name: hk_award_budget
         description: Surrogate hash key derived from award_id and fiscal_year.
@@ -133,6 +145,10 @@ models:
       VARCHAR source formats — ISO, US slash-delimited, long month-name text,
       and abbreviated month-name text — to typed DATE values. Unresolvable
       date strings yield null.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure uniqueness of compliance deadlines. 
+        The award_id foreign key is verified to prevent orphaned deadlines.
     columns:
       - name: hk_compliance_deadline
         description: Surrogate hash key for the deadline, derived from deadline_id.
@@ -163,13 +179,17 @@ models:
       - name: submission_date
         description: Normalised date the report was actually submitted; null if not yet submitted.
 
-  - name: stg_granttrack__match_fund_tracking
+  - name: stg_granttrack__match_fund_transactions
     description: >
-      One staged row per match fund transaction recording a non-federal
-      contribution toward an award's required match. The contributors field
+      Match fund tracking records documenting the source, amount, and date of organizational funds
+      provided to meet grant matching requirements. Grain: One row per match fund record.
       is preserved as a raw comma-separated string from the source Excel cell;
       splitting to individual contributor rows is deferred to the integration
       layer.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure uniqueness of match transactions. 
+        The award_id foreign key is validated against active awards.
     columns:
       - name: hk_match_fund
         description: Surrogate hash key for the match fund transaction, derived from match_id.
@@ -214,6 +234,10 @@ models:
       receipt date, and cross-references the StateGov Financials encumbrance
       covering the expenditure. Source dates and amounts are already typed
       correctly and require no normalisation.
+    meta:
+      testing_rationale: >
+        Primary keys are tested to ensure transactional distinctness. The award_id foreign
+        key is checked to prevent requests from being linked to invalid awards.
     columns:
       - name: hk_reimbursement_request
         description: Surrogate hash key for the request, derived from request_id.
