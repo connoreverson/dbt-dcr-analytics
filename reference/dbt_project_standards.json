@@ -130,7 +130,7 @@
     "title": "Meaningful CTE Names",
     "is_automated": false,
     "layer": "all",
-    "description": "CTE names must be meaningful and succinct: import CTEs should include the object being imported (e.g., 'grant_applications', 'payments', 'budget_lines'); simple transformation CTEs should include the object and a verb (e.g., 'payments_to_fund_grain', 'asset_id_added_to_payments'); complex transformations should have the subject, object, and verb (e.g., 'payments_joined_to_budgets')."
+    "description": "CTE names must be meaningful and succinct: import CTEs should include the object being imported (e.g., 'grant_applications', 'payments', 'budget_lines'); simple transformation CTEs should include the object and a verb (e.g., 'payments_to_fund_grain', 'asset_id_added_to_payments'); complex transformations should have the subject, object, and verb (e.g., 'payments_joined_to_budgets').\n\n**Exception:** Simple staging models generated via codegen are exempt from this rule; the conventional `source` and `final` (or `renamed`) CTE syntax is permitted in the staging layer."
   },
   {
     "id": "ALL-CTE-04",
@@ -235,7 +235,7 @@
     "title": "Exploratory Data Profiling During Development",
     "is_automated": false,
     "layer": "all",
-    "description": "Before finalizing a model, profile the data flowing through it. This is a development practice, not an artifact that persists in the codebase. At minimum, the analyst should investigate: row counts before and after each join or filter to confirm that cardinality behaves as expected; value distributions for key columns to confirm that the data looks reasonable; null rates for columns that the model depends on; and any unexpected duplicates, orphans, or outliers. The profiling itself does not need to be committed, but the insights it produces should inform the tests the analyst writes and the rationale they document.\n\n###### **Techniques**\n\nUse 'dbt show' to preview model output during development. Run ad-hoc count(*) queries on individual CTEs by temporarily making them the final select to verify row counts at each transformation step. Compare counts before and after a join to detect fan-out (the count should not increase unless the join is intentionally one-to-many). Query 'select column, count(*) from model group by column order by count(*) desc' to inspect value distributions and spot unexpected nulls, blanks, or dominant values. These checks take minutes and frequently surface issues that formal tests would miss until production.\n\n---"
+    "description": "Before finalizing a model, profile the data flowing through it. This is a development practice, not an artifact that persists in the codebase. At minimum, the analyst should investigate: row counts before and after each join or filter to confirm that cardinality behaves as expected; value distributions for key columns to confirm that the data looks reasonable; null rates for columns that the model depends on; and any unexpected duplicates, orphans, or outliers. The profiling itself does not need to be committed, but the insights it produces should inform the tests the analyst writes and the rationale they document.\n\n###### **Techniques**\n\nUse 'dbt show' to preview model output during development. Run ad-hoc count(*) queries on individual CTEs by temporarily making them the final select to verify row counts at each transformation step. Compare counts before and after a join to detect fan-out (the count should not increase unless the join is intentionally one-to-many). Query 'select column, count(*) from model group by column order by count(*) desc' to inspect value distributions and spot unexpected nulls, blanks, or dominant values. These checks take minutes and frequently surface issues that formal tests would miss until production.\n\n**Note for Automated Reviewers:** SKIP this rule during static file analysis. This is a required practice but does not produce a persisted artifact visible in the codebase.\n\n---"
   },
   {
     "id": "SQL-STG-01",
@@ -459,7 +459,7 @@
     "title": "Harmonize and Deduplicate Records",
     "is_automated": false,
     "layer": "integration",
-    "description": "Each row in the integration model must represent a distinct record across all upstream staging models and source tables. Execute coalesce statements, case statements, joins, window functions, and aggregations as needed."
+    "description": "Each row in the integration model must represent a distinct record across all upstream staging models and source tables. Execute coalesce statements, case statements, joins, window functions, and aggregations as needed to build complete records. \n\n**Caution on Explicit Deduplication:** Explicit deduplication logic (like `qualify row_number()`) should NOT be used as a blunt instrument. It masks upstream data quality defects and incurs a performance penalty. Rely on rigorous `unique` and `not_null` schema testing on primary keys at the Source and Staging layers to fail loud and early. Explicit deduplication logic should be reserved ONLY for integration models unioning overlapping datasets or handling known-poor legacy sources (documented as such). If pulling from a single staging system with strict uniqueness constraints, skip explicit deduplication."
   },
   {
     "id": "SQL-INT-12",

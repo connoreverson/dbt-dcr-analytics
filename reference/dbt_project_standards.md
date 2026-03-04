@@ -176,6 +176,8 @@ All joins must be explicit (e.g., 'left join', 'inner join') and all joined colu
 
 CTE names must be meaningful and succinct: import CTEs should include the object being imported (e.g., 'grant\_applications', 'payments', 'budget\_lines'); simple transformation CTEs should include the object and a verb (e.g., 'payments\_to\_fund\_grain', 'asset\_id\_added\_to\_payments'); complex transformations should have the subject, object, and verb (e.g., 'payments\_joined\_to\_budgets').
 
+**Exception:** Simple staging models generated via codegen are exempt from this rule; the conventional `source` and `final` (or `renamed`) CTE syntax is permitted in the staging layer.
+
 #### **Rule: ALL-CTE-04 No Duplicative CTEs Across Models** [Manual]
 
 If the same CTE logic appears in more than one model, reconstruct it into a dedicated upstream model or a macro.
@@ -393,6 +395,8 @@ Before finalizing a model, profile the data flowing through it. This is a develo
 ###### **Techniques**
 
 Use 'dbt show' to preview model output during development. Run ad-hoc count(\*) queries on individual CTEs by temporarily making them the final select to verify row counts at each transformation step. Compare counts before and after a join to detect fan-out (the count should not increase unless the join is intentionally one-to-many). Query 'select column, count(\*) from model group by column order by count(\*) desc' to inspect value distributions and spot unexpected nulls, blanks, or dominant values. These checks take minutes and frequently surface issues that formal tests would miss until production.
+
+**Note for Automated Reviewers:** SKIP this rule during static file analysis. This is a required practice but does not produce a persisted artifact visible in the codebase.
 
 ---
 
@@ -690,7 +694,9 @@ Present the columns and values in the integration model with the most accurate, 
 
 ##### **Rule: SQL-INT-11 Harmonize and Deduplicate Records** [Manual]
 
-Each row in the integration model must represent a distinct record across all upstream staging models and source tables. Execute coalesce statements, case statements, joins, window functions, and aggregations as needed.
+Each row in the integration model must represent a distinct record across all upstream staging models and source tables. Execute coalesce statements, case statements, joins, window functions, and aggregations as needed to build complete records.
+
+**Caution on Explicit Deduplication:** Explicit deduplication logic (like `qualify row_number()`) should NOT be used as a blunt instrument. It masks upstream data quality defects and incurs a performance penalty. Rely on rigorous `unique` and `not_null` schema testing on primary keys at the Source and Staging layers to fail loud and early. Explicit deduplication logic should be reserved ONLY for integration models unioning overlapping datasets or handling known-poor legacy sources (documented as such). If pulling from a single staging system with strict uniqueness constraints, skip explicit deduplication.
 
 ##### **Rule: SQL-INT-12 Minimal Renaming** [Manual]
 
