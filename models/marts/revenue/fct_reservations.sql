@@ -10,12 +10,12 @@ stg_reservations as (
 
 fct_reservations as (
     select
-        cast(visits_sk as varchar) as reservations_sk,
+        cast(int_visits.visits_sk as varchar) as reservations_sk,
 
         -- Dimension Keys
-        cast(_contact_sk as varchar) as contacts_sk,
-        cast(_asset_sk as varchar) as customer_assets_sk,
-        cast(_park_sk as varchar) as parks_sk,
+        cast(int_visits._contact_sk as varchar) as contacts_sk,
+        cast(int_visits._asset_sk as varchar) as customer_assets_sk,
+        cast(int_visits._park_sk as varchar) as parks_sk,
 
         -- Measures
         cast(stg_reservations.reservation_status as varchar) as reservation_status,

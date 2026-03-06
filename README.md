@@ -155,7 +155,6 @@ dbt test
 For automated CI-like testing with linting and governance scoring, use [nox](https://nox.thea.codes/):
 
 ```powershell
-pip install nox
 nox -s ci       # Run full CI pipeline: deps → seed → build → lint → score → check
 nox -s lint     # Lint all SQL
 nox -s score    # Run dbt-score governance validation

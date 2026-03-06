@@ -17,7 +17,7 @@ final as (
         has_annual_pass,
         is_senior,
         is_veteran,
-        case when merged_into_customer_id is not null then true else false end as is_merged_duplicate
+        (merged_into_customer_id is not null) as is_merged_duplicate
     from source
 )
 

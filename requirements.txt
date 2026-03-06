@@ -8,3 +8,4 @@ rich~=13.0.0
 questionary~=2.1.1
 pandas~=2.2.0
 pyyaml>=6.0.0
+nox>=2024.4.15

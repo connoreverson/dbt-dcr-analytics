@@ -10,11 +10,11 @@ stg_transactions as (
 
 fct_pos_transactions as (
     select
-        cast(transactions_sk as varchar) as transactions_sk,
+        cast(int_transactions.transactions_sk as varchar) as transactions_sk,
 
         -- Dimension Keys
-        cast(_contact_sk as varchar) as contacts_sk,
-        cast(_park_sk as varchar) as parks_sk,
+        cast(int_transactions._contact_sk as varchar) as contacts_sk,
+        cast(int_transactions._park_sk as varchar) as parks_sk,
 
         -- Measures
         cast(int_transactions.amount as decimal(10, 2)) as transaction_amount,

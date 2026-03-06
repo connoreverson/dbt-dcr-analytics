@@ -32,9 +32,10 @@ parks_enriched as (
         parks_sk,
         park_name,
         region,
-        cast(total_acres as decimal(10, 2)) as acreage,
         park_type,
+        infratrak_park_id,
 
+        cast(total_acres as decimal(10, 2)) as acreage,
         cast(address1_city as varchar) as address1_city,
         cast(address1_stateorprovince as varchar)
             as address1_stateorprovince,
@@ -48,7 +49,6 @@ parks_enriched as (
             when source_system = 'DCR-GEO-01' then 'Active - Verified'
             else 'Active - Unverified'
         end as operational_status,
-        infratrak_park_id,
 
         case
             when

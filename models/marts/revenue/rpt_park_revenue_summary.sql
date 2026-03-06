@@ -16,10 +16,10 @@ fct_pos_transactions as (
 res_prepared as (
     select
         parks_sk,
-        date_trunc('month', check_in_date) as report_month,
         reservations_sk,
         reservation_amount,
-        nights_stayed
+        nights_stayed,
+        date_trunc('month', check_in_date) as report_month
     from fct_reservations
 ),
 
@@ -41,10 +41,10 @@ res_agg as (
 pos_prepared as (
     select
         parks_sk,
-        date_trunc('month', transaction_created_at) as report_month,
         transactions_sk,
         transaction_amount,
-        quantity
+        quantity,
+        date_trunc('month', transaction_created_at) as report_month
     from fct_pos_transactions
 ),
 

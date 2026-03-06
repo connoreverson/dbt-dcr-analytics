@@ -17,6 +17,10 @@ python = "3.10"
 # Sessions to run by default
 nox.options.sessions = ["deps", "seed", "build", "lint", "score", "check"]
 
+# Use the project's existing virtualenv instead of creating isolated session venvs.
+# All tools (dbt, sqlfluff, dbt-score) are installed there, not in nox-managed envs.
+nox.options.default_venv_backend = "none"
+
 
 @nox.session
 def deps(session):
@@ -52,7 +56,8 @@ def lint(session):
 @nox.session
 def score(session):
     """Run dbt-score governance checks."""
-    session.run("dbt-score", "score", external=True)
+    session.env["PYTHONUTF8"] = "1"
+    session.run("dbt-score", "lint", external=True)
 
 
 @nox.session
@@ -78,8 +83,8 @@ def ci(session):
     session.run("dbt", "seed", external=True)
     session.run("dbt", "build", external=True)
     session.run("sqlfluff", "lint", "models/", "--dialect", "duckdb", external=True)
-    session.run("dbt-score", "score", external=True)
     session.env["PYTHONUTF8"] = "1"
+    session.run("dbt-score", "lint", external=True)
     session.run(
         "python",
         "scripts/check_model.py",
