@@ -20,7 +20,6 @@ dbt-public-sector-example/
 │   ├── architectural_review.md         # Source data readiness assessment
 │   ├── project.md                      # Project framing and design decisions
 │   ├── data_inventory_summary.md       # Condensed quick-reference for all 10 systems
-│   ├── VOICE_PROFILE_Connor.md         # Writing style guide for project owner
 │   └── business_artifacts/             # Read-only upstream business docs
 │       ├── DCR Data Inventory.md
 │       ├── DCR Business Glossary.md
@@ -40,7 +39,6 @@ Read these before making substantive decisions:
 - @reference/dbt_project_standards.md — 103 rules governing every layer of the dbt project
 - @reference/SPEC_vertical_slice_revenue.md — Complete specification for the first vertical slice (Revenue & Reservations)
 - @source_data/cdm_metadata/revenue_slice/ — Curated CDM entity and column schemas for this slice (Asset, nonProfitCore, applicationCommon, Visits, cdmfoundation). Full library available in parent directory if needed.
-- @reference/VOICE_PROFILE_Connor.md — Writing conventions for project documentation
 
 ## Authority and Guardrails
 
@@ -104,7 +102,3 @@ Read these before making substantive decisions:
 ## Current Phase
 
 The Revenue & Reservations vertical slice is in **active implementation**. Staging, integration, and mart models have been built across two source systems (VistaReserve and GeoParks). The execution plan lives at `reference/plans/2026-02-23-revenue-reservations-project-plan.md`. Consult the SPEC (`reference/SPEC_vertical_slice_revenue.md`) for remaining deliverables and CDM conformance requirements before making any changes.
-
-## Writing Style
-
-When producing documentation, plans, or written artifacts, follow the conventions in `reference/VOICE_PROFILE_Connor.md`. Key points: purpose-driven precision, calm and trust-building tone, no unnecessary jargon, trace claims to evidence, balance compliance with usability.
