@@ -94,31 +94,6 @@ def save_state(session):
         if src_pkgs.exists() and not dst_pkgs.exists():
             shutil.copytree(str(src_pkgs), str(dst_pkgs))
 
-        # Match line endings in the worktree to the corresponding file in the current
-        # working tree. Windows git autocrlf=true converts LF→CRLF on checkout, but
-        # files written directly by tooling (e.g. Claude Code) keep LF, so the project
-        # has mixed endings. The worktree always uses CRLF; we mirror the current
-        # working tree per-file so dbt produces matching checksums for unchanged content.
-        for ext in ("*.sql", "*.yml", "*.yaml"):
-            for wt_file in worktree_dir.rglob(ext):
-                if "dbt_packages" in wt_file.parts:
-                    continue
-                rel = wt_file.relative_to(worktree_dir)
-                cur_file = Path(".") / rel
-                wt_raw = wt_file.read_bytes()
-                if cur_file.exists():
-                    cur_raw = cur_file.read_bytes()
-                    # Match whatever endings the current working tree file uses
-                    if b"\r\n" in cur_raw:
-                        normalized = wt_raw.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
-                    else:
-                        normalized = wt_raw.replace(b"\r\n", b"\n")
-                else:
-                    # File only exists in the baseline (deleted since HEAD~1) — use LF
-                    normalized = wt_raw.replace(b"\r\n", b"\n")
-                if normalized != wt_raw:
-                    wt_file.write_bytes(normalized)
-
         # dbt parse generates manifest.json without connecting to the database
         _STATE_DIR.mkdir(parents=True, exist_ok=True)
         session.run(
@@ -148,6 +123,10 @@ def check(session):
     """
     session.env["PYTHONUTF8"] = "1"
 
+    # Refresh target/manifest.json so state:modified compares against the current
+    # working tree, not a stale manifest from a previous build.
+    session.run("dbt", "parse", external=True)
+
     if _STATE_MANIFEST.exists():
         select = "state:modified"
         extra = ["--state", str(_STATE_DIR)]
@@ -173,24 +152,14 @@ def check(session):
 
 @nox.session
 def ci(session):
-    """Run all CI checks (deps → seed → build → lint → score → check)."""
-    session.run("dbt", "deps", external=True)
-    session.run("dbt", "seed", external=True)
-    session.run("dbt", "build", external=True)
-    session.run("sqlfluff", "lint", "models/", "--dialect", "duckdb", external=True)
-    session.env["PYTHONUTF8"] = "1"
-    session.run("dbt-score", "lint", external=True)
-    session.run(
-        "python",
-        "scripts/check_model.py",
-        "--select",
-        "state:modified" if _STATE_MANIFEST.exists() else "+",
-        *(["--state", str(_STATE_DIR)] if _STATE_MANIFEST.exists() else []),
-        "--json",
-        "--output",
-        "tmp/check_model.json",
-        external=True,
-    )
+    """Run all CI checks by chaining individual sessions.
+
+    Equivalent to running: nox (default sessions)
+    Using session.notify() ensures ci stays in sync with any changes to
+    individual sessions rather than duplicating their logic.
+    """
+    for s in ("deps", "seed", "build", "lint", "score", "check"):
+        session.notify(s)
 
 
 @nox.session
