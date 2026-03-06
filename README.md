@@ -9,8 +9,8 @@ The source data is entirely synthetic, generated with Python and [Mimesis](https
 For the impatient:
 
 ```powershell
-git clone https://github.com/<your-org>/dbt-public-sector-example.git
-cd dbt-public-sector-example
+git clone https://github.com/<your-org>/dbt-dcr-analytics.git
+cd dbt-dcr-analytics
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
@@ -106,8 +106,8 @@ Marts use a dimensional modeling pattern with `dim_` (dimensions), `fct_` (facts
 Clone the repository and create a Python virtual environment:
 
 ```powershell
-git clone https://github.com/<your-org>/dbt-public-sector-example.git
-cd dbt-public-sector-example
+git clone https://github.com/<your-org>/dbt-dcr-analytics.git
+cd dbt-dcr-analytics
 
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
@@ -842,7 +842,7 @@ To adopt part of this project — for example, the shared agent rules in `.agent
 
 ```powershell
 # Export a single directory from this repo into an existing repo
-git -C C:\path\to\dbt-public-sector-example archive HEAD .agent/rules/ | tar -x -C C:\path\to\your-repo
+git -C C:\path\to\dbt-dcr-analytics archive HEAD .agent/rules/ | tar -x -C C:\path\to\your-repo
 ```
 
 Replace `.agent/rules/` with whichever path you want to copy. The directory structure is preserved. Then stage and commit in the target repo:
@@ -856,13 +856,13 @@ git commit -m "chore: adopt DCR Analytics agent rules"
 To copy individual files rather than a whole directory, list them explicitly:
 
 ```powershell
-git -C C:\path\to\dbt-public-sector-example archive HEAD scripts/check_model.py scripts/review_model.py | tar -x -C C:\path\to\your-repo
+git -C C:\path\to\dbt-dcr-analytics archive HEAD scripts/check_model.py scripts/review_model.py | tar -x -C C:\path\to\your-repo
 ```
 
 If `tar` is not available, use `Copy-Item` directly and then `git add`:
 
 ```powershell
-Copy-Item -Recurse C:\path\to\dbt-public-sector-example\.agent\rules\ C:\path\to\your-repo\.agent\rules\
+Copy-Item -Recurse C:\path\to\dbt-dcr-analytics\.agent\rules\ C:\path\to\your-repo\.agent\rules\
 ```
 
 ## Project Standards
@@ -878,7 +878,7 @@ Contributors should read this document before writing or reviewing models. The s
 ## Project Structure
 
 ```
-dbt-public-sector-example/
+dbt-dcr-analytics/
 ├── models/
 │   ├── staging/                  # Views: one subdirectory per source system
 │   │   ├── vistareserve/         #   stg_vistareserve__reservations, etc.

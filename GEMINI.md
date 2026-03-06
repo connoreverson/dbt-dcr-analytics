@@ -5,7 +5,7 @@ You are a data engineering agent working on the DCR Analytics project for the De
 ## Project Structure
 
 ```
-dbt-public-sector-example/
+dbt-dcr-analytics/
 ├── .agent/                    # Agent skills and rules (cross-compatible SSoT)
 │   ├── rules/                 # Always-on and model-decision rules
 │   └── skills/                # On-demand skill packages
