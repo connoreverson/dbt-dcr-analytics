@@ -486,6 +486,24 @@ python scripts/review_model.py --select models/integration --export-yaml
 python scripts/review_model.py --select int_parks
 ```
 
+#### Sending a Review to Gemini via the Clipboard
+
+After generating an agent checklist, you can pipe the file directly into the Windows clipboard and paste it into [Gemini](https://gemini.google.com/app) in Chrome for a qualitative peer review. This is useful when you want a second opinion on description quality, business rule design, or CDM mapping decisions that automated tools cannot evaluate.
+
+```powershell
+python scripts/review_model.py --select int_parks --agent; Get-Content tmp/review_int_parks.md | Set-Clipboard
+```
+
+The script writes its checklist to `tmp/review_<model>.md`, and `Set-Clipboard` loads the file into the clipboard. Open Chrome, navigate to [gemini.google.com/app](https://gemini.google.com/app), and paste with `Ctrl+V`.
+
+For batch reviews, use `--export-yaml` and copy each model file individually:
+
+```powershell
+python scripts/review_model.py --select models/integration --export-yaml; Get-Content tmp/reviews/int_financial_transactions.yaml | Set-Clipboard
+```
+
+In Gemini, a useful prompt framing is: *"You are reviewing a dbt integration model against the DCR Analytics project standards. Here is the review checklist — please evaluate each item and flag any FAIL or NEEDS-ATTENTION findings with your reasoning."* Paste the checklist content immediately after the prompt.
+
 ### inspect_source.py — Source Data Discovery
 
 Profiles a source table before writing staging models. Reports row counts, column schemas, uniqueness and cardinality analysis, null distributions, date ranges, and sample rows.
@@ -817,6 +835,35 @@ git push -u origin feat/add-int-work-orders
 ### Pull Requests
 
 When opening a pull request, include which models were added or changed, whether `dbt build` and `check_model.py` pass, and any governance decisions worth noting (CDM exceptions, severity choices, known data quality gaps). Reviewers should be able to understand the scope and rationale without reading every line of SQL.
+
+### Copying Files into an Existing Repository
+
+To adopt part of this project — for example, the shared agent rules in `.agent/rules/` or the `scripts/` toolchain — into a repository you already own, use `git archive` to extract a specific directory as a tarball and pipe it into the target location:
+
+```powershell
+# Export a single directory from this repo into an existing repo
+git -C C:\path\to\dbt-public-sector-example archive HEAD .agent/rules/ | tar -x -C C:\path\to\your-repo
+```
+
+Replace `.agent/rules/` with whichever path you want to copy. The directory structure is preserved. Then stage and commit in the target repo:
+
+```powershell
+cd C:\path\to\your-repo
+git add .agent/rules/
+git commit -m "chore: adopt DCR Analytics agent rules"
+```
+
+To copy individual files rather than a whole directory, list them explicitly:
+
+```powershell
+git -C C:\path\to\dbt-public-sector-example archive HEAD scripts/check_model.py scripts/review_model.py | tar -x -C C:\path\to\your-repo
+```
+
+If `tar` is not available, use `Copy-Item` directly and then `git add`:
+
+```powershell
+Copy-Item -Recurse C:\path\to\dbt-public-sector-example\.agent\rules\ C:\path\to\your-repo\.agent\rules\
+```
 
 ## Project Standards
 
