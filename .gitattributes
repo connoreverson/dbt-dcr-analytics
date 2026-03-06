@@ -1,0 +1,13 @@
+# Enforce LF line endings for all text files.
+# Overrides core.autocrlf=true so dbt checksums are consistent
+# between the working tree and git worktrees used by save_state.
+* text=auto
+*.sql text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.csv text eol=lf
+*.toml text eol=lf
+*.txt text eol=lf
+*.json text eol=lf

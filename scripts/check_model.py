@@ -401,7 +401,7 @@ class ModelChecker:
         except Exception as e:
             self.add_result(model_name, "SQL Static Analysis", "SKIP", [f"Error reading SQL file: {e}"])
 
-    def run_checks(self, select: str) -> List[CheckResult]:
+    def run_checks(self, select: str, state: Optional[str] = None) -> List[CheckResult]:
         self.console.print()
         
         # Project-level checks before the model loop
@@ -446,7 +446,10 @@ class ModelChecker:
         self.console.print(Panel(f"Testing Models by Selection: [bold]{select}[/bold]", border_style="blue", expand=False))
         
         dbt = dbtRunner()
-        res: dbtRunnerResult = dbt.invoke(["ls", "-s", select, "--resource-types", "model", "--quiet"])
+        ls_args = ["ls", "-s", select, "--resource-types", "model", "--quiet"]
+        if state:
+            ls_args.extend(["--state", state])
+        res: dbtRunnerResult = dbt.invoke(ls_args)
         
         if not res.success or not res.result:
             self.console.print(f"[red]Could not resolve any models for selection '{select}'[/red]")
@@ -501,13 +504,14 @@ def run_checks(model_name: str, quiet: bool = False) -> List[CheckResult]:
 def main():
     parser = argparse.ArgumentParser(description="Check dbt models against project standards.")
     parser.add_argument("--select", "-s", type=str, required=True, help="dbt selection string (e.g. models/integration or int_parks)")
+    parser.add_argument("--state", type=str, help="Path to directory containing comparison manifest.json for state:modified selector")
     parser.add_argument("--json", action="store_true", help="Output results as JSON to stdout")
     parser.add_argument("--output", type=str, help="Output results as JSON to file")
     args = parser.parse_args()
 
     is_json = args.json or bool(args.output)
     checker = ModelChecker(is_json_output=is_json)
-    results = checker.run_checks(args.select)
+    results = checker.run_checks(args.select, state=args.state)
 
     # Summary
     table = Table(title=f"Global Summary", show_header=True, header_style="bold magenta")

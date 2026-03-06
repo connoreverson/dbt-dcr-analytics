@@ -14,7 +14,6 @@ import sys
 from pathlib import Path
 
 import duckdb
-import pandas as pd
 
 
 def export_mart_data(db_path, format="both", select=None):
@@ -29,25 +28,31 @@ def export_mart_data(db_path, format="both", select=None):
     # Connect to DuckDB
     conn = duckdb.connect(db_path)
 
-    # Get list of mart tables
-    result = conn.execute(
-        "select table_name from information_schema.tables "
-        "where table_schema = 'main' and table_name like 'main_marts_%' "
-        "order by table_name"
-    ).fetch_all()
+    # Discover mart model names from the models/marts/ directory
+    marts_dir = Path("models/marts")
+    if not marts_dir.exists():
+        print("❌ models/marts/ directory not found")
+        return False
 
-    mart_tables = [row[0] for row in result]
+    all_mart_names = {p.stem for p in marts_dir.rglob("*.sql")}
+
+    # Filter to those that exist as tables in the database
+    existing = {
+        row[0]
+        for row in conn.execute(
+            "select table_name from information_schema.tables where table_schema = 'main'"
+        ).fetchall()
+    }
+    mart_tables = sorted(all_mart_names & existing)
 
     if not mart_tables:
-        print("❌ No mart tables found in database")
+        print("❌ No mart tables found in database (run 'dbt build' first)")
         return False
 
     if select:
-        # Filter to requested model
-        full_name = f"main_marts_{select}"
-        mart_tables = [t for t in mart_tables if t == full_name]
+        mart_tables = [t for t in mart_tables if t == select]
         if not mart_tables:
-            print(f"❌ Mart model '{select}' not found (expected table: {full_name})")
+            print(f"❌ Mart model '{select}' not found in database")
             return False
 
     # Create output directory
