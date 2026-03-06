@@ -94,31 +94,33 @@ class ModelChecker:
         self.console.print(f"\n[bold]3. dbt-score lint --select {model_name}[/bold]")
         try:
             env = os.environ.copy()
-            env["PYTHONIOENCODING"] = "utf-8"
+            env["PYTHONUTF8"] = "1"
             result = subprocess.run(
                 [sys.executable, "-m", "dbt_score", "lint", "--select", model_name, "-f", "json", "-n", "dbt_score.rules.generic", "-n", "scripts.dbt_score_rules"],
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
                 env=env
             )
             try:
                 score_data = json.loads(result.stdout)
-                target_key = next((k for k in score_data.keys() if k.endswith(f".{model_name}") and k.startswith("model.")), None)
-                
-                if target_key:
-                    node_data = score_data[target_key]
+                node_data = score_data.get("models", {}).get(model_name)
+
+                if node_data:
                     score = node_data.get("score", 0.0)
                     eval_messages = []
-                    for rule, r_res in node_data.get("evaluations", {}).items():
-                        if r_res.get("status") in [1, 2]: # failure/warning in typical rule systems
+                    for rule, r_res in node_data.get("results", {}).items():
+                        if r_res.get("result") in ["WARN", "ERR"]:
                             eval_messages.append(f"{rule}: {r_res.get('message')}")
-                    
-                    if score < 5.0:
-                        self.add_result(model_name, f"dbt-score - {score} (below 5.0 threshold)", "FAIL", eval_messages)
+
+                    if not node_data.get("pass", True) or score < 5.0:
+                        self.add_result(model_name, f"dbt-score - {score:.2f} (below threshold)", "FAIL", eval_messages)
+                    elif eval_messages:
+                        self.add_result(model_name, f"dbt-score - {score:.2f} (warnings)", "WARN", eval_messages)
                     else:
-                        self.add_result(model_name, f"dbt-score - {score}", "PASS")
+                        self.add_result(model_name, f"dbt-score - {score:.2f}", "PASS")
                 else:
-                     self.add_result(model_name, "dbt-score - model missing", "WARN", ["Model not found in score output"])
+                    self.add_result(model_name, "dbt-score - model missing", "WARN", ["Model not found in score output"])
 
             except json.JSONDecodeError:
                 if "score" in result.stdout.lower():
