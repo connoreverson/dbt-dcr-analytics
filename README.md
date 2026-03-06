@@ -4,6 +4,21 @@ This is an example project demonstrating how a state government agency — the D
 
 The source data is entirely synthetic, generated with Python and [Mimesis](https://mimesis.name/) to simulate realistic data quality issues that public sector organizations encounter: stale crosswalks, regional coverage gaps, mixed identifier formats, and legacy system quirks. The governance toolchain — sqlfluff, dbt-score, and dbt-project-evaluator — enforces 103 project standards that map to [DAMA data quality dimensions](#data-quality-and-dama-dimensions), making this a practical reference for teams that need to balance compliance with usability.
 
+## Quick Start
+
+For the impatient:
+
+```powershell
+git clone https://github.com/<your-org>/dbt-public-sector-example.git
+cd dbt-public-sector-example
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+dbt deps && dbt seed && dbt build
+```
+
+All 10 source databases are included. No external setup needed. See [Getting Started](#getting-started) for detailed instructions and [Running Tests](#running-tests) for CI automation.
+
 ## Architecture
 
 DCR Analytics uses [dbt-duckdb](https://github.com/duckdb/dbt-duckdb) with DuckDB's `ATTACH` feature to query all 10 source databases as cross-database schemas from a single analytical warehouse — no data movement or ETL pipeline required.
@@ -128,6 +143,46 @@ You can also query the warehouse directly:
 ```powershell
 dbt show --select int_parks --limit 5
 ```
+
+### Running Tests
+
+The project includes 745 data tests covering schema validation, nullness, uniqueness, referential integrity, and business rule enforcement. Run them with:
+
+```powershell
+dbt test
+```
+
+For automated CI-like testing with linting and governance scoring, use [nox](https://nox.thea.codes/):
+
+```powershell
+pip install nox
+nox -s ci       # Run full CI pipeline: deps → seed → build → lint → score → check
+nox -s lint     # Lint all SQL
+nox -s score    # Run dbt-score governance validation
+```
+
+See `noxfile.py` for individual session definitions. You can also run sessions individually: `nox -s build`, `nox -s test`, etc.
+
+### Exporting Data
+
+To export all mart model data to CSV and Parquet files:
+
+```powershell
+python scripts/export_mart_data.py --format both --select fct_reservations
+```
+
+Use `--format csv` or `--format parquet` for a single format, or omit `--select` to export all marts. Outputs go to the `output/` directory.
+
+## AI-Assisted Development
+
+This project includes configuration for AI-assisted code generation using [Claude Code](https://claude.com/claude-code) and [Gemini](https://gemini.google.com/app):
+
+- **`.agent/`** — Shared governance rules and dbt skills (SSoT for both Claude and Gemini)
+- **`.claude/`** — Claude Code agent definitions and local configuration
+- **`.gemini/`** — Gemini CLI and Antigravity settings
+- **`.ai/prompts/`** — System prompts for dbt-implementer and spec-planner agents
+
+These directories are optional and do not affect local development. Remove them if you are not using an AI assistant. See [CLAUDE.md](CLAUDE.md) and [GEMINI.md](GEMINI.md) for agent-specific instructions.
 
 ## PowerShell Basics
 
@@ -835,3 +890,16 @@ dbt-public-sector-example/
 - [DAMA DMBOK](https://www.dama.org/cpages/body-of-knowledge)
 - [dbt Discourse](https://discourse.getdbt.com/) — community Q&A
 - [dbt Community Slack](https://community.getdbt.com/) — live discussion
+
+## Credits
+
+This project was built with [Claude Code](https://claude.com/claude-code) and [Google Gemini](https://gemini.google.com/app), demonstrating how AI-assisted development can accelerate dbt project scaffolding while maintaining governance, testing, and documentation standards. Cross-agent coordination via [Anthropic's Agent SDK](https://github.com/anthropics/anthropic-sdk-python) and Google's Antigravity enables shared governance rules and prompts across different AI assistants.
+
+The synthetic source data is generated using [Mimesis](https://mimesis.name/). The governance toolchain includes [dbt-score](https://github.com/mkdocs-plugins/dbt-score), [dbt-project-evaluator](https://github.com/dbt-labs/dbt-project-evaluator), and [sqlfluff](https://github.com/sqlfluff/sqlfluff).
+
+Inspired by real-world challenges in public sector analytics, this project demonstrates best practices for:
+- Standardized dbt project structure across 10 heterogeneous source systems
+- Governance automation with linting, scoring, and custom checkers
+- CDM conformance and cross-system entity reconciliation
+- Comprehensive data quality testing across the pipeline
+- Local-first development with DuckDB (no external infrastructure needed)

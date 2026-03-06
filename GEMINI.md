@@ -99,6 +99,6 @@ Read these before making substantive decisions:
 | Testing | dbt build (schema + data tests) | Plus singular tests for reconciliation |
 | Packages | dbt_utils, dbt_expectations, audit_helper, codegen | All version-pinned |
 
-## Current Phase
+## Project Status
 
-The Revenue & Reservations vertical slice is in **active implementation**. Staging, integration, and mart models have been built across two source systems (VistaReserve and GeoParks). The execution plan lives at `reference/plans/2026-02-23-revenue-reservations-project-plan.md`. Consult the SPEC (`reference/SPEC_vertical_slice_revenue.md`) for remaining deliverables and CDM conformance requirements before making any changes.
+DCR Analytics is a complete, reference-quality dbt project demonstrating integrated analytics across 10 source systems. The Revenue & Reservations vertical slice (the primary implementation focus) includes staging, integration, and mart models with comprehensive testing and documentation. For guidance on extending the project to additional vertical slices or business domains, consult the SPEC (`reference/SPEC_vertical_slice_revenue.md`) and the project standards (`reference/dbt_project_standards.md`).
