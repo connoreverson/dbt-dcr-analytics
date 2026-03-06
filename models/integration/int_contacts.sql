@@ -11,7 +11,13 @@ final as (
         first_name,
         last_name,
         email as e_mail_address1,
-        phone as mobile_phone
+        phone as mobile_phone,
+        address_state,
+        account_created_at,
+        has_annual_pass,
+        is_senior,
+        is_veteran,
+        case when merged_into_customer_id is not null then true else false end as is_merged_duplicate
     from source
 )
 

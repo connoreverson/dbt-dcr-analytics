@@ -83,7 +83,6 @@ Marts use a dimensional modeling pattern with `dim_` (dimensions), `fct_` (facts
 ### Prerequisites
 
 - [Python 3.10+](https://www.python.org/downloads/)
-- [VS Code](https://code.visualstudio.com/) with the [dbt Power User](https://marketplace.visualstudio.com/items?itemName=innoverio.vscode-dbt-power-user) extension (recommended)
 - [Git](https://git-scm.com/downloads)
 - Windows 11 with PowerShell
 
@@ -129,6 +128,176 @@ You can also query the warehouse directly:
 ```powershell
 dbt show --select int_parks --limit 5
 ```
+
+## PowerShell Basics
+
+This project uses PowerShell as its primary shell on Windows. If you are more familiar with Bash, cmd, or another terminal, the following tips cover the patterns that come up most often when working with dbt and Python on Windows.
+
+### Running Commands
+
+PowerShell commands work like most shells — type the command, press Enter. Chaining works with `;` (run sequentially regardless of success) or `&&` (run the next command only if the previous one succeeded, available in PowerShell 7+):
+
+```powershell
+dbt build --select int_parks; dbt-score lint --select int_parks
+```
+
+### Setting Environment Variables
+
+Environment variables are set per-session using `$env:`. They do not persist after you close the terminal. The most common one in this project is `PYTHONUTF8`, which prevents encoding errors in console output:
+
+```powershell
+# Set for the current session
+$env:PYTHONUTF8=1
+
+# Set inline for a single command (semicolon separates the two statements)
+$env:PYTHONUTF8=1; python scripts/check_model.py --select int_parks
+```
+
+In Bash or Git Bash, the equivalent is `PYTHONUTF8=1 python scripts/check_model.py --select int_parks` — the variable is prefixed directly to the command.
+
+### Virtual Environment Activation
+
+Python virtual environments are activated differently depending on the shell:
+
+```powershell
+# PowerShell
+.\.venv\Scripts\Activate.ps1
+
+# Git Bash
+source .venv/Scripts/activate
+
+# cmd
+.venv\Scripts\activate.bat
+```
+
+If you see an error about execution policies when activating in PowerShell, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once to allow local scripts.
+
+### Path Separators
+
+PowerShell accepts both forward slashes (`/`) and backslashes (`\`) in file paths, so `models/staging/vistareserve` and `models\staging\vistareserve` both work. Most examples in this README use backslash-free paths for readability.
+
+### Piping and Filtering Output
+
+PowerShell's pipeline passes objects rather than text, which changes how filtering works compared to Bash. A few patterns that come up in this project:
+
+```powershell
+# Count lines of output (equivalent to wc -l in Bash)
+dbt ls --resource-type model | Measure-Object -Line
+
+# Filter output to lines containing a keyword (equivalent to grep)
+dbt ls --resource-type model | Select-String "staging"
+
+# View only the first N lines (equivalent to head)
+dbt ls --resource-type model | Select-Object -First 10
+```
+
+### Navigating the Terminal
+
+These patterns apply regardless of which shell you use — PowerShell, Git Bash, or the VS Code integrated terminal.
+
+**Moving through text on the command line:**
+
+| Action | Shortcut |
+|---|---|
+| Move cursor one word left | `Ctrl+Left Arrow` |
+| Move cursor one word right | `Ctrl+Right Arrow` |
+| Jump to the beginning of the line | `Home` |
+| Jump to the end of the line | `End` |
+| Delete the word before the cursor | `Ctrl+Backspace` |
+| Delete the word after the cursor | `Ctrl+Delete` |
+
+**Working with command history:**
+
+| Action | Shortcut |
+|---|---|
+| Previous command | `Up Arrow` |
+| Next command (after scrolling up) | `Down Arrow` |
+| Search command history | `Ctrl+R`, then start typing |
+| Accept the history search match | `Enter` or `Right Arrow` |
+| Cancel history search | `Escape` |
+
+History search is one of the most useful habits to build. If you ran a long `dbt build --select` command earlier in the session, pressing `Ctrl+R` and typing `build` will find it — no need to retype or scroll.
+
+**Stopping and clearing:**
+
+| Action | Shortcut |
+|---|---|
+| Cancel a running command | `Ctrl+C` |
+| Clear the screen | `cls` (PowerShell) or `clear` (Bash) |
+| Close the terminal | `exit` |
+
+### Common Gotchas
+
+- **Single vs. double quotes:** PowerShell interpolates variables inside double quotes (`"$variable"`) but not inside single quotes (`'$variable'`). When passing literal strings to dbt or Python, single quotes are safer.
+- **Tab completion:** PowerShell supports tab completion for file paths, commands, and parameters. Press Tab to cycle through matches.
+- **Long-running commands:** If `dbt build` is taking longer than expected, `Ctrl+C` cancels it cleanly. dbt will finish the current model before stopping.
+- **Copy and paste in the terminal:** In the VS Code integrated terminal, `Ctrl+C` copies selected text when text is highlighted, and sends an interrupt signal when nothing is selected. `Ctrl+V` pastes. In standalone PowerShell windows, right-click pastes by default.
+
+## VS Code for This Project
+
+VS Code is the recommended editor for this project, and a few of its features are worth knowing even if you primarily work in another editor. The shortcuts below assume the default Windows keybindings.
+
+### Opening and Navigating Files
+
+| Action | Shortcut | Notes |
+|---|---|---|
+| Open a file by name | `Ctrl+P` | Type a partial filename — `int_parks` finds `int_parks.sql` and its YAML |
+| Switch between open tabs | `Ctrl+Tab` | Hold Ctrl and press Tab repeatedly to cycle |
+| Close the current tab | `Ctrl+W` | |
+| Reopen a recently closed tab | `Ctrl+Shift+T` | |
+| Go to a specific line number | `Ctrl+G` | Useful when a test failure or linter reports a line number |
+| Open the file explorer sidebar | `Ctrl+Shift+E` | |
+
+`Ctrl+P` is the single most efficient way to open files in this project. Typing `stg_vista` narrows to all VistaReserve staging models; typing `_models.yml` narrows to all YAML property files. You can also type `:` after the filename to jump to a specific line — `int_parks.sql:15` opens the file at line 15.
+
+### Searching Across the Project
+
+| Action | Shortcut | Notes |
+|---|---|---|
+| Search in the current file | `Ctrl+F` | |
+| Search and replace in the current file | `Ctrl+H` | |
+| Search across all files | `Ctrl+Shift+F` | The most useful search in a dbt project |
+| Search by symbol (function, model name) | `Ctrl+Shift+O` | In SQL files, this finds CTE names |
+
+When searching across all files (`Ctrl+Shift+F`), use the "files to include" field to scope the search. For example, entering `models/integration` in that field limits results to integration models. This is helpful when searching for a column name that appears in many layers — you often want to see where it is defined in integration, not every staging model that sources it.
+
+### Working with the Terminal
+
+| Action | Shortcut | Notes |
+|---|---|---|
+| Toggle the integrated terminal | `` Ctrl+` `` | Opens or focuses the terminal panel |
+| Create a new terminal instance | `` Ctrl+Shift+` `` | Useful for running dbt in one terminal and linting in another |
+| Switch between terminal instances | `Ctrl+Page Up` / `Ctrl+Page Down` | When you have multiple terminals open |
+| Split the terminal | `Ctrl+Shift+5` | Side-by-side terminals in the same panel |
+| Maximize/restore the terminal panel | Double-click the panel title bar | Gives more room for long dbt output |
+
+A common workflow is to keep two terminals open: one for `dbt build` and `dbt show` commands, and another for linting and governance checks. This avoids the need to scroll back through output to find a previous command's results.
+
+### Editing
+
+| Action | Shortcut | Notes |
+|---|---|---|
+| Move a line up or down | `Alt+Up` / `Alt+Down` | Reorder SQL columns or CTE clauses without cut-and-paste |
+| Duplicate a line | `Shift+Alt+Down` | Useful when adding similar column definitions in YAML |
+| Delete a line | `Ctrl+Shift+K` | |
+| Toggle line comment | `Ctrl+/` | Comments or uncomments the selected lines |
+| Select the next occurrence of the current word | `Ctrl+D` | Builds a multi-cursor selection — rename a column alias in several places at once |
+| Select all occurrences of the current word | `Ctrl+Shift+L` | |
+| Undo | `Ctrl+Z` | |
+| Redo | `Ctrl+Y` or `Ctrl+Shift+Z` | |
+| Indent / outdent selected lines | `Tab` / `Shift+Tab` | |
+
+`Ctrl+D` deserves special mention. If you need to rename a CTE alias or column name that appears multiple times in a SQL file, place your cursor on the word and press `Ctrl+D` repeatedly — each press selects the next occurrence and creates an additional cursor. Then type the new name once, and all occurrences update simultaneously. `Ctrl+Shift+L` does the same thing but selects every occurrence in the file at once.
+
+### Side-by-Side Editing
+
+When writing or reviewing dbt models, it is often helpful to see a model's SQL and its YAML properties file at the same time. To open a file in a split view:
+
+1. Open the SQL file (e.g., `int_parks.sql`) with `Ctrl+P`.
+2. Open the YAML file (e.g., `_models.yml`) with `Ctrl+P`.
+3. Drag the YAML tab to the right side of the editor, or right-click the tab and select "Split Right."
+
+This layout makes it straightforward to verify that every column in the SQL's final `SELECT` appears in the YAML's `columns:` list — a check that prevents contract mismatches at build time.
 
 ## Common dbt Commands
 
@@ -399,17 +568,85 @@ Each dimension translates into specific dbt testing patterns. The project standa
 | Accuracy | [dbt unit tests](https://docs.getdbt.com/docs/build/unit-tests) on business logic, singular reconciliation tests | Unit tests on KPI calculations in mart models |
 | Timeliness | `dbt source freshness` with `warn_after` / `error_after` thresholds, staleness bounds on crosswalk update timestamps | VistaReserve sources have freshness checks; TrafficCount sources have demo-appropriate thresholds |
 
+### What the Pipeline Can and Cannot Control
+
+A dbt pipeline can enforce structure, test assertions, and surface problems — but it cannot fix data that was never captured correctly at the point of entry. This distinction matters because many of the quality risks in a public sector data environment originate upstream, in how source systems are configured, how consistently they are used, and whether the people entering data have feedback on what happens when a field is left blank or a value is entered outside its expected range.
+
+Some source systems impose strong constraints at the point of entry — required fields, picklist validation, referential integrity checks — and the data that arrives in the pipeline reflects that discipline. Other systems, particularly those designed to minimize friction for field staff or seasonal workers, accept nearly any input and rely on downstream review that may or may not happen. Legacy systems often have constraints that were appropriate when they were built but have not evolved with the data they now carry; newer pilot systems may not yet have governance controls in place because the priority was deployment speed over data discipline.
+
+What this means for analysts working in this project: the tests and contracts you see in the dbt layer are the last line of defense, not the first. They tell you where quality is being measured and where it is not. A passing test suite does not mean the data is accurate in an absolute sense — it means the data meets the assertions that have been written so far. A `not_null` test on a customer name column confirms that the field is populated, but it cannot confirm that the name is spelled correctly or belongs to the right person. An `accepted_values` test on a status field confirms that every value falls within a known set, but it cannot confirm that the status was updated at the right time by the right person in the source system.
+
+The sections below describe what each layer of the pipeline contributes to quality enforcement, and — just as importantly — what each layer depends on but cannot verify.
+
 ### How Each Layer Contributes
 
-Quality enforcement is cumulative — each layer adds dimension coverage that the previous layer cannot provide.
+Quality enforcement is cumulative. Each layer adds dimension coverage that the previous layer cannot provide, and each layer inherits assumptions about the data it receives.
 
-**Sources:** Timeliness checks via `dbt source freshness`. This is the only layer where freshness can be evaluated, because staging models are views that reflect source state at query time.
+#### Sources
 
-**Staging:** Uniqueness (`unique` + `not_null` on the natural key) and basic validity (type casting catches malformed values). Staging tests protect the rest of the pipeline from source-level problems.
+**What this layer does:** Timeliness checks via `dbt source freshness`. This is the only layer where freshness can be evaluated, because staging models are views that reflect source state at query time. Source YAML declarations also document the expected schema, owner, and loader for each table — making it possible to trace a column back to its origin system and the team responsible for it.
 
-**Integration:** Uniqueness on surrogate keys, completeness via row count guards on union models, consistency via relationship tests between integration entities, and validity via CDM `accepted_values` on enumerated fields.
+**What this layer depends on:** Source systems delivering data on their expected schedule, with the schema they have documented. When a source system changes a column name, adds a field, or stops populating a table, the pipeline will surface the break — but the root cause is upstream. Analysts should treat source freshness failures as signals to investigate whether a system load failed, a vendor changed an API, or a batch process was delayed, rather than assuming the pipeline itself is broken.
 
-**Marts:** All six dimensions converge. Contracts enforce structural consistency. Unit tests verify accuracy of business logic. Relationship tests confirm dimensional integrity. Reconciliation tests (singular SQL tests in `tests/marts/`) validate that aggregated metrics balance against their underlying facts.
+**What this layer cannot verify:** Whether the data in the source tables is accurate, complete, or consistently entered. A source table can be perfectly fresh and structurally intact while containing records that were entered incorrectly, entered late, or never entered at all. Systems that do not enforce required fields at the point of entry — like the GrantTrack Excel workbook or BioSurvey's Access database — can deliver structurally valid rows where critical fields are blank or contain placeholder values.
+
+#### Staging
+
+**What this layer does:** Establishes uniqueness and basic validity. Every staging model tests `unique` and `not_null` on the natural key, which confirms that rows from the source are not duplicated and that the identifier the source system assigns is always present. Type casting in the SQL — converting a `VARCHAR` date to a proper `DATE`, or an integer ID to a `VARCHAR` for consistent joining — catches malformed values that would otherwise propagate silently. If a value cannot be cast, the model fails, and the failure points directly to the problematic source record.
+
+**What this layer depends on:** Source systems assigning meaningful, stable natural keys. Most enterprise systems (VistaReserve, InfraTrak, PeopleFirst) handle this well. Legacy systems and spreadsheet-based workflows are less predictable — LegacyRes uses format-era-dependent IDs, and GrantTrack's row identity depends on a combination of columns that may not be unique if an analyst accidentally duplicates a row in the workbook.
+
+**What this layer cannot verify:** Whether a record that exists in the source should exist, or whether a record that should exist is missing. Staging tests confirm structural integrity — "every row has a key, and no key is repeated" — but they do not know whether 100 reservations is the right number for a given day, or whether a missing work order means the work was not done or the work order was never created. Analysts writing staging tests should focus on protecting downstream models from structural corruption, and should use `severity: warn` for fields where blanks are a known characteristic of the source system rather than a sign of breakage.
+
+#### Integration
+
+**What this layer does:** Uniqueness on surrogate keys, completeness via row count guards on union models, consistency via relationship tests between integration entities, and validity via CDM `accepted_values` on enumerated fields. Integration is where cross-system problems become visible — a park that exists in one source but not another, an asset whose identifier format does not match the crosswalk, or a union of two sources that produces fewer rows than expected.
+
+Row count bounds (`expect_table_row_count_to_be_between`) on union models serve a specific purpose: if a source feed fails silently and delivers zero rows, the union still succeeds but the row count drops. The bounds catch this. They should be set wide enough to accommodate normal variation but narrow enough to catch a missing source.
+
+**What this layer depends on:** Crosswalk tables and shared identifiers being maintained. The VistaReserve-to-GeoParks asset crosswalk, for example, has not been updated since 2022 — meaning that assets registered in either system after that date cannot be matched at the record level. Integration models that join across systems are only as current as the least-maintained crosswalk they depend on. Relationship tests between integration entities (`relationships` tests on foreign keys like `_park_sk` or `_contact_sk`) confirm that a foreign key value exists in the referenced model, but they cannot confirm that the match is semantically correct if the crosswalk that produced the key is stale.
+
+**What this layer cannot verify:** Whether the business meaning of a field is consistent across the sources being combined. Two systems may both have a `status` column with a value of "Active," but "Active" in VistaReserve means a reservation is currently checked in, while "Active" in InfraTrak means an asset is in service. CDM column mapping standardizes the names; it does not standardize the semantics unless the integration SQL explicitly recodes the values. Analysts writing integration models should document these semantic differences in the model's YAML description and, where the SPEC calls for it, apply `case` expressions that normalize values into a shared domain.
+
+#### Marts
+
+**What this layer does:** All six dimensions converge. Contracts enforce structural consistency — every mart model declares its columns and data types, and a mismatch between the SQL output and the contract fails the build. Unit tests verify accuracy of business logic by asserting that known inputs produce expected outputs. Relationship tests confirm dimensional integrity — every foreign key in a fact table points to a real row in its dimension. Reconciliation tests (singular SQL tests in `tests/marts/`) validate that aggregated metrics balance against their underlying facts.
+
+**What this layer depends on:** Integration models delivering semantically clean, correctly keyed data. A mart model that calculates revenue per park trusts that `_park_sk` in the fact table correctly identifies the park, that the revenue amount was correctly converted from the source system's format, and that no duplicate transactions inflated the total. If any of those assumptions are wrong, the mart will produce a structurally valid, contract-compliant result that is nonetheless incorrect.
+
+**What this layer cannot verify:** Whether the business rules encoded in the SQL match the business rules that the organization actually follows. A KPI formula can be implemented exactly as specified in the SPEC and still be wrong if the SPEC misunderstands how the business calculates that metric. Unit tests confirm that the code does what the code says; they do not confirm that what the code says is what the business means. Analysts writing or reviewing mart models should verify KPI definitions with the business owners who use them, not just with the SPEC that documents them.
+
+### Source System Quality Characteristics
+
+The 10 source systems in this project span a wide range of data maturity, and the quality risks each one introduces are shaped by how the system was built, when it was deployed, and how much governance its operators have in place. Understanding these patterns helps analysts anticipate where problems are likely to appear — and where a passing test suite may be masking gaps that the pipeline cannot detect.
+
+**Enterprise SaaS platforms** (VistaReserve, InfraTrak, PeopleFirst) generally enforce constraints at the point of entry: required fields, picklist validation, referential integrity between related tables. The data that arrives from these systems tends to be structurally clean. The quality risks are subtler — duplicate customer records created by front-desk staff who cannot find an existing profile (VistaReserve's 18–22% duplicate rate), or assets registered inconsistently because the onboarding process varies by region (InfraTrak covers only 28 of 50 parks).
+
+**Statewide mandated systems** (StateGov Financials, PeopleFirst) are well-governed but operationally constrained. Their schemas reflect the needs of the agencies that built them, not necessarily the needs of downstream analytics. StateGov's general ledger aggregates daily transactions into monthly batches, losing the daily detail that revenue analysis needs. PeopleFirst tracks duty stations at the organizational unit level, not the park level — so joining employees to parks is an approximation, not a precise mapping. These are not data entry errors; they are design decisions made for a different purpose.
+
+**Legacy and decommissioned systems** (LegacyRes, StateGov's COBOL layer, BioSurvey's Access database) carry the longest history and the most inconsistency. Date formats change across export eras. Identifiers follow conventions that no longer match current systems. Mixed-entity tables store different observation types in the same columns, relying on implicit conventions that were understood by the original users but are not documented. The pipeline can cast and rename these columns, but it cannot reconstruct the context that was lost when the system's original operators retired or moved on.
+
+**Spreadsheet and manual-entry systems** (GrantTrack) have the least structural governance. There are no enforced constraints on what values can be entered, no referential integrity between sheets, and no audit trail for changes. The 2–5% reconciliation gap between GrantTrack and StateGov Financials is a known, persistent condition — not a bug to be fixed, but a reality to be documented and monitored. Analysts working with grant data should treat `severity: warn` tests as the appropriate signal level for fields where manual entry introduces expected variation.
+
+**Air-gapped systems** (RangerShield) present a different challenge entirely. The data is structurally clean within its own domain, but it cannot be joined to any other system electronically. All cross-domain data use goes through manual extraction and sanitization, which introduces both latency and the possibility of transcription errors. The pipeline treats RangerShield data as self-contained — integration models that consume it do not attempt cross-system joins, and any analytical connection to other domains (like mapping incidents to parks) depends on location text matching rather than shared keys.
+
+**IoT and pilot systems** (TrafficCount) are the newest and least proven. Sensor coverage is limited to roughly 15% of parks, and the vehicle occupancy multiplier used to estimate visitor counts has not been validated since 2019. The data itself is structurally reliable — sensors produce consistent, timestamped records — but the derived metrics (estimated visitors from vehicle counts) depend on assumptions that analysts should understand before using them in reports. Row count tests and freshness checks confirm that sensor data is flowing; they do not confirm that the counts are representative of actual visitation patterns across the full park system.
+
+### Analyst Responsibilities for Data Quality
+
+The governance toolchain — sqlfluff, dbt-score, dbt-project-evaluator, and `check_model.py` — automates roughly 47% of the project's 103 standards. The remaining 53% depend on the judgment of the person writing or reviewing the model. Automated tools can confirm that a test exists; they cannot confirm that the right test exists, or that the test is sufficient for the risk it is meant to address.
+
+When writing or modifying a model, consider the following responsibilities as part of the work — not as a separate review step, but as part of how the model is designed.
+
+**Understand the source before writing the model.** Run `inspect_source.py` on the source table to see its actual column types, cardinality, null distribution, and sample values. Read the Data Inventory entry for the source system to understand its known quality issues. A staging model for a table with a 20% null rate on a critical field needs a different testing strategy than one for a table where that field is always populated.
+
+**Choose test severity based on what the source system can guarantee.** A `not_null` test with `severity: error` is appropriate when the source system enforces the field as required — a null value genuinely indicates a pipeline break or a system failure. The same test with `severity: warn` is appropriate when the source system allows blanks and blanks are a known, expected condition — walk-up park visitors who are not required to provide contact information, seasonal employees whose certification records have not yet been entered, or grants whose compliance deadlines have not been set because the award is still in negotiation.
+
+**Document what you cannot test.** If a column's accuracy depends on a business process that happens outside the pipeline — a park ranger entering incident locations as narrative text, a grants analyst manually reconciling spreadsheet totals against the general ledger, a seasonal worker estimating headcounts — note this in the model's YAML description or in a `meta:` block. Future analysts and reviewers need to understand not just what the tests cover, but what the tests cannot cover and why.
+
+**Monitor warn-level tests over time.** A `severity: warn` test that fires occasionally is doing its job — it surfaces a known condition without blocking the build. A `severity: warn` test that fires on every run may indicate that the condition has worsened, that the threshold needs adjustment, or that the source system's behavior has changed. Treat persistent warnings as signals worth investigating, not as background noise to ignore.
+
+**Verify business logic with the people who use it.** Unit tests on mart KPI calculations confirm that the SQL produces the expected output for a given input. They do not confirm that the formula is correct from the business's perspective. Before marking a mart model as complete, verify the business rules — not just the SQL — with the domain experts who will consume the output. This is especially important for calculations that combine data from multiple source systems, where the interaction between systems can produce results that are technically correct but operationally misleading.
 
 ### Contributing Quality Tests
 

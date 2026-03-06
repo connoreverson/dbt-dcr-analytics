@@ -68,6 +68,10 @@ models:
       - name: feature_class
         description: "The primary category or classification of the asset."
         data_type: varchar
+        tests:
+          - not_null:
+              config:
+                severity: warn
       - name: sub_type
         description: "The secondary sub-type or detailed classification of the asset."
         data_type: varchar
@@ -149,6 +153,10 @@ models:
       - name: job_classification
         description: "The standardized job title or classification for the position."
         data_type: varchar
+        tests:
+          - not_null:
+              config:
+                severity: warn
       - name: pay_grade
         description: "The civil service pay band for the position."
         data_type: varchar

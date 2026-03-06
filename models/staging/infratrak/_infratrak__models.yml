@@ -62,10 +62,20 @@ models:
         description: Latitude of the asset centroid in decimal degrees (WGS 84).
         tests:
           - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: -90
+              max_value: 90
+              config:
+                where: "latitude is not null"
       - name: longitude
         description: Longitude of the asset centroid in decimal degrees (WGS 84).
         tests:
           - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: -180
+              max_value: 180
+              config:
+                where: "longitude is not null"
       - name: is_visible_in_survey
         description: True if the asset was captured during the 2019 physical field inventory.
         tests:
@@ -112,7 +122,7 @@ models:
           better condition; FCI ≥ 70 is considered "good" for capital planning.
         tests:
           - not_null
-          - dbt_utils.accepted_range:
+          - dbt_expectations.expect_column_values_to_be_between:
               min_value: 1
               max_value: 100
       - name: inspection_date

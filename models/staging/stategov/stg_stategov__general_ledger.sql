@@ -23,6 +23,7 @@ final as (
         --  classification
         cast(source.entry_type as varchar) as entry_type,
         --  numerics
+        -- Note: Negative amounts represent valid refunds and adjustments per DAMA review.
         cast(source.amount as decimal(12, 2)) as amount,
         --  audit
         cast(source.batch_reference as varchar) as batch_reference,

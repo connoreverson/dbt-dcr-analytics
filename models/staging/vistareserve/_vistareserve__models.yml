@@ -56,6 +56,12 @@ models:
         description: The state of residence provided by the customer.
       - name: email
         description: Customer's email address.
+        tests:
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: "^[^@]+@[^@]+\\.[^@]+$"
+              config:
+                severity: warn
+                where: "email is not null"
       - name: first_name
         description: Customer's given name.
       - name: last_name
@@ -71,9 +77,19 @@ models:
       - name: account_created_at
         description: Timestamp when the profile was first registered in VistaReserve.
       - name: equipment_preference
-        description: Derived from preferences_json. The typical camping equipment used (e.g., RV, Tent).
+        description: Customer's preference for bringing their own equipment versus renting on-site. Extracted from unstructured preferences JSON.
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null:
+              row_condition: "1=1"
+              config:
+                severity: warn
       - name: accessibility_needs
-        description: Derived from preferences_json. Specific ADA or physical accommodations requested by the user.
+        description: Specific accommodation requirements flagged by the customer. Extracted from unstructured preferences JSON.
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null:
+              row_condition: "1=1"
+              config:
+                severity: warn
 
   - name: stg_vistareserve__inventory_assets
     description: >
@@ -110,6 +126,10 @@ models:
         description: Type of utility connections available (e.g., Full, Electric Only, None).
       - name: max_occupancy
         description: The maximum number of individuals legally permitted at the asset.
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 1000
       - name: is_ada_accessible
         description: Indicates if the site meets Americans with Disabilities Act standards.
 
@@ -121,6 +141,13 @@ models:
       testing_rationale: >
         Primary keys (hk_asset_crosswalks, vista_asset_id) are tested for uniqueness to
         prevent one-to-many fan-outs when joining crosswalk mappings to base assets.
+    tests:
+      - dbt_expectations.expect_column_max_to_be_between:
+          column_name: days_since_last_update
+          min_value: 0
+          max_value: 1825
+          config:
+            severity: warn
     columns:
       - name: hk_asset_crosswalks
         description: Surrogate hash key derived from vista_asset_id. Uniquely identifies an asset crosswalk record from VistaReserve.
@@ -189,6 +216,13 @@ models:
       testing_rationale: >
         Primary keys are tested for uniqueness to prevent duplicated reservation financial amounts
         during aggregation.
+    tests:
+      - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+          column_A: departure_date
+          column_B: arrival_date
+          or_equal: false
+          config:
+            severity: warn
     columns:
       - name: hk_reservations
         description: Surrogate hash key derived from reservation_id. Uniquely identifies a reservation record from VistaReserve.
@@ -206,6 +240,9 @@ models:
         description: Foreign key identifying the user who made the reservation.
       - name: reservation_status
         description: Current state of the booking (e.g., Confirmed, Cancelled, Completed).
+        tests:
+          - accepted_values:
+              values: ['confirmed', 'cancelled', 'completed']
       - name: total_amount
         description: Gross dollar value of the entire reservation, including fees and taxes.
       - name: arrival_date
@@ -215,7 +252,12 @@ models:
       - name: reservation_created_at
         description: Timestamp of when the customer secured the reservation.
       - name: booking_source
-        description: Derived from booking_metadata. Indicates where the reservation originated (e.g., Web, Call Center).
+        description: The channel through which the reservation was made (e.g., Web, Call Center, Walk-in). Extracted from booking_metadata JSON.
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null:
+              row_condition: "1=1"
+              config:
+                severity: warn
       - name: promo_code
         description: Derived from booking_metadata. The specific discount code applied to this booking, if any.
       - name: number_of_guests

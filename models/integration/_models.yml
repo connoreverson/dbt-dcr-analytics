@@ -19,6 +19,9 @@ models:
         government physical infrastructure with lifecycle, geometry, and condition attributes.
         A custom PhysicalAsset entity extending Asset.FunctionalLocation is documented there.
     tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 10000
+          max_value: 20000
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - source_system
@@ -134,6 +137,11 @@ models:
     meta:
       testing_rationale: >
         Tests protect against duplicate park accounts and ensure the primary key is never null.
+        Expect table row count ensures we don't unexpectedly lose park records.
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 40
+          max_value: 100
     columns:
       - name: parks_sk
         description: The canonical integration surrogate key for the park account.
@@ -218,8 +226,13 @@ models:
           as encoded by the StateGov mainframe batch process.
       - name: amount
         description: The monetary value of the GL entry in USD.
+        meta:
+          business_rule: Negative amounts represent valid refunds and adjustments.
         tests:
           - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: -10000000
+              max_value: 10000000
       - name: account_id
         description: >
           The compound account identifier from StateGov Financials, formatted as
@@ -308,6 +321,18 @@ models:
         description: Customer's primary email address.
       - name: mobile_phone
         description: Customer's mobile or primary phone number.
+      - name: is_merged_duplicate
+        description: Flag indicating if this customer profile was merged into another profile due to duplication.
+      - name: address_state
+        description: The state of residence provided by the customer.
+      - name: account_created_at
+        description: Timestamp when the profile was first registered.
+      - name: has_annual_pass
+        description: Flag indicating if the customer holds a valid annual parks pass.
+      - name: is_senior
+        description: Flag indicating if the customer qualifies for senior discounts.
+      - name: is_veteran
+        description: Flag indicating if the customer qualifies for veteran discounts.
 
   - name: int_customer_assets
     description: >
@@ -460,6 +485,9 @@ models:
         uniqueness. The unique_combination_of_columns test confirms that no (type, id) pair
         appears more than once in the union output.
     tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 12000
+          max_value: 18000
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - observation_type

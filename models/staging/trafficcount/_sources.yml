@@ -10,15 +10,17 @@ sources:
       present in this dataset — all records are anonymous sensor readings.
     meta:
       freshness_policy: >
-        Freshness thresholds are not configured. Source data is loaded from a
-        static DuckDB file generated at project setup time. In production,
-        this hourly IoT telemetry source should define warn_after: {count: 2,
-        period: hour} and error_after: {count: 6, period: hour} — stale
-        sensor data would directly mislead visitation metric calculations.
+        Demo threshold. Production recommendation: warn_after: {count: 2, period: hour}
+        and error_after: {count: 6, period: hour} — stale sensor data would directly
+        mislead visitation metric calculations.
     database: trafficcount
     schema: raw_trafficcount
     tables:
       - name: sensor_locations
+        loaded_at_field: _loaded_at
+        freshness:
+          warn_after: {count: 365, period: day}
+          error_after: {count: 730, period: day}
         description: >
           Reference table for all deployed IoT sensors. Each row represents one physical
           sensor device installed at a park location. Links sensors to park IDs and records
@@ -50,6 +52,10 @@ sources:
             description: Soft-delete flag from the source system.
 
       - name: vehicle_counts
+        loaded_at_field: _loaded_at
+        freshness:
+          warn_after: {count: 365, period: day}
+          error_after: {count: 730, period: day}
         description: >
           Hourly raw vehicle counts from Vehicle Magnetometer sensors at park entrance gates.
           Each row represents one hour of vehicle detections at a single sensor. 70,088 rows
@@ -76,6 +82,10 @@ sources:
             description: Soft-delete flag from the source system.
 
       - name: pedestrian_cyclist_counts
+        loaded_at_field: _loaded_at
+        freshness:
+          warn_after: {count: 365, period: day}
+          error_after: {count: 730, period: day}
         description: >
           Hourly raw pedestrian and cyclist counts from Infrared Trail Counter sensors at
           park trailheads. Each row represents one hour of detections at a single trail sensor.
@@ -105,6 +115,10 @@ sources:
             description: Soft-delete flag from the source system.
 
       - name: derived_visitor_metrics
+        loaded_at_field: _loaded_at
+        freshness:
+          warn_after: {count: 365, period: day}
+          error_after: {count: 730, period: day}
         description: >
           Pre-computed daily total visitor estimates, derived by summing non-anomalous hourly
           vehicle counts and applying the standard DCR 2.7 vehicle occupancy multiplier. Each

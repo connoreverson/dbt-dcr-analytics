@@ -21,6 +21,10 @@ models:
       - name: vendor_name
         description: "The legal name or DBA of the vendor."
         data_type: varchar
+        tests:
+          - not_null:
+              config:
+                severity: warn
       - name: vendor_type
         description: "Categorical division of vendor types (e.g., corporate, non-profit, individual)."
         data_type: varchar
@@ -33,3 +37,18 @@ models:
       - name: source_system
         description: "The origin system for the vendor record."
         data_type: varchar
+
+  - name: fct_expenditures
+    description: "Fact model capturing gross financial expenditures from the state general ledger, aligned to vendors."
+    columns:
+      - name: expenditure_sk
+        description: "Surrogate key for the expenditure."
+        tests:
+          - unique
+          - not_null
+      - name: vendors_sk
+        description: "Foreign key linking to dim_vendors."
+        tests:
+          - relationships:
+              to: ref('dim_vendors')
+              field: vendor_sk

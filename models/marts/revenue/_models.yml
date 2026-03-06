@@ -24,6 +24,10 @@ models:
       - name: park_name
         data_type: varchar
         description: The business name of the park.
+        tests:
+          - not_null:
+              config:
+                severity: warn
       - name: region
         data_type: varchar
         description: The organizational region the park belongs to.
@@ -77,6 +81,10 @@ models:
       - name: customer_name
         data_type: varchar
         description: Full name of the customer.
+        tests:
+          - not_null:
+              config:
+                severity: warn
       - name: email
         data_type: varchar
         description: Email address of the customer.
@@ -95,6 +103,9 @@ models:
       - name: customer_tenure_tier
         data_type: varchar
         description: Categorical tier based on the length of time since account creation.
+      - name: is_merged_duplicate
+        data_type: boolean
+        description: Flag indicating if this customer profile was merged into another profile due to duplication.
       - name: has_annual_pass
         data_type: boolean
         description: Indicates whether the customer holds an active annual pass.
@@ -168,6 +179,12 @@ models:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 0
           max_value: 1000000
+      - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+          column_A: check_out_date
+          column_B: check_in_date
+          or_equal: false
+          config:
+            severity: warn
     config:
       contract:
         enforced: true
@@ -295,6 +312,115 @@ models:
       - name: is_kiosk_entry
         data_type: boolean
         description: Indicates whether the transaction occurred at an unstaffed kiosk.
+
+  - name: fct_park_occupancy_daily_snapshot
+    description: >
+      Daily occupancy snapshot derived from the reservations fact table, expanded
+      across the date spine. Grain: one row per park per calendar day, for days
+      with at least one active reservation. Answers "how many guests were on-site
+      on a given day?" — a question the event-grain fct_reservations table cannot
+      answer without date-range arithmetic in every consuming query. Each active
+      reservation is fanned out across every calendar day in its stay window
+      (check_in_date inclusive through check_out_date exclusive), then aggregated
+      by park and day to yield a headcount and revenue-density snapshot.
+    meta:
+      testing_rationale: >
+        Composite uniqueness on (parks_sk, snapshot_date) enforces the one-row-per-
+        park-per-day grain and catches any fan-out regression introduced upstream.
+        The row count ceiling guards against runaway cross-joins if the date spine
+        or reservations source grows unexpectedly.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - parks_sk
+            - snapshot_date
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 0
+          max_value: 10000000
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: occupancy_snapshot_sk
+        data_type: varchar
+        description: Surrogate key for the park-day occupancy record, derived from parks_sk and snapshot_date.
+        tests:
+          - unique
+          - not_null
+      - name: parks_sk
+        data_type: varchar
+        description: Foreign key to dim_parks identifying the park whose daily occupancy is captured.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_parks')
+              field: parks_sk
+      - name: park_name
+        data_type: varchar
+        description: Business name of the park on the snapshot date, sourced from dim_parks.
+      - name: region
+        data_type: varchar
+        description: Organizational region of the park, sourced from dim_parks.
+      - name: snapshot_date
+        data_type: date
+        description: >
+          The calendar date represented by this row. One row exists per park per
+          date on which at least one reservation's stay window was active.
+        tests:
+          - not_null
+      - name: calendar_year
+        data_type: bigint
+        description: Four-digit calendar year of the snapshot date.
+      - name: calendar_month
+        data_type: bigint
+        description: Calendar month number (1–12) of the snapshot date.
+      - name: calendar_quarter
+        data_type: bigint
+        description: Calendar quarter (1–4) of the snapshot date.
+      - name: fiscal_year
+        data_type: bigint
+        description: DCR fiscal year of the snapshot date (July–June cycle; FY2025 begins July 2024).
+      - name: fiscal_month
+        data_type: bigint
+        description: Fiscal month number (1–12) within the DCR fiscal year.
+      - name: day_name
+        data_type: varchar
+        description: Name of the day of the week for the snapshot date (e.g., Monday, Tuesday).
+      - name: day_of_month
+        data_type: bigint
+        description: Numeric day within the calendar month (1–31).
+      - name: active_reservation_count
+        data_type: bigint
+        description: >
+          Number of reservations whose stay window includes this date. Represents
+          the count of occupied campsites or bookable assets at the park on this day,
+          before weighting by party size.
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 10000
+              config:
+                severity: warn
+      - name: total_guests_on_site
+        data_type: bigint
+        description: >
+          Sum of number_of_guests across all active reservations on this date.
+          Represents the estimated total guest presence at the park on this day.
+          Null values in number_of_guests are excluded from the sum.
+      - name: total_reservation_revenue_in_stay
+        data_type: decimal(14,2)
+        description: >
+          Sum of reservation_amount for all stays active on this date. This measure
+          intentionally double-counts revenue across nights in multi-night stays,
+          making it useful for relative revenue-density comparison (which nights are
+          highest-value) but not for total revenue reporting. Use fct_reservations
+          for revenue aggregation.
+        meta:
+          caution: >
+            Revenue is spread across all nights of the stay window. A three-night
+            reservation for $300 contributes $300 to each of the three snapshot
+            dates, not $100 per night. Avoid summing this column across dates
+            for total revenue calculations.
 
   - name: rpt_park_revenue_summary
     description: >

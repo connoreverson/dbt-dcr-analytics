@@ -4,6 +4,7 @@ dcr_analytics:
     dev:
       type: duckdb
       path: 'target/dcr_analytics.duckdb'
+      threads: 4
       schema: main
       attach:
         - path: 'source_data/duckdb/dcr_rev_01_vistareserve.duckdb'

@@ -26,6 +26,10 @@ models:
       - name: parks_sk
         description: "The focal park evaluated."
         data_type: varchar
+        tests:
+          - relationships:
+              to: ref('dim_parks')
+              field: parks_sk
       - name: total_expenditures
         description: "Summary of gross financial expenditures linked to this park."
         data_type: decimal(38,2)

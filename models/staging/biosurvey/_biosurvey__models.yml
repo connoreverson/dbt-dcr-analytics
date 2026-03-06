@@ -129,8 +129,20 @@ models:
         description: >
           GPS latitude of the survey point. Null for pre-GPS surveys (~pre-2010),
           which represent approximately 60% of records.
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: -90
+              max_value: 90
+              config:
+                where: "latitude is not null"
       - name: longitude
         description: GPS longitude of the survey point. Null for pre-GPS surveys.
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: -180
+              max_value: 180
+              config:
+                where: "longitude is not null"
 
   - name: stg_biosurvey__survey_sites
     description: >

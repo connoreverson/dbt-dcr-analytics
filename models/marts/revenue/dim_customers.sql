@@ -9,9 +9,9 @@ customers_enriched as (
         contacts_sk,
 
         -- combine first and last
-        emailaddress1 as email,
+        e_mail_address1 as email,
 
-        mobilephone as phone,
+        mobile_phone as phone,
         address_state,
         account_created_at as customer_since_date,
         has_annual_pass,
@@ -20,8 +20,9 @@ customers_enriched as (
         is_senior,
 
         is_veteran,
+        is_merged_duplicate,
 
-        concat_ws(' ', firstname, lastname) as customer_name,
+        concat_ws(' ', first_name, last_name) as customer_name,
         case
             when
                 address_state in (

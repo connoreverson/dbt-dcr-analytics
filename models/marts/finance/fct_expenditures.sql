@@ -18,7 +18,9 @@ final as (
     select
         gl.financials_sk as expenditure_sk,
         gl.gl_entry_id as source_record_id,
-        {{ dbt_utils.generate_surrogate_key(['ap.vendor_id']) }} as vendors_sk,
+        case
+            when ap.vendor_id is not null then {{ dbt_utils.generate_surrogate_key(['ap.vendor_id']) }}
+        end as vendors_sk,
         cast(null as varchar) as parks_sk,
         cast(
             cast(gl.fiscal_year as varchar) || '-'

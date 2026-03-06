@@ -57,6 +57,10 @@ Before every `dbt build`, do this manually:
 3. Confirm: every YAML column exists in SQL, every SQL column is in YAML
 4. If mismatched: fix before running — do not learn from the runtime error
 
+**DuckDB Type Mismatches:** When enforcing YAML contracts with DuckDB, `SUM(integer)` returns `HUGEINT` and date `EXTRACT()` returns `INTEGER`. You must explicitly `cast()` these to `bigint` (or whatever your contract specifies) in the final SELECT to prevent `dbt build` from failing on contract type assertion.
+
+**Running Checks:** When using `python scripts/check_model.py`, output to JSON using `--json --output tmp/check.json` and read the file to avoid PowerShell terminal encoding/truncation issues.
+
 ## Description Quality Gate
 
 Before saving any `_models.yml`, scan every description for: `unique`, `not_null`, `fan-out`, `deduplication`, `protecting against`, `tests verify`. If any appear, move that sentence to `meta: testing_rationale:`.

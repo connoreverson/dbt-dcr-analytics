@@ -4,6 +4,10 @@ int_customer_assets as (
     select * from {{ ref('int_customer_assets') }}
 ),
 
+stg_assets as (
+    select * from {{ ref('stg_vistareserve__inventory_assets') }}
+),
+
 int_parks as (
     select * from {{ ref('int_parks') }}
 ),
@@ -13,16 +17,18 @@ inventory_joined as (
         int_customer_assets.customer_assets_sk,
         int_customer_assets._parent_park_sk,
         int_customer_assets.name as asset_name,
-        int_customer_assets.asset_type,
-        int_customer_assets.max_occupancy,
-        int_customer_assets.is_ada_accessible,
-        int_customer_assets.pet_policy,
-        int_customer_assets.utility_hookup,
+        stg_assets.asset_type,
+        stg_assets.max_occupancy,
+        stg_assets.is_ada_accessible,
+        stg_assets.pet_policy,
+        stg_assets.utility_hookup,
         int_parks.name as park_assignment
 
     from int_customer_assets
     left join int_parks
         on int_customer_assets._parent_park_sk = int_parks.parks_sk
+    left join stg_assets
+        on cast(int_customer_assets.customerasset_id as varchar) = cast(stg_assets.asset_id as varchar)
 ),
 
 inventory_enriched as (
