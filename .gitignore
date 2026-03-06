@@ -7,3 +7,25 @@ tmp/
 __pycache__/
 *.pyc
 worktrees/
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python
+*.egg-info/
+dist/
+build/
+
+# Exported data
+output/
+
+# User config
+.user.yml
