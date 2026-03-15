@@ -369,6 +369,14 @@ def inspect_bigquery(conn_str: str, schema: str = None, table: str = None):
 
 
 def main():
+    import warnings
+    warnings.warn(
+        "inspect_source.py is deprecated and will be removed in a future release. "
+        "Use 'python scripts/profiler/cli.py' instead.",
+        DeprecationWarning,
+        stacklevel=1,
+    )
+
     parser = argparse.ArgumentParser(description="Inspect a data source system before staging.")
     parser.add_argument("--type", choices=["duckdb", "bigquery"], required=True, 
                         help="The type of the source database system.")
