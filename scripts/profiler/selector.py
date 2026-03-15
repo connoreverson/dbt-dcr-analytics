@@ -55,7 +55,8 @@ def _run_dbt_ls(selector: str) -> list[str]:
     if not result.success:
         raise RuntimeError(
             f"dbt ls failed for selector {selector!r}. "
-            "Check that the selector matches at least one node."
+            "This may indicate a syntax error in the selector or a dbt configuration problem. "
+            "Run `dbt ls --select <selector>` manually to see the full error."
         )
     # result.result is an iterable of unique_id strings
     unique_ids = list(result.result)
@@ -65,8 +66,14 @@ def _run_dbt_ls(selector: str) -> list[str]:
 
 
 def _load_manifest() -> dict:
-    with open(MANIFEST_PATH, encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(MANIFEST_PATH, encoding="utf-8") as f:
+            return json.load(f)
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            f"manifest.json is malformed at {MANIFEST_PATH}: {exc}. "
+            "Run `dbt parse` to regenerate it."
+        ) from exc
 
 
 def _build_target(
