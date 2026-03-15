@@ -57,6 +57,9 @@ def render_html(result: AnalysisResult, sanitize_html: bool = False) -> Path:
             title=result.target.table,
             progress_bar=False,
         )
+    elif sanitize_html and not result.pii_columns:
+        logger.info("--sanitize-html requested but no PII columns detected; rendering unsanitized.")
+        profile_to_render = result.profile
     else:
         profile_to_render = result.profile
 

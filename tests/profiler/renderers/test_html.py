@@ -93,3 +93,15 @@ def test_render_html_filename_includes_table_and_timestamp(result_with_profile, 
     out = render_html(result_with_profile)
     assert "test_table" in out.name
     assert "20260315" in out.name
+
+
+def test_render_html_sanitize_html_no_pii_logs_info(result_with_profile, tmp_path, monkeypatch, caplog):
+    """When sanitize_html=True but no PII columns, logs info and renders normally."""
+    import logging
+    import scripts.profiler.renderers.html as html_mod
+    monkeypatch.setattr(html_mod, "_TMP_DIR", tmp_path)
+    result_with_profile.pii_columns = set()
+    with caplog.at_level(logging.INFO, logger="scripts.profiler.renderers.html"):
+        out = render_html(result_with_profile, sanitize_html=True)
+    assert out.exists()
+    assert any("no PII" in msg.lower() or "unsanitized" in msg.lower() for msg in caplog.messages)
