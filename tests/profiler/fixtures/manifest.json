@@ -1,0 +1,40 @@
+{
+  "metadata": {
+    "dbt_schema_version": "https://schemas.getdbt.com/dbt/manifest/v12/manifest.json",
+    "dbt_version": "1.9.0",
+    "generated_at": "2026-03-15T00:00:00.000000Z",
+    "invocation_id": "test-fixture",
+    "env": {}
+  },
+  "nodes": {
+    "model.dcr_analytics.stg_parks__facilities": {
+      "unique_id": "model.dcr_analytics.stg_parks__facilities",
+      "name": "stg_parks__facilities",
+      "resource_type": "model",
+      "database": "dev",
+      "schema": "main",
+      "alias": "stg_parks__facilities",
+      "config": {"materialized": "view"}
+    },
+    "model.dcr_analytics.int_parks": {
+      "unique_id": "model.dcr_analytics.int_parks",
+      "name": "int_parks",
+      "resource_type": "model",
+      "database": "dev",
+      "schema": "main",
+      "alias": "int_parks",
+      "config": {"materialized": "table"}
+    }
+  },
+  "sources": {
+    "source.dcr_analytics.vistareserve.reservations": {
+      "unique_id": "source.dcr_analytics.vistareserve.reservations",
+      "name": "reservations",
+      "source_name": "vistareserve",
+      "resource_type": "source",
+      "database": "source_data/duckdb/dcr_rev_01_vistareserve.duckdb",
+      "schema": "main",
+      "identifier": "reservations"
+    }
+  }
+}
