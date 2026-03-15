@@ -12,6 +12,19 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
+def _apply_generic_redaction(result: pd.DataFrame, pii_columns: set[str]) -> None:
+    """Apply [REDACTED] token to all values in pii_columns (in-place on result copy).
+
+    Handles None and NaN values correctly by preserving them.
+    """
+    for col in pii_columns:
+        if col not in result.columns:
+            continue
+        result[col] = result[col].apply(
+            lambda v: "[REDACTED]" if v is not None and not (isinstance(v, float) and pd.isna(v)) else v
+        )
+
+
 def sanitize(df: pd.DataFrame, pii_columns: set[str]) -> pd.DataFrame:
     """Return a copy of df with PII column values replaced by redaction tokens.
 
@@ -71,20 +84,12 @@ def sanitize(df: pd.DataFrame, pii_columns: set[str]) -> pd.DataFrame:
             "presidio-anonymizer not installed; using generic [REDACTED] tokens. "
             "Install with: pip install 'presidio-anonymizer>=2.2'"
         )
-        for col in pii_columns:
-            if col in result.columns:
-                result[col] = result[col].apply(
-                    lambda v: "[REDACTED]" if v is not None else v
-                )
+        _apply_generic_redaction(result, pii_columns)
 
     except Exception as exc:
         logger.warning(
             "Presidio anonymization failed (%s); using generic [REDACTED] tokens.", exc
         )
-        for col in pii_columns:
-            if col in result.columns:
-                result[col] = result[col].apply(
-                    lambda v: "[REDACTED]" if v is not None else v
-                )
+        _apply_generic_redaction(result, pii_columns)
 
     return result

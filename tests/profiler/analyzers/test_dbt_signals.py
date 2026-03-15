@@ -71,3 +71,14 @@ def test_empty_description_returns_empty_list():
 def test_description_with_none_attributes():
     desc = SimpleNamespace(variables=None, alerts=None)
     assert detect_signals(desc) == []
+
+
+def test_cast_hint_for_numeric_in_object_column():
+    """A column with object dtype but a mean value should get CAST_HINT."""
+    desc = _make_desc({
+        "amount": {"type": "Categorical", "dtype": "object", "mean": 149.99}
+    })
+    signals = detect_signals(desc)
+    cast = [s for s in signals if s.signal_type == "CAST_HINT" and s.column_name == "amount"]
+    assert len(cast) == 1
+    assert "numeric" in cast[0].message

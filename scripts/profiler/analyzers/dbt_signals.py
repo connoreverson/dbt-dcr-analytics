@@ -100,8 +100,12 @@ def detect_signals(description: object) -> list[DbtSignal]:
 
 
 def _looks_like_date_column(col_name: str, stats: dict) -> bool:
-    """Heuristic: does the column name contain date/time keywords?"""
-    date_keywords = ("date", "time", "at", "on", "created", "updated", "modified", "ts")
+    """Heuristic: does the column name contain date/time keywords?
+
+    Match whole words or common date suffixes — avoid 'at' matching 'category'
+    by using underscore-prefixed variants (_at, _on).
+    """
+    date_keywords = ("date", "time", "_at", "_on", "created", "updated", "modified", "_ts", "timestamp")
     name_lower = col_name.lower()
     return any(kw in name_lower for kw in date_keywords)
 
