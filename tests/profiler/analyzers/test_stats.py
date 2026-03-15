@@ -35,13 +35,12 @@ def test_profile_returns_analysis_result(fixture_df, sample_target):
 
 
 def test_profile_description_has_expected_keys(fixture_df, sample_target):
-    """Description object has variables and table keys."""
+    """Description object has variables dict with one entry per column."""
     result = profile_dataframe(fixture_df, sample_target)
     desc = result.description
-    # ydata-profiling description is a BaseDescription-like object
-    # with a .variables attribute (dict of column name -> stats)
     variables = desc.variables if hasattr(desc, "variables") else {}
-    assert "id" in variables or len(variables) > 0
+    # fixture_df has 6 columns — all should appear in the description
+    assert len(variables) == len(fixture_df.columns)
 
 
 def test_profile_minimal_vs_full(fixture_df, sample_target):
@@ -56,14 +55,14 @@ def test_profile_minimal_vs_full(fixture_df, sample_target):
 def test_missing_ydata_profiling_raises_import_error(sample_target, monkeypatch):
     """ImportError is raised with pip install hint when ydata-profiling absent."""
     import sys
-    # Temporarily hide the module
+    had_module = "ydata_profiling" in sys.modules
     original = sys.modules.get("ydata_profiling")
     sys.modules["ydata_profiling"] = None  # type: ignore[assignment]
     try:
         with pytest.raises(ImportError, match="ydata-profiling"):
             profile_dataframe(pd.DataFrame({"a": [1]}), sample_target)
     finally:
-        if original is None:
+        if not had_module:
             del sys.modules["ydata_profiling"]
         else:
             sys.modules["ydata_profiling"] = original

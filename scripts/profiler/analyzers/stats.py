@@ -25,6 +25,11 @@ def profile_dataframe(
         AnalysisResult with profile and description populated.
         pii_columns and dbt_signals are empty (filled in by downstream analyzers).
 
+    Note:
+        progress_bar=False is set unconditionally to prevent tqdm output in
+        non-interactive (CLI/subprocess) contexts where the progress bar would
+        corrupt terminal output.
+
     Raises:
         ImportError: if ydata-profiling is not installed.
     """
