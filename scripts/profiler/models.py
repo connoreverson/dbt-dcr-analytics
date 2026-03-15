@@ -62,9 +62,9 @@ class AnalysisResult:
     """
 
     target: SelectionTarget
-    profile: ProfileReport
+    profile: ProfileReport | None
     """Full ydata-profiling ProfileReport object. Used by html renderer."""
-    description: BaseDescription
+    description: BaseDescription | None
     """profile.get_description(). Used by markdown renderer and dbt_signals."""
     sample: pd.DataFrame
     """Raw sample — never mutated."""

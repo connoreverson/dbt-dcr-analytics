@@ -78,7 +78,7 @@ def resolve_output_modes(output_str: str) -> set[str]:
     return modes
 
 
-def profile_target(target, args) -> None:
+def profile_target(target, args, modes: set[str]) -> None:
     """Run the full profiling pipeline for a single SelectionTarget."""
     from scripts.profiler.connectors.duckdb import DuckDBConnector
     from scripts.profiler.connectors.bigquery import BigQueryConnector
@@ -99,7 +99,6 @@ def profile_target(target, args) -> None:
             connector.close()
 
     # Run analyzers
-    modes = resolve_output_modes(args.output)
     needs_full_stats = "html" in modes or "markdown" in modes
 
     if needs_full_stats:
@@ -165,7 +164,7 @@ def main(argv: list[str] | None = None) -> int:
     exit_code = 0
     for target in targets:
         try:
-            profile_target(target, args)
+            profile_target(target, args, modes)
         except Exception as exc:
             if args.verbose:
                 raise

@@ -1,3 +1,6 @@
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
 [tool.dbt-score]
 # Fail any model whose score drops below this threshold
 fail_any_model_under = 5.0
