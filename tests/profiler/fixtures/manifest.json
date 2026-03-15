@@ -14,7 +14,8 @@
       "database": "dev",
       "schema": "main",
       "alias": "stg_parks__facilities",
-      "config": {"materialized": "view"}
+      "config": {"materialized": "view"},
+      "original_file_path": "models/staging/stg_parks__facilities.sql"
     },
     "model.dcr_analytics.int_parks": {
       "unique_id": "model.dcr_analytics.int_parks",
@@ -24,6 +25,16 @@
       "schema": "main",
       "alias": "int_parks",
       "config": {"materialized": "table"}
+    },
+    "model.dcr_analytics.fct_reservations": {
+      "unique_id": "model.dcr_analytics.fct_reservations",
+      "name": "fct_reservations",
+      "resource_type": "model",
+      "database": "dev",
+      "schema": "main",
+      "alias": "fct_reservations",
+      "config": {"materialized": "table"},
+      "original_file_path": "models/marts/fct_reservations.sql"
     }
   },
   "sources": {
@@ -35,6 +46,16 @@
       "database": "source_data/duckdb/dcr_rev_01_vistareserve.duckdb",
       "schema": "main",
       "identifier": "reservations"
+    },
+    "source.dcr_analytics.reservations.transactions": {
+      "unique_id": "source.dcr_analytics.reservations.transactions",
+      "name": "transactions",
+      "source_name": "reservations",
+      "resource_type": "source",
+      "database": "dcr_rev_01_vistareserve",
+      "schema": "reservations",
+      "identifier": "transactions",
+      "original_file_path": "models/staging/reservations/_sources.yml"
     }
   }
 }
