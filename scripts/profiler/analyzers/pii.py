@@ -108,4 +108,4 @@ def detect_pii(df: pd.DataFrame) -> set[str]:
 
 def _is_string_column(series: pd.Series) -> bool:
     """Return True if the series contains string/object data."""
-    return series.dtype == object or hasattr(series, "str")
+    return pd.api.types.is_string_dtype(series)

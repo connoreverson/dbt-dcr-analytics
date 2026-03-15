@@ -6,6 +6,14 @@ import pytest
 from scripts.profiler.analyzers.pii import _PII_NAME_PATTERNS, _spacy_available, detect_pii
 
 
+def _presidio_available() -> bool:
+    try:
+        import presidio_analyzer  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
 # ---------------------------------------------------------------------------
 # Pass 1: name heuristic tests
 # ---------------------------------------------------------------------------
@@ -56,7 +64,7 @@ def test_all_numeric_columns_not_flagged():
 # ---------------------------------------------------------------------------
 
 @pytest.mark.skipif(
-    not _spacy_available(),
+    not _spacy_available() or not _presidio_available(),
     reason="presidio-analyzer + en_core_web_lg not available",
 )
 def test_value_scan_flags_obfuscated_email_column():
@@ -84,3 +92,27 @@ def test_fixture_df_constant_col_not_flagged(fixture_df):
     """'constant_col' is not a PII name and contains 'X' values -- not flagged."""
     result = detect_pii(fixture_df)
     assert "constant_col" not in result
+
+
+def test_presidio_absent_falls_back_to_name_heuristic(caplog):
+    """When presidio-analyzer is absent, name-heuristic results are still returned."""
+    import sys
+    import logging
+    had = "presidio_analyzer" in sys.modules
+    original = sys.modules.get("presidio_analyzer")
+    sys.modules["presidio_analyzer"] = None  # type: ignore[assignment]
+    try:
+        df = pd.DataFrame({
+            "email_address": ["x@y.com"],
+            "obfuscated_col": ["x@y.com"],  # would be caught by value scan
+        })
+        with caplog.at_level(logging.WARNING, logger="scripts.profiler.analyzers.pii"):
+            result = detect_pii(df)
+        assert "email_address" in result  # name heuristic still works
+        assert "obfuscated_col" not in result  # value scan skipped
+        assert any("presidio-analyzer" in msg for msg in caplog.messages)
+    finally:
+        if not had:
+            del sys.modules["presidio_analyzer"]
+        else:
+            sys.modules["presidio_analyzer"] = original
