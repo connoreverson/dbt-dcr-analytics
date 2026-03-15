@@ -23,8 +23,12 @@ class BigQueryConnector(BaseConnector):
             ) from e
         # conn_str format: "project.dataset"
         parts = target.conn_str.split(".")
+        if len(parts) < 2:
+            raise ValueError(
+                f"BigQuery conn_str must be 'project.dataset', got: {target.conn_str!r}"
+            )
         self._project = parts[0]
-        self._dataset = parts[1] if len(parts) > 1 else target.schema
+        self._dataset = parts[1]
         self._client: object | None = None  # deferred -- authenticate on first use
 
     def _get_client(self):
@@ -39,13 +43,19 @@ class BigQueryConnector(BaseConnector):
 
     def get_schema(self) -> list[ColumnDef]:
         """Return column definitions via INFORMATION_SCHEMA."""
+        bq = self._bq
         query = (
             f"SELECT column_name, data_type, is_nullable "
             f"FROM `{self._project}.{self._dataset}.INFORMATION_SCHEMA.COLUMNS` "
-            f"WHERE table_name = '{self.target.table}' "
+            f"WHERE table_name = @table_name "
             f"ORDER BY ordinal_position"
         )
-        rows = self._get_client().query(query).result()
+        job_config = bq.QueryJobConfig(
+            query_parameters=[
+                bq.ScalarQueryParameter("table_name", "STRING", self.target.table)
+            ]
+        )
+        rows = self._get_client().query(query, job_config=job_config).result()
         return [
             ColumnDef(
                 name=row.column_name,
