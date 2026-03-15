@@ -68,7 +68,7 @@ def test_render_markdown_redacts_pii(minimal_result, tmp_path, monkeypatch):
     content = out.read_text(encoding="utf-8")
     # email_address values should be redacted
     assert "alice@example.com" not in content
-    assert "REDACTED" in content
+    assert "[REDACTED" in content  # presidio format [REDACTED:TYPE] or fallback [REDACTED]
 
 
 def test_render_markdown_with_signals(minimal_result, tmp_path, monkeypatch):
@@ -91,3 +91,16 @@ def test_render_markdown_filename_includes_table_and_timestamp(minimal_result, t
     out = render_markdown(minimal_result)
     assert "test_table" in out.name
     assert "20260315" in out.name
+
+
+def test_render_markdown_ddl_includes_cast_hint(minimal_result, tmp_path, monkeypatch):
+    """Cast hint signals appear as inline comments in the DDL section."""
+    import scripts.profiler.renderers.markdown as md_mod
+    monkeypatch.setattr(md_mod, "_TMP_DIR", tmp_path)
+    minimal_result.dbt_signals = [
+        DbtSignal(signal_type="CAST_HINT", column_name="amount", message="cast as decimal"),
+    ]
+    out = render_markdown(minimal_result)
+    content = out.read_text(encoding="utf-8")
+    ddl_section = content.split("## Column Statistics")[0]
+    assert "cast as decimal" in ddl_section

@@ -150,6 +150,8 @@ def _df_to_markdown_table(df: pd.DataFrame) -> str:
     sep = "| " + " | ".join("---" for _ in cols) + " |"
     rows = []
     for _, row in df.iterrows():
-        cells = " | ".join(str(v) if v is not None else "NULL" for v in row)
+        cells = " | ".join(
+            str(v).replace("|", "\\|") if v is not None else "NULL" for v in row
+        )
         rows.append(f"| {cells} |")
     return "\n".join([header, sep] + rows)
