@@ -32,7 +32,8 @@ def test_ssn_column_flagged_by_name():
 
 
 def test_non_pii_column_not_flagged_by_name():
-    df = pd.DataFrame({"confirmed_at": ["2024-01-01"], "status": ["active"]})
+    # Use non-date, non-PII values so Presidio value-scan doesn't false-positive
+    df = pd.DataFrame({"confirmed_at": ["active", "pending"], "status": ["open", "closed"]})
     result = detect_pii(df)
     assert "confirmed_at" not in result
     assert "status" not in result
