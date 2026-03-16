@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 _TMP_DIR = Path("tmp")
 
 
-def render_markdown(result: AnalysisResult) -> Path:
+def render_markdown(result: AnalysisResult, sanitize_pii: bool = False) -> Path:
     """Render a profiling result to an LLM-optimized markdown file.
 
     Sections:
@@ -27,7 +27,7 @@ def render_markdown(result: AnalysisResult) -> Path:
     3. Column statistics table — column, type, null%, n_distinct, alerts
     4. dbt Signals — bulleted list
     5. PII Columns — flagged names and entity types
-    6. Sample Rows — 5 rows with PII columns showing [REDACTED:...]
+    6. Sample Rows — 5 rows; PII columns show [REDACTED:...] when sanitize_pii=True
 
     Returns:
         Path to the written .md file.
@@ -114,11 +114,11 @@ def render_markdown(result: AnalysisResult) -> Path:
         lines.append("_No PII columns detected._")
     lines.append("")
 
-    # 6. Sample Rows (redacted)
+    # 6. Sample Rows
     lines.append("## Sample Rows")
     lines.append("")
-    sanitized = sanitize(result.sample, result.pii_columns)
-    sample_5 = sanitized.head(5)
+    sample_df = sanitize(result.sample, result.pii_columns) if sanitize_pii else result.sample
+    sample_5 = sample_df.head(5)
     lines.append(_df_to_markdown_table(sample_5))
     lines.append("")
 

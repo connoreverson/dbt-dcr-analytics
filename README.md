@@ -531,7 +531,7 @@ $env:PYTHONUTF8=1; python -m scripts.profiler.cli --select stg_vistareserve__res
 $env:PYTHONUTF8=1; python -m scripts.profiler.cli --select fct_reservations --output all --sample 5000
 
 # Generate an HTML report with PII redacted in sample rows (for LLM-safe sharing)
-$env:PYTHONUTF8=1; python -m scripts.profiler.cli --select int_employees --output html --sanitize-html
+$env:PYTHONUTF8=1; python -m scripts.profiler.cli --select int_employees --output html --sanitize-pii
 ```
 
 Run the profiler as a module (`python -m scripts.profiler.cli`) from the project root — this ensures the `scripts` package is importable. The `PYTHONUTF8=1` prefix is required on Windows to prevent encoding errors in the rich console output. In Git Bash use `PYTHONUTF8=1 python -m scripts.profiler.cli ...` instead.
@@ -554,7 +554,7 @@ Run the profiler as a module (`python -m scripts.profiler.cli`) from the project
 | `--sample N` | `1000` | Number of rows to sample |
 | `--full-profile` | off | Enable ydata-profiling correlations and interactions (slower) |
 | `--env` | `local` | `local` for DuckDB, `prod` for BigQuery |
-| `--sanitize-html` | off | Redact PII columns in HTML sample rows before writing the report |
+| `--sanitize-pii` | off | Redact PII values in output (markdown and HTML); for LLM-safe sharing |
 | `--verbose` | off | Show full tracebacks on error |
 
 #### dbt Signals
@@ -570,7 +570,7 @@ The profiler emits four signal types that surface potential staging issues:
 
 #### PII Detection
 
-PII detection runs in two passes. Pass 1 flags columns whose names match known patterns (`email`, `ssn`, `phone`, `first_name`, `address`, etc.). Pass 2 uses [Presidio](https://microsoft.github.io/presidio/) to scan sample values in any unflagged string columns. If `presidio-analyzer` or the `en_core_web_lg` spaCy model is not installed, the profiler falls back gracefully to name-heuristic detection only. In terminal mode, PII columns are highlighted but not redacted. Use `--sanitize-html` when generating HTML reports intended for sharing with LLMs or external reviewers.
+PII detection runs in two passes. Pass 1 flags columns whose names match known patterns (`email`, `ssn`, `phone`, `first_name`, `address`, etc.). Pass 2 uses [Presidio](https://microsoft.github.io/presidio/) to scan sample values in any unflagged string columns. If `presidio-analyzer` or the `en_core_web_lg` spaCy model is not installed, the profiler falls back gracefully to name-heuristic detection only. In terminal mode, PII columns are highlighted but not redacted. Use `--sanitize-pii` when generating markdown or HTML output intended for sharing with LLMs or external reviewers.
 
 #### Prerequisites
 

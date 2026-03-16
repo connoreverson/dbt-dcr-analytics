@@ -5,6 +5,8 @@ typed SelectionTarget instances for downstream profiling.
 """
 from __future__ import annotations
 
+import contextlib
+import io
 import json
 import os
 from pathlib import Path
@@ -45,21 +47,26 @@ def _ensure_manifest() -> None:
 
 
 def _run_dbt_ls(selector: str) -> list[str]:
-    """Invoke `dbt ls --select <selector> --output selector` via dbtRunner.
+    """Invoke `dbt ls --select <selector> --output json` via dbtRunner.
 
     Returns a list of unique node IDs (e.g. 'model.dcr_analytics.stg_parks__facilities').
+    Only models and sources are included; tests, seeds, and analyses are excluded.
     """
     from dbt.cli.main import dbtRunner
     runner = dbtRunner()
-    result = runner.invoke(["ls", "--select", selector, "--output", "selector"])
+    with contextlib.redirect_stdout(io.StringIO()):
+        result = runner.invoke(["ls", "--select", selector, "--output", "json"])
     if not result.success:
         raise RuntimeError(
             f"dbt ls failed for selector {selector!r}. "
             "This may indicate a syntax error in the selector or a dbt configuration problem. "
             "Run `dbt ls --select <selector>` manually to see the full error."
         )
-    # result.result is an iterable of unique_id strings
-    unique_ids = list(result.result)
+    unique_ids = []
+    for item in result.result:
+        node_data = json.loads(item) if isinstance(item, str) else item
+        if node_data.get("resource_type") in ("model", "source"):
+            unique_ids.append(node_data["unique_id"])
     if not unique_ids:
         raise ValueError(f"No dbt nodes matched selector: {selector!r}")
     return unique_ids
@@ -110,8 +117,10 @@ def _build_target(
         conn_str = f"{database}.{schema}"
     else:
         connector_type = "duckdb"
-        # Resolve DuckDB path from environment or fall back to project convention
         conn_str = _resolve_duckdb_path(node)
+        # For sources, the manifest 'database' is the attach alias (e.g. 'peoplefirst').
+        # Store it so the connector can build a three-part FQN: alias.schema.table.
+        database = node.get("database", "") if prefix_part == "source" else ""
 
     return SelectionTarget(
         prefix=prefix,
@@ -120,17 +129,17 @@ def _build_target(
         conn_str=conn_str,
         schema=schema,
         resource_type=resource_type,
+        database=database,
     )
 
 
 def _resolve_duckdb_path(node: dict) -> str:
     """Resolve the .duckdb file path for a node.
 
-    Checks PROFILER_DUCKDB_PATH env var first, then falls back to a
-    convention-based path: source_data/duckdb/<database>.duckdb
+    Checks PROFILER_DUCKDB_PATH env var first, then falls back to the dbt
+    target database where all models are materialized.
     """
     env_path = os.environ.get("PROFILER_DUCKDB_PATH")
     if env_path:
         return env_path
-    database = node.get("database", "dev")
-    return str(Path("source_data") / "duckdb" / f"{database}.duckdb")
+    return str(Path("target") / "dcr_analytics.duckdb")

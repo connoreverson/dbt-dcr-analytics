@@ -51,9 +51,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Environment: local (DuckDB) or prod (BigQuery) (default: local)",
     )
     parser.add_argument(
-        "--sanitize-html",
+        "--sanitize-pii",
         action="store_true",
-        help="Redact PII in HTML sample rows (slower; for LLM-safe sharing)",
+        help="Redact PII values in output (slower; for LLM-safe sharing)",
     )
     parser.add_argument(
         "--verbose",
@@ -129,13 +129,13 @@ def profile_target(target, args, modes: set[str]) -> None:
     if "markdown" in modes:
         from scripts.profiler.renderers.markdown import render_markdown
 
-        out = render_markdown(result)
+        out = render_markdown(result, sanitize_pii=args.sanitize_pii)
         print(f"Markdown: {out}")
 
     if "html" in modes:
         from scripts.profiler.renderers.html import render_html
 
-        out = render_html(result, sanitize_html=args.sanitize_html)
+        out = render_html(result, sanitize_pii=args.sanitize_pii)
         print(f"HTML:     {out}")
 
 

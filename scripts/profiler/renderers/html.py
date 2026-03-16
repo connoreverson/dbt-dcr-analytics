@@ -11,18 +11,18 @@ logger = logging.getLogger(__name__)
 _TMP_DIR = Path("tmp")
 
 
-def render_html(result: AnalysisResult, sanitize_html: bool = False) -> Path:
+def render_html(result: AnalysisResult, sanitize_pii: bool = False) -> Path:
     """Render a profiling result to an interactive ydata-profiling HTML report.
 
     Prepends a custom signals and PII section as the first child of <body>.
 
-    When sanitize_html=True, builds a second ProfileReport from the sanitized
+    When sanitize_pii=True, builds a second ProfileReport from the sanitized
     DataFrame before rendering. This is intentionally more expensive and is
     intended for LLM-safe sharing, not routine use.
 
     Args:
         result: The AnalysisResult to render.
-        sanitize_html: If True, redact PII in sample rows before rendering.
+        sanitize_pii: If True, redact PII in sample rows before rendering.
 
     Returns:
         Path to the written .html file.
@@ -41,7 +41,7 @@ def render_html(result: AnalysisResult, sanitize_html: bool = False) -> Path:
     out_path = _TMP_DIR / f"profile_{result.target.table}_{timestamp}.html"
     _TMP_DIR.mkdir(parents=True, exist_ok=True)
 
-    if sanitize_html and result.pii_columns:
+    if sanitize_pii and result.pii_columns:
         # Build a second ProfileReport from the sanitized frame
         try:
             from ydata_profiling import ProfileReport
@@ -57,8 +57,8 @@ def render_html(result: AnalysisResult, sanitize_html: bool = False) -> Path:
             title=result.target.table,
             progress_bar=False,
         )
-    elif sanitize_html and not result.pii_columns:
-        logger.info("--sanitize-html requested but no PII columns detected; rendering unsanitized.")
+    elif sanitize_pii and not result.pii_columns:
+        logger.info("--sanitize-pii requested but no PII columns detected; rendering unsanitized.")
         profile_to_render = result.profile
     else:
         profile_to_render = result.profile

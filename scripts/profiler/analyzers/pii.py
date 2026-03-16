@@ -82,7 +82,18 @@ def detect_pii(df: pd.DataFrame) -> set[str]:
     try:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            analyzer = AnalyzerEngine()
+            _presidio_loggers = [
+                logging.getLogger(name)
+                for name in ("presidio-analyzer", "presidio_analyzer")
+            ]
+            _prior_levels = [lg.level for lg in _presidio_loggers]
+            for lg in _presidio_loggers:
+                lg.setLevel(logging.ERROR)
+            try:
+                analyzer = AnalyzerEngine()
+            finally:
+                for lg, lvl in zip(_presidio_loggers, _prior_levels):
+                    lg.setLevel(lvl)
 
         for col in unflagged_str_cols:
             sample_values = (

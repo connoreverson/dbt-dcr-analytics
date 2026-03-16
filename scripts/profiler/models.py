@@ -32,6 +32,9 @@ class SelectionTarget:
     schema: str
     resource_type: str
     """'source' or 'model'."""
+    database: str = ""
+    """Attach alias for source nodes (e.g. 'peoplefirst'). Empty for model nodes,
+    which always live in the main schema of the target .duckdb file."""
 
 
 @dataclass
