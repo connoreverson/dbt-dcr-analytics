@@ -516,6 +516,71 @@ python scripts/inspect_source.py --type duckdb --conn source_data/duckdb/dcr_rev
 python scripts/inspect_source.py --type duckdb --conn source_data/duckdb/dcr_rev_01_vistareserve.duckdb --table main.reservations
 ```
 
+### profiler/ — Source and Model Profiling
+
+A deeper statistical profiler for dbt sources and models. Unlike `inspect_source.py`, the profiler uses dbt's selector syntax so you can profile any node the same way you reference it in `dbt build` — no need to know the underlying file path or schema name. It produces column-level statistics, PII detection, and dbt-specific signals (cast hints, rename hints, unused column warnings) across three output formats.
+
+```powershell
+# Profile a staging model — terminal output (default)
+$env:PYTHONUTF8=1; python -m scripts.profiler.cli --select stg_geoparks__parks_master
+
+# Profile a staging model and write a Markdown report
+$env:PYTHONUTF8=1; python -m scripts.profiler.cli --select stg_vistareserve__reservations --output markdown
+
+# Profile a mart model with all output formats and a larger sample
+$env:PYTHONUTF8=1; python -m scripts.profiler.cli --select fct_reservations --output all --sample 5000
+
+# Generate an HTML report with PII redacted in sample rows (for LLM-safe sharing)
+$env:PYTHONUTF8=1; python -m scripts.profiler.cli --select int_employees --output html --sanitize-html
+```
+
+Run the profiler as a module (`python -m scripts.profiler.cli`) from the project root — this ensures the `scripts` package is importable. The `PYTHONUTF8=1` prefix is required on Windows to prevent encoding errors in the rich console output. In Git Bash use `PYTHONUTF8=1 python -m scripts.profiler.cli ...` instead.
+
+#### Output modes
+
+| Mode | Output | Description |
+|---|---|---|
+| `terminal` | Console | Compact stats table (via skimpy) with color-coded dbt Signals and PII panels |
+| `markdown` | `tmp/profile_<model>.md` | Full ydata-profiling statistics in Markdown, suitable for committing or pasting into a review |
+| `html` | `tmp/profile_<model>.html` | Interactive HTML report with distributions, correlations, and sample rows |
+| `all` | All three | Equivalent to `--output terminal,markdown,html` |
+
+#### Options
+
+| Flag | Default | Description |
+|---|---|---|
+| `--select` / `-s` | required | dbt node selector — model name, `source:<src>.<table>`, or any valid dbt selector |
+| `--output` / `-o` | `terminal` | Comma-separated output modes (see table above) |
+| `--sample N` | `1000` | Number of rows to sample |
+| `--full-profile` | off | Enable ydata-profiling correlations and interactions (slower) |
+| `--env` | `local` | `local` for DuckDB, `prod` for BigQuery |
+| `--sanitize-html` | off | Redact PII columns in HTML sample rows before writing the report |
+| `--verbose` | off | Show full tracebacks on error |
+
+#### dbt Signals
+
+The profiler emits four signal types that surface potential staging issues:
+
+| Signal | What it means |
+|---|---|
+| `CAST_HINT` | A VARCHAR column appears to contain numeric or date values — consider casting in staging |
+| `RENAME_HINT` | A column uses camelCase, Hungarian notation, or an ambiguous generic name |
+| `UNUSED_COLUMN` | A column has a constant value or very high null rate — consider dropping in staging |
+| `NULL_PATTERN` | A column shows a null distribution pattern worth documenting |
+
+#### PII Detection
+
+PII detection runs in two passes. Pass 1 flags columns whose names match known patterns (`email`, `ssn`, `phone`, `first_name`, `address`, etc.). Pass 2 uses [Presidio](https://microsoft.github.io/presidio/) to scan sample values in any unflagged string columns. If `presidio-analyzer` or the `en_core_web_lg` spaCy model is not installed, the profiler falls back gracefully to name-heuristic detection only. In terminal mode, PII columns are highlighted but not redacted. Use `--sanitize-html` when generating HTML reports intended for sharing with LLMs or external reviewers.
+
+#### Prerequisites
+
+The profiler requires a compiled manifest (`target/manifest.json`). If the manifest is absent or older than `dbt_project.yml`, the profiler runs `dbt parse` automatically. Markdown and HTML output require `ydata-profiling`; terminal output uses `skimpy`. Both are included in `requirements.txt`. Full PII value scanning additionally requires:
+
+```powershell
+pip install "presidio-analyzer>=2.2"
+python -m spacy download en_core_web_lg
+```
+
 ### search_cdm.py — CDM Catalog Search
 
 Searches the full Microsoft Common Data Model column catalog using keyword and fuzzy matching. Useful when mapping staging columns to CDM entity attributes.
@@ -710,7 +775,7 @@ The governance toolchain — sqlfluff, dbt-score, dbt-project-evaluator, and `ch
 
 When writing or modifying a model, consider the following responsibilities as part of the work — not as a separate review step, but as part of how the model is designed.
 
-**Understand the source before writing the model.** Run `inspect_source.py` on the source table to see its actual column types, cardinality, null distribution, and sample values. Read the Data Inventory entry for the source system to understand its known quality issues. A staging model for a table with a 20% null rate on a critical field needs a different testing strategy than one for a table where that field is always populated.
+**Understand the source before writing the model.** Run `inspect_source.py` on the source table to see its actual column types, cardinality, null distribution, and sample values, or run the profiler (`python -m scripts.profiler.cli`) against an existing source or model node using dbt selector syntax for deeper statistical analysis and automatic dbt Signals. Read the Data Inventory entry for the source system to understand its known quality issues. A staging model for a table with a 20% null rate on a critical field needs a different testing strategy than one for a table where that field is always populated.
 
 **Choose test severity based on what the source system can guarantee.** A `not_null` test with `severity: error` is appropriate when the source system enforces the field as required — a null value genuinely indicates a pipeline break or a system failure. The same test with `severity: warn` is appropriate when the source system allows blanks and blanks are a known, expected condition — walk-up park visitors who are not required to provide contact information, seasonal employees whose certification records have not yet been entered, or grants whose compliance deadlines have not been set because the award is still in negotiation.
 
@@ -724,7 +789,7 @@ When writing or modifying a model, consider the following responsibilities as pa
 
 When adding or modifying a model, follow this workflow to identify which quality tests are needed:
 
-1. **Identify the grain.** What is one row in this model? The primary key column(s) must have `unique` and `not_null` tests. For composite keys, use `dbt_utils.unique_combination_of_columns`.
+1. **Identify the grain.** What is one row in this model? The primary key column(s) must have `unique` and `not_null` tests. For composite keys, use `dbt_utils.unique_combination_of_columns`. Run the profiler (`$env:PYTHONUTF8=1; python -m scripts.profiler.cli --select <model>`) first — its `CAST_HINT` and `UNUSED_COLUMN` signals often surface candidates for additional tests before you write a single line of YAML.
 
 2. **Identify the dimension.** For each column, ask which DAMA dimension is most at risk:
    - A column that could be null when it should not be → **Completeness** → `not_null`
