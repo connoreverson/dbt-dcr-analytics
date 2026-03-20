@@ -14,7 +14,13 @@ The `scripts/` directory grew organically into 8 flat scripts plus a well-struct
 4. Produces LLM-friendly output analysts can paste into Gemini for modeling assistance
 5. Scales to tables with tens of thousands to millions of rows
 
-The team's primary anti-pattern: they go straight from source tables to dashboard-shaped models, skipping dimensional modeling. They don't identify the business entity they're modeling, don't consider CDM alignment, and build single-source pass-through integration models without surrogate keys or union-ready structure.
+The team's primary anti-patterns:
+
+- **Report-driven development:** They go straight from source tables to dashboard-shaped models, skipping dimensional modeling. They don't identify the business entity they're modeling, don't consider CDM alignment, and build single-source pass-through integration models without surrogate keys or union-ready structure.
+- **Page-shaped facts:** They build one fact model per dashboard page instead of modeling the underlying business event. Facts embed descriptive attributes (park names, customer details) directly instead of joining to dimensions.
+- **Skipping dimensions:** They treat dimensions as optional enrichments rather than first-class entities. Descriptive attributes are duplicated across every fact row.
+- **Pass-through reports:** They create report models that consume a single fact without aggregation or multi-table combination, adding indirection without value.
+- **Duplicate facts:** Multiple fact models capture the same business event at different grains, when a single fact + report model would suffice.
 
 ## Audience and Workflow
 
@@ -73,12 +79,13 @@ scripts/
 │   # NOTE: connectors/ and renderers/ move to _core/ in phase 0.
 │   # Profiler imports from _core/ after phase 6 refactor.
 │
-├── grain/                      # Grain verification + join cardinality + integration lint
+├── grain/                      # Grain verification + join cardinality + layer-specific lint
 │   ├── __init__.py
 │   ├── cli.py                  # Entry: python -m scripts.grain --select <model>
 │   ├── key_discovery.py        # Candidate PK detection via analytical queries
 │   ├── join_analysis.py        # sqlglot AST parsing + cardinality queries
-│   └── integration_lint.py     # Single-source, no SK, pass-through, no CDM checks
+│   ├── integration_lint.py     # Single-source, no SK, pass-through, no CDM checks
+│   └── mart_lint.py            # Wide facts, missing dims, pass-through reports, duplicate grain
 │
 ├── llm_context/                # LLM context generation + CDM advisor + guided intake
 │   ├── __init__.py
@@ -92,7 +99,8 @@ scripts/
 │   ├── __init__.py
 │   ├── cli.py                  # Entry: python -m scripts.scaffold <subcommand>
 │   ├── test_scaffold.py        # Generate missing YAML tests as copy-pasteable YAML
-│   └── integration_scaffold.py # Generate integration model SQL + YAML skeleton
+│   ├── integration_scaffold.py # Generate integration model SQL + YAML skeleton
+│   └── mart_scaffold.py        # Generate fact/dimension/report SQL + YAML skeletons
 │
 ├── preflight/                  # Analyst self-check before PR
 │   ├── __init__.py
@@ -221,6 +229,44 @@ Each finding is a warning with an explanation of why it matters and a command to
 
 **Note on intake metadata:** The intake check looks for `meta: { intake_completed: true }` in the model's YAML entry, not for a file on disk. This is set by `new_model.py` when it generates the YAML snippet, and persists in version control. Existing `int_*` models built before this tooling will not have this metadata — the check produces a low-severity suggestion ("Consider running `python -m scripts.llm_context new-model` to document this model's entity and grain"), not a warning. This avoids false warnings on the 7+ existing integration models.
 
+**`mart_lint.py`** — Mart Model Anti-Pattern Detection
+
+Runs automatically when `--select` target is a `fct_`, `dim_`, or `rpt_` model. Detects the specific anti-patterns documented in the team's issue trends: page-shaped facts, skipped dimensions, pass-through reports, and duplicate grains.
+
+**Fact model checks (`fct_`):**
+
+| Check | What it detects | Method |
+|---|---|---|
+| Wide fact | Fact has multiple non-key, non-measure string columns that look like descriptive attributes (e.g., `park_name`, `customer_email`, `region`) without corresponding dimension FK columns | Query output columns; flag string columns matching `_name`, `_email`, `_address`, `_description`, `_region`, `_type` patterns where no corresponding `_sk` or `_id` FK exists for that entity |
+| No dimension joins | Fact doesn't join to any `dim_` model | `depends_on` in manifest — check for any node with `dim_` prefix |
+| Embedded dimensions | Fact contains columns that belong in a dimension — descriptive attributes duplicated per event row | Column name heuristic cross-referenced with existing dimension columns: if `dim_parks` has `park_name` and the fact also has `park_name` without joining to `dim_parks`, flag it |
+| Duplicate grain | Another `fct_` model has the same candidate primary key pattern (same business event modeled twice) | Cross-reference `key_discovery` results across all `fct_` models in the project |
+| Missing date dimension join | Fact has date columns but no join to `dim_date` | `depends_on` check + column inspection for `_date`, `_at`, `_on` suffixes |
+
+For each finding, the output explains what to do:
+- Wide fact → "These columns should live in dimension tables. Consider: [specific dimension suggestions based on existing dims and column names]"
+- No dimension joins → "Fact models should join to dimensions for descriptive attributes, not carry them inline."
+- Embedded dimensions → "dim_parks already has park_name — join via parks_sk instead of embedding"
+- Missing date dimension → "Add date_key and join to dim_date for calendar/fiscal attributes"
+
+**Dimension model checks (`dim_`):**
+
+| Check | What it detects | Method |
+|---|---|---|
+| Not referenced | No `fct_` or `rpt_` model joins to this dimension | Reverse `depends_on` lookup across all mart models |
+| Duplicate entity | Another `dim_` model covers the same entity (high column name overlap) | Column name similarity across all `dim_` models |
+| Missing surrogate key | No `_sk` column in output | Query output columns |
+
+**Report model checks (`rpt_`):**
+
+| Check | What it detects | Method |
+|---|---|---|
+| Single-fact pass-through | Report only consumes one `fct_` model and doesn't aggregate | `depends_on` count (only 1 `fct_` parent) + sqlglot AST check for GROUP BY |
+| No aggregation | Report has no GROUP BY clause — it's passing data through without changing the grain | sqlglot AST inspection |
+| Grain same as source fact | Report output row count equals input fact row count — no grain change occurred | Query both and compare |
+
+For single-fact pass-throughs, the output suggests: "This report only consumes fct_reservations without aggregation. Consider whether your BI tool can join the fact to its dimensions directly — a report model earns its place when it combines multiple facts or aggregates to a different grain."
+
 ### Phase 2: `llm_context/` — LLM Context Generation, CDM Advisor, Guided Intake
 
 **CLI:**
@@ -235,7 +281,9 @@ python -m scripts.llm_context source-summary --select source:peoplefirst.employe
 
 **`new_model.py`** — Guided Intake Questionnaire
 
-Interactive questionary-based workflow. Questions:
+Interactive questionary-based workflow. The intake branches based on the target layer.
+
+**Common questions (all layers):**
 
 1. "What data are you working with?" — source system and table names
 2. "What does each row represent?" — plain English grain statement
@@ -243,10 +291,62 @@ Interactive questionary-based workflow. Questions:
 4. "Who or what is involved?" — related entities
 5. "What questions should the data answer?" — business questions (not report names)
 
-Output (all generated at once):
-- CDM entity match (via `cdm_advisor.py` behind the scenes)
-- Integration model SQL skeleton (via `scaffold/integration_scaffold.py`)
-- YAML snippet with grain description, CDM entity, core tests, and `meta: { intake_completed: true, intake_date: "YYYY-MM-DD" }`
+**Layer selection:**
+
+6. "Which layer is this model for?" — multiple choice:
+   - Staging (cast/rename from source)
+   - Integration (normalize an entity across systems)
+   - Mart (business-facing: fact, dimension, or report)
+
+**Integration branch:** Proceeds to CDM entity matching and integration model scaffolding as described above.
+
+**Mart branch — model type classification:**
+
+7. "What kind of mart model is this?" — multiple choice with explanations:
+   - "A business event that happened (transaction, booking, inspection, measurement)" → FACT
+   - "A descriptive entity (a park, a person, an asset, a date)" → DIMENSION
+   - "A summary that combines multiple facts or aggregates to a different grain" → REPORT
+   - "Not sure" → tool explains the distinction with concrete examples from the project, then re-asks
+
+**Mart branch — FACT path:**
+
+8. Tool queries existing `fct_` models in the project and displays them with their grain statements.
+   "Do any of these existing facts already capture the same business event?"
+   - If yes → "You may need a REPORT model that aggregates the existing fact, not a new fact. Let's explore that path instead." Redirects to REPORT path.
+   - If no → proceeds
+
+9. "What dimensions describe this event?" — checklist:
+   - Who (a person, customer, or organization)
+   - Where (a park, facility, or location)
+   - When (a date or time period)
+   - What (an asset, product, or item)
+
+   For each selected dimension category, tool checks for existing `dim_` models:
+   - If exists → "dim_parks exists — your fact should join via parks_sk, not embed park attributes"
+   - If missing → "No customer dimension exists yet. Consider building dim_customers first, or flag this as a dependency."
+
+   Output: fact model skeleton with surrogate key FKs to existing dimensions, measures only (no embedded descriptive columns), and TODO comments for missing dimensions. Note: the scaffold will generate FK references to dimensions that may not exist yet (e.g., `customer_sk` referencing `dim_customers`). This is intentional — the SQL will fail at `dbt build` time, which surfaces the missing dependency naturally. The TODO comments and the intake's "missing dimension" warning make this explicit.
+
+**Mart branch — DIMENSION path:**
+
+8. Tool queries existing `dim_` models and displays them.
+   "Does your entity overlap with any of these?"
+   - If yes → "Consider extending the existing dimension rather than creating a new one."
+   - If no → proceeds to scaffold a dimension with surrogate key, descriptive attributes, and derived classifications.
+
+**Mart branch — REPORT path:**
+
+8. "Which existing fact tables does this report combine or aggregate?" — checklist of all `fct_` models in the project.
+
+9. "What grain does the report aggregate to?" — free text (e.g., "park + month")
+
+10. Tool validates the report earns its place:
+    - If only one fact selected and no aggregation grain differs from the fact's grain → "This report only passes through a single fact. Consider whether your BI tool can do this join directly. Proceed anyway?"
+    - If multiple facts or different grain → proceeds to scaffold a report model with per-fact CTEs and a final join.
+
+**Output (all paths):**
+- Model SQL skeleton appropriate to the layer and type
+- YAML snippet with grain description, core tests, and `meta: { intake_completed: true, intake_date: "YYYY-MM-DD", model_type: "fact|dimension|report|integration" }`
 - LLM context block (copy-paste ready for Gemini)
 - Intake answers saved as `meta:` fields in the generated YAML (version-controlled, co-located with model)
 
@@ -343,7 +443,45 @@ Process:
 3. Generate SQL skeleton: surrogate key, CDM column mapping with inline comments, source-specific columns separated, union-ready CTE structure, `TODO` comments on unmapped columns
 4. Generate YAML snippet: grain description, CDM entity in `meta:`, core tests, contract placeholder
 
-Output: SQL file + YAML snippet saved to `tmp/scaffold/`. Also called by `new_model.py` after intake questionnaire.
+Output: SQL file + YAML snippet saved to `tmp/scaffold/`. Also called by `new_model.py` after intake questionnaire (integration branch).
+
+**`mart_scaffold.py`** — Generate Fact/Dimension/Report Model Skeletons
+
+Called by `new_model.py` after the mart branch intake, or directly:
+
+```bash
+python -m scripts.scaffold fact --name fct_permits \
+  --grain "one row per permit application" \
+  --dimensions dim_parks dim_customers dim_date \
+  --measures "permit_fee, processing_days"
+
+python -m scripts.scaffold dimension --name dim_applicants \
+  --grain "one row per applicant organization" \
+  --key applicant_id
+
+python -m scripts.scaffold report --name rpt_park_revenue_summary \
+  --facts fct_reservations fct_pos_transactions \
+  --grain "one row per park per month"
+```
+
+**Fact skeleton features:**
+- Surrogate key FKs to specified dimensions (e.g., `parks_sk`, `customer_sk`, `date_key`)
+- Measures only in the SELECT — no descriptive attribute columns
+- CTE structure: one CTE per source, one for joins, one final SELECT
+- YAML with contract enforced, dimension relationship tests, grain description
+- Comment block at top: "This fact captures [grain]. Descriptive attributes come from dimensions, not from this table."
+
+**Dimension skeleton features:**
+- Surrogate key generation via `dbt_utils.generate_surrogate_key()`
+- Descriptive attribute columns with TODO placeholders
+- Derived classification stubs (e.g., `-- TODO: CASE WHEN ... END as size_tier`)
+- YAML with contract enforced, unique/not_null on SK
+
+**Report skeleton features:**
+- One CTE per source fact with aggregation to the target grain
+- Final CTE joins the aggregated facts
+- YAML with grain description, note explaining why this report exists (multi-fact or grain change)
+- Comment: "This report combines [N] fact tables at the [grain] grain. If consuming a single fact without aggregation, consider connecting your BI tool directly."
 
 ### Phase 4: `preflight/` — Analyst Self-Check
 
@@ -357,7 +495,12 @@ python -m scripts.preflight --select int_grant_applications
 2. Builds? — `dbt build --select <model>` (model + tests)
 3. Grain — calls `grain/key_discovery`. Is PK unique and tested?
 4. Join cardinality — calls `grain/join_analysis`. Any fan-outs?
-5. Integration lint (if `int_` model) — calls `grain/integration_lint`
+5. **Layer-specific lint:**
+   - If `int_` model → calls `grain/integration_lint` (single-source, no SK, pass-through, no CDM)
+   - If `fct_` model → calls `grain/mart_lint` fact checks (wide fact, no dim joins, embedded dims, duplicate grain, missing date dim)
+   - If `dim_` model → calls `grain/mart_lint` dimension checks (not referenced, duplicate entity, missing SK)
+   - If `rpt_` model → calls `grain/mart_lint` report checks (single-fact pass-through, no aggregation, grain same as source)
+   - If `stg_` or `base_` model → no layer-specific lint (staging correctness is covered by steps 1-4 and existing sqlfluff/dbt tests; a staging linter may be added in future iterations)
 6. Test coverage — calls `scaffold/test_scaffold` in dry-run/count mode. How many suggested tests missing?
 7. YAML/SQL alignment — columns in SQL output vs columns in YAML, flag mismatches
 
