@@ -85,7 +85,9 @@ scripts/
 │   ├── key_discovery.py        # Candidate PK detection via analytical queries
 │   ├── join_analysis.py        # sqlglot AST parsing + cardinality queries
 │   ├── integration_lint.py     # Single-source, no SK, pass-through, no CDM checks
-│   └── mart_lint.py            # Wide facts, missing dims, pass-through reports, duplicate grain
+│   ├── mart_lint.py            # Wide facts, missing dims, pass-through reports, duplicate grain
+│   ├── staging_lint.py         # Forbidden operations in staging (JOIN, GROUP BY, WHERE, subqueries)
+│   └── dag_lint.py             # DAG direction violations (lateral/reverse layer references)
 │
 ├── llm_context/                # LLM context generation + CDM advisor + guided intake
 │   ├── __init__.py
@@ -100,7 +102,8 @@ scripts/
 │   ├── cli.py                  # Entry: python -m scripts.scaffold <subcommand>
 │   ├── test_scaffold.py        # Generate missing YAML tests as copy-pasteable YAML
 │   ├── integration_scaffold.py # Generate integration model SQL + YAML skeleton
-│   └── mart_scaffold.py        # Generate fact/dimension/report SQL + YAML skeletons
+│   ├── mart_scaffold.py        # Generate fact/dimension/report SQL + YAML skeletons
+│   └── source_freshness_scaffold.py  # Generate source freshness YAML blocks
 │
 ├── preflight/                  # Analyst self-check before PR
 │   ├── __init__.py
@@ -267,6 +270,81 @@ For each finding, the output explains what to do:
 
 For single-fact pass-throughs, the output suggests: "This report only consumes fct_reservations without aggregation. Consider whether your BI tool can join the fact to its dimensions directly — a report model earns its place when it combines multiple facts or aggregates to a different grain."
 
+**`staging_lint.py`** — Staging Model Purity Checker
+
+Runs automatically when `--select` target is a `stg_` or `base_` model. The staging layer should cast, rename, and return — nothing else. This is the single most common violation across the team's four dashboard projects.
+
+| Check | What it detects | Method |
+|---|---|---|
+| Forbidden JOIN | Staging model contains a JOIN clause (staging should be 1:1 with source) | sqlglot AST — walk for JOIN nodes |
+| Forbidden GROUP BY | Staging model aggregates data (changes the grain from the source) | sqlglot AST — walk for GROUP BY nodes |
+| Forbidden WHERE | Staging model filters rows (should be done in integration or mart layer) | sqlglot AST — walk for WHERE nodes. Exception: `WHERE` inside a `QUALIFY` or window function is allowed. |
+| Forbidden subquery | Staging model contains `FROM (SELECT ...)` inline subqueries | sqlglot AST — walk for nested SELECT nodes inside FROM clauses |
+| Logic beyond cast/rename | Staging model contains CASE statements, arithmetic, or string manipulation beyond simple aliasing | sqlglot AST — walk for CASE, binary operations (`+`, `-`, `*`, `/`), and function calls beyond `CAST`, `TRIM`, `LOWER`, `UPPER`, `COALESCE` (the allowed staging functions) |
+
+**Output example:**
+```
+STAGING LINT: stg_emphasys_elite__s8tran
+════════════════════════════════════════
+
+✗ Forbidden JOIN on line 12: LEFT JOIN source_b ON ...
+  → Staging models must be 1:1 with their source table.
+    Move join logic to an integration model.
+
+✗ Forbidden WHERE on line 8: WHERE status != 'test'
+  → Staging should not filter rows. Move filtering to
+    the integration or mart layer that consumes this model.
+
+✓ No GROUP BY
+✓ No subqueries
+⚠ CASE statement on line 15: CASE WHEN type = 'A' THEN ...
+  → Staging should cast and rename only. Move business
+    logic to the integration layer.
+```
+
+**`dag_lint.py`** — DAG Direction Checker
+
+Runs on any model. Detects models that reference peers in the same layer or models in downstream layers, which creates unpredictable cascading failures and violates unidirectional DAG flow. This appears in all four team projects.
+
+**Detection method:** Read `depends_on.nodes` from the manifest for the target model. For each dependency, determine its layer from its prefix (`stg_`, `int_`, `fct_`/`dim_`/`rpt_`). Compare the target model's layer to each dependency's layer.
+
+**Valid dependency directions:**
+```
+staging  → sources only
+base     → sources only
+integration → staging, base (and one designated shared integration model per project, if documented)
+marts (fct/dim/rpt) → integration, staging (for seeds/lookups)
+reports → facts, dimensions, integration
+```
+
+**Violations:**
+| Violation | Example | Severity |
+|---|---|---|
+| Same-layer reference | `int_cases_enriched` depends on `int_parks_enriched` | Warning (may be intentional for shared integration models, but must be documented) |
+| Reverse reference | `stg_*` depends on `int_*` or `fct_*` | Error |
+| Mart-to-mart | `fct_executive_summary` depends on `fct_inspection_operations` | Warning (facts should not depend on facts; use a report model to combine them) |
+| Skip-layer | `fct_*` depends directly on a source (skipping staging) | Warning |
+
+**Output example:**
+```
+DAG LINT: int_sf__cases_enriched
+════════════════════════════════
+
+✗ Same-layer reference: depends on int_sf__parks_enriched (integration → integration)
+  → Integration models should depend on staging, not on other integration models.
+    If this dependency is intentional (shared entity resolution), document it in
+    the model's YAML meta block: meta: { shared_integration_dependency: int_sf__parks_enriched }
+
+✗ Same-layer reference: depends on int_sf__assets_enriched (integration → integration)
+  → Same as above. Two same-layer dependencies suggest this model may need to
+    be restructured, or the shared models should be promoted to a designated
+    shared integration tier.
+
+✓ All other dependencies are valid (3 staging sources)
+```
+
+The `shared_integration_dependency` meta convention allows intentional same-layer references to be documented and suppressed in future runs — similar to how `-- noqa` works for sqlfluff.
+
 ### Phase 2: `llm_context/` — LLM Context Generation, CDM Advisor, Guided Intake
 
 **CLI:**
@@ -409,6 +487,8 @@ python -m scripts.scaffold tests --select stg_vistareserve__reservations --apply
 python -m scripts.scaffold integration --entity "Request" \
   --sources stg_grantwatch__applications stg_grantwatch__amendments \
   --key application_id
+python -m scripts.scaffold freshness --select source:peoplefirst
+python -m scripts.scaffold freshness --select source:peoplefirst --apply
 ```
 
 **`test_scaffold.py`** — Generate Missing YAML Tests
@@ -483,6 +563,85 @@ python -m scripts.scaffold report --name rpt_park_revenue_summary \
 - YAML with grain description, note explaining why this report exists (multi-fact or grain change)
 - Comment: "This report combines [N] fact tables at the [grain] grain. If consuming a single fact without aggregation, consider connecting your BI tool directly."
 
+**`source_freshness_scaffold.py`** — Generate Source Freshness YAML Blocks
+
+Generates `freshness:` configuration for source YAML files. This is missing from all four team projects.
+
+```bash
+python -m scripts.scaffold freshness --select source:peoplefirst
+python -m scripts.scaffold freshness --select source:peoplefirst --apply
+```
+
+**Process:**
+1. Read the source's table definitions from manifest
+2. For each table, identify candidate `loaded_at_field` columns by name heuristic:
+   - Exact matches: `_loaded_at`, `_updated_at`, `_modified_at`, `_created_at`, `updated_date`, `modified_date`, `last_modified`, `load_timestamp`
+   - If no candidate found, query the table for date/timestamp columns and pick the one with the most recent max value
+3. Generate `freshness:` block with conservative defaults:
+   - `warn_after: {count: 24, period: hour}`
+   - `error_after: {count: 48, period: hour}`
+   - Inline comment: "Adjust thresholds based on this source's expected update cadence"
+4. For transactional tables (detected by name heuristic: `transactions`, `events`, `logs`, `orders`), tighten defaults to `warn_after: 12h / error_after: 24h`
+5. For reference/lookup tables (detected by low row count or name: `types`, `codes`, `categories`, `mappings`), loosen defaults to `warn_after: 7d / error_after: 14d`
+
+**Two modes:** `--dry-run` (default, prints to stdout) and `--apply` (writes into source YAML).
+
+**Output:**
+```yaml
+# Suggested freshness for source: peoplefirst
+# Generated by scaffold — review thresholds before committing
+
+sources:
+  - name: peoplefirst
+    tables:
+      - name: employees
+        loaded_at_field: updated_at  # detected: most recent timestamp column
+        freshness:
+          warn_after: {count: 24, period: hour}
+          error_after: {count: 48, period: hour}
+          # Adjust based on HR system's actual sync cadence
+
+      - name: position_codes
+        loaded_at_field: modified_date
+        freshness:
+          warn_after: {count: 7, period: day}   # reference table — infrequent updates
+          error_after: {count: 14, period: day}
+```
+
+**Seed-driven lookup suggestions in `test_scaffold.py`:**
+
+When `test_scaffold.py` analyzes a model, it also inspects the compiled SQL (via sqlglot) for hardcoded CASE statements that map categorical values. When found:
+
+1. Extract the CASE mapping (input values → output values)
+2. Check if a seed CSV already exists that covers this mapping (search `seeds/` for CSVs with matching column names or values)
+3. If no seed exists, suggest creating one:
+
+```yaml
+# ⚠ Hardcoded CASE mapping detected on line 23:
+#   CASE WHEN type = 'A' THEN 'Active'
+#        WHEN type = 'I' THEN 'Inactive'
+#        WHEN type = 'P' THEN 'Pending' END
+#
+# Consider replacing with a seed-driven lookup:
+#   1. Create seeds/status_type_codes.csv:
+#      code,label
+#      A,Active
+#      I,Inactive
+#      P,Pending
+#
+#   2. Join to the seed in your model:
+#      left join {{ ref('status_type_codes') }} using (code)
+#
+#   3. Add accepted_values test on the seed:
+#      - accepted_values:
+#          values: ['A', 'I', 'P']
+#
+# Benefits: single source of truth, testable, no code change needed
+# when new values are added.
+```
+
+This detection runs as part of the normal `test_scaffold` flow — no separate command needed. The suggestion appears alongside the test recommendations in the output.
+
 ### Phase 4: `preflight/` — Analyst Self-Check
 
 **CLI:**
@@ -496,13 +655,14 @@ python -m scripts.preflight --select int_grant_applications
 3. Grain — calls `grain/key_discovery`. Is PK unique and tested?
 4. Join cardinality — calls `grain/join_analysis`. Any fan-outs?
 5. **Layer-specific lint:**
+   - If `stg_` or `base_` model → calls `grain/staging_lint` (forbidden JOIN, GROUP BY, WHERE, subqueries, non-trivial logic)
    - If `int_` model → calls `grain/integration_lint` (single-source, no SK, pass-through, no CDM)
    - If `fct_` model → calls `grain/mart_lint` fact checks (wide fact, no dim joins, embedded dims, duplicate grain, missing date dim)
    - If `dim_` model → calls `grain/mart_lint` dimension checks (not referenced, duplicate entity, missing SK)
    - If `rpt_` model → calls `grain/mart_lint` report checks (single-fact pass-through, no aggregation, grain same as source)
-   - If `stg_` or `base_` model → no layer-specific lint (staging correctness is covered by steps 1-4 and existing sqlfluff/dbt tests; a staging linter may be added in future iterations)
-6. Test coverage — calls `scaffold/test_scaffold` in dry-run/count mode. How many suggested tests missing?
-7. YAML/SQL alignment — columns in SQL output vs columns in YAML, flag mismatches
+6. DAG direction — calls `grain/dag_lint`. Any same-layer, reverse, or skip-layer references?
+7. Test coverage — calls `scaffold/test_scaffold` in dry-run/count mode. How many suggested tests missing?
+8. YAML/SQL alignment — columns in SQL output vs columns in YAML, flag mismatches
 
 Output: Pass/fail with warnings. Warnings don't block. Each warning links to the command that fixes it.
 
