@@ -46,3 +46,4 @@ def test_duckdb_run_query(tmp_path):
     result = connector.run_query("SELECT count(*) as cnt FROM main.test_table")
     assert isinstance(result, pd.DataFrame)
     assert result["cnt"].iloc[0] == 3
+    connector.close()
