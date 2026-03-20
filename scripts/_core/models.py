@@ -7,7 +7,7 @@ from typing import Literal
 
 @dataclass
 class SelectionTarget:
-    """A resolved dbt node ready for analysis."""
+    """A resolved dbt node and its database connection details."""
 
     prefix: Literal["source", "model"]
     table: str
