@@ -1,0 +1,11 @@
+cdm_entity_name,entity_description,cdm_manifest
+Asset,Physical assets owned or managed by the organization — parks, facilities, infrastructure, equipment. Tracked by location, type, condition, and lifecycle status.,Asset
+Contact,People and organizations that interact with DCR — visitors, permittees, grantees, vendors. Stores name, address, communication preferences.,nonProfitCore
+Employee,People employed by the organization. Stores position, department, hire date, compensation, duty station.,nonProfitCore
+Reservation,A booking or reservation of a park facility or resource. Captures dates, guest, facility, party size, status, and fees.,applicationCommon
+FinancialTransaction,A monetary exchange — point-of-sale purchases, fee payments, refunds, transfers. Captures amount, date, method, and associated entity.,nonProfitCore
+EcologicalSurvey,Field observations of ecological conditions — flora/fauna sightings, water quality measurements, invasive species tracking. Captures location, date, observer, and measurement values.,cdmfoundation
+VisitorCount,Aggregated visitor traffic measurements from sensors at park entrances. Captures sensor location, date, count, and vehicle/pedestrian classification.,Visits
+OfficerShift,Law enforcement officer work assignments — shift times, assigned park, patrol area, duty type. Subject to CJIS air-gap isolation requirements.,cdmfoundation
+Grant,Financial grant applications and awards — applicant, program, amount requested/awarded, status, dates.,nonProfitCore
+Permit,Authorization to use a park resource or perform a regulated activity. Captures applicant, type, location, dates, and conditions.,applicationCommon
