@@ -283,9 +283,9 @@ def test_render_llm_context_with_prompt():
 Run: `source .venv/Scripts/activate && PYTHONUTF8=1 python -m pytest tests/scripts/test_core_renderers.py -v`
 Expected: FAIL — `ModuleNotFoundError`
 
-- [ ] **Step 3: Copy existing renderers and create LLM renderer**
+- [x] **Step 3: Copy existing renderers and create LLM renderer**
 
-Copy `scripts/profiler/renderers/terminal.py`, `markdown.py`, `html.py` to `scripts/_core/renderers/`. Update any profiler-specific imports.
+`llm.py` was created as specified (see below). `terminal.py`, `markdown.py`, and `html.py` were NOT copied — these renderers import `AnalysisResult` (profiler-specific type) and `scripts.profiler.sanitizer` (profiler-specific module). Copying them would create a backwards dependency from `_core` → `profiler`. These three renderers stay in `scripts/profiler/renderers/` and will be addressed in Phase 6 when the full profiler migration occurs.
 
 Create `scripts/_core/renderers/llm.py`:
 

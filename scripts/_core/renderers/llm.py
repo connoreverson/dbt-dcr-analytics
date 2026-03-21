@@ -12,6 +12,7 @@ def render_llm_context(
         sections: Ordered dict of section_name -> content.
             Content can be a string or list of strings (rendered as bullets).
         suggested_prompt: Optional pre-written prompt for the analyst to paste.
+            An empty string is treated as absent (falsy check).
 
     Returns:
         Markdown string with no decorative formatting.
