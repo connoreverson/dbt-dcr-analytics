@@ -62,3 +62,21 @@ def test_check_yaml_test_coverage():
     result2 = check_yaml_test_coverage(["other_col"], yaml_tests)
     assert result2["covered"] is False
     assert "unique" in result2["missing_tests"]
+
+
+def test_find_candidate_keys_empty():
+    """Empty DataFrame returns no candidates."""
+    df = pd.DataFrame({"id": [], "name": []})
+    candidates = find_candidate_keys(df)
+    assert candidates == []
+
+
+def test_check_yaml_test_coverage_composite():
+    """Composite key always needs unique_combination_of_columns."""
+    yaml_tests = {
+        "col_a": ["not_null"],
+        "col_b": ["not_null"],
+    }
+    result = check_yaml_test_coverage(["col_a", "col_b"], yaml_tests)
+    assert result["covered"] is False
+    assert "unique_combination_of_columns" in result["missing_tests"]

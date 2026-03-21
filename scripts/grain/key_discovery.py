@@ -106,33 +106,33 @@ def check_yaml_test_coverage(
         if "not_null" not in col_tests:
             missing.append("not_null")
     else:
-        # For composite keys, we need unique_combination_of_columns
-        # This is harder to detect from simple column->tests mapping;
-        # for now, check that all columns have not_null
+        # For composite keys, check that all key columns have not_null
         for col in key_columns:
             col_tests = yaml_tests.get(col, [])
             if "not_null" not in col_tests:
                 missing.append(f"not_null on {col}")
-        # Check for unique_combination at model level (simplified)
-        if "unique" not in missing:
-            missing.append("unique_combination_of_columns")
+        # Composite keys always need a unique_combination_of_columns test
+        missing.append("unique_combination_of_columns")
 
     return {"covered": len(missing) == 0, "missing_tests": missing}
 
 
 def _extract_yaml_tests(node: dict) -> dict[str, list[str]]:
-    """Extract existing test names per column from a manifest node."""
-    yaml_tests: dict[str, list[str]] = {}
-    for col_name in node.get("columns", {}):
-        yaml_tests[col_name] = []
+    """Extract existing test names per column from a manifest node.
 
-    # Walk manifest tests (simplified -- full extraction requires walking node.tests)
-    for test_node in node.get("config", {}).get("data_tests", []):
-        if isinstance(test_node, dict):
-            for test_name, test_config in test_node.items():
-                col = test_config.get("column_name", "")
-                if col:
-                    yaml_tests.setdefault(col, []).append(test_name)
+    In the dbt manifest, per-column tests live under node["columns"][col_name]["data_tests"]
+    as a list of strings (e.g. ["unique", "not_null"]) or dicts with test configs.
+    """
+    yaml_tests: dict[str, list[str]] = {}
+    for col_name, col_info in node.get("columns", {}).items():
+        tests: list[str] = []
+        for test in col_info.get("data_tests", []):
+            if isinstance(test, str):
+                tests.append(test)
+            elif isinstance(test, dict):
+                # Dict form: {"not_null": {...}} or {"accepted_values": {...}}
+                tests.extend(test.keys())
+        yaml_tests[col_name] = tests
     return yaml_tests
 
 
