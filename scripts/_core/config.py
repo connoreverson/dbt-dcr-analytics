@@ -44,9 +44,10 @@ def ensure_manifest(
     runner = dbtRunner()
     result = runner.invoke(["parse"])
     if not result.success:
+        error_detail = str(result.exception) if result.exception else "unknown error"
         raise RuntimeError(
-            "Manifest is stale and `dbt parse` failed. "
-            "Run `dbt parse` manually to diagnose."
+            f"Manifest is stale and `dbt parse` failed: {error_detail}. "
+            f"Run `dbt parse` manually to diagnose."
         )
     return manifest_path
 
@@ -77,5 +78,5 @@ def detect_environment(
                     outputs = profile_data.get("outputs", {})
                     target_config = outputs.get(target_name, {})
                     adapter = target_config.get("type", "duckdb")
-                    return adapter
+                    return adapter if adapter == "bigquery" else "duckdb"
     return "duckdb"  # default

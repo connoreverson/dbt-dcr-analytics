@@ -80,3 +80,18 @@ def test_detect_environment_default_when_missing():
     """Returns duckdb when no profiles.yml found."""
     result = detect_environment(profiles_paths=[Path("/nonexistent/profiles.yml")])
     assert result == "duckdb"
+
+
+def test_detect_environment_normalizes_unknown_to_duckdb(tmp_path):
+    """Non-duckdb, non-bigquery adapters default to duckdb."""
+    profiles = tmp_path / "profiles.yml"
+    profiles.write_text(
+        "dcr_analytics:\n"
+        "  target: dev\n"
+        "  outputs:\n"
+        "    dev:\n"
+        "      type: snowflake\n"
+        "      account: myaccount\n"
+    )
+    result = detect_environment(profiles_paths=[profiles])
+    assert result == "duckdb"
