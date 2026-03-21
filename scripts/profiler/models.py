@@ -9,41 +9,12 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Literal
 
+from scripts._core.models import ColumnDef, SelectionTarget  # noqa: F401 — re-export
+
 if TYPE_CHECKING:
     import pandas as pd
     from ydata_profiling import ProfileReport
     from ydata_profiling.model.description import BaseDescription
-
-
-@dataclass
-class SelectionTarget:
-    """A resolved dbt node ready for profiling."""
-
-    prefix: Literal["source", "model"]
-    table: str
-    """Unqualified relation name from the manifest 'name' field.
-    Used as display title and output filename component."""
-    connector_type: Literal["duckdb", "bigquery"]
-    conn_str: str
-    """Resolved .duckdb path or BigQuery project.dataset string.
-    Populated by selector.py from the manifest 'database' field.
-    For DuckDB sources, the manifest stores the .duckdb file path in 'database'.
-    For BigQuery model nodes, this is 'project.dataset'."""
-    schema: str
-    resource_type: str
-    """'source' or 'model'."""
-    database: str = ""
-    """Attach alias for source nodes (e.g. 'peoplefirst'). Empty for model nodes,
-    which always live in the main schema of the target .duckdb file."""
-
-
-@dataclass
-class ColumnDef:
-    """Schema metadata for a single column."""
-
-    name: str
-    source_type: str
-    nullable: bool
 
 
 @dataclass
