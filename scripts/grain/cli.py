@@ -37,7 +37,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
 
-    from scripts._core.selector import resolve_selector, _determine_layer
+    from scripts._core.selector import resolve_selector, determine_layer
 
     try:
         targets = resolve_selector(args.select)
@@ -49,7 +49,7 @@ def main(argv: list[str] | None = None) -> int:
     exit_code = 0
 
     for target in targets:
-        layer = _determine_layer(target.table)
+        layer = determine_layer(target.table)
 
         if "grain" in checks:
             from scripts.grain.key_discovery import run_key_discovery

@@ -32,7 +32,7 @@ def load_manifest() -> dict:
     return _load_manifest()
 
 
-def _determine_layer(model_name: str) -> str:
+def determine_layer(model_name: str) -> str:
     """Determine a model's layer from its naming prefix."""
     if model_name.startswith("stg_"):
         return "staging"
