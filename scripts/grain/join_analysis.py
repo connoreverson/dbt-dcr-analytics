@@ -74,7 +74,7 @@ def classify_cardinality(
 
     if left_distinct == right_distinct and expansion <= 1.05:
         card = "1:1"
-    elif left_distinct >= right_distinct and expansion > 1.05:
+    elif left_distinct > right_distinct and expansion > 1.05:
         card = "1:M"
     elif left_distinct < right_distinct and expansion <= 1.05:
         card = "M:1"
@@ -91,8 +91,8 @@ def classify_cardinality(
 def run_join_analysis(target: SelectionTarget, output_mode: str = "terminal") -> list[dict]:
     """Analyze all joins in a model's compiled SQL.
 
-    Loads compiled SQL from target/compiled/, parses joins,
-    then queries both sides to classify cardinality.
+    Loads compiled SQL from target/compiled/, parses and returns all JOIN clauses.
+    Cardinality classification requires additional warehouse queries (not yet implemented).
     """
     compiled_path = _find_compiled_sql(target.table)
     if compiled_path is None:
@@ -110,7 +110,8 @@ def run_join_analysis(target: SelectionTarget, output_mode: str = "terminal") ->
 
 def _find_compiled_sql(model_name: str) -> Path | None:
     """Find the compiled SQL for a model in target/compiled/."""
-    compiled_dir = Path("target/compiled")
+    project_root = Path(__file__).parents[2]
+    compiled_dir = project_root / "target" / "compiled"
     if not compiled_dir.exists():
         return None
     for sql_file in compiled_dir.rglob(f"{model_name}.sql"):

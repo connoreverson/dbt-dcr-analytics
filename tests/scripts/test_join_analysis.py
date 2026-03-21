@@ -1,5 +1,5 @@
 # tests/scripts/test_join_analysis.py
-from scripts.grain.join_analysis import extract_joins
+from scripts.grain.join_analysis import classify_cardinality, extract_joins
 
 
 def test_extract_joins_single_left_join():
@@ -48,3 +48,29 @@ def test_extract_joins_cte():
     joins = extract_joins(sql)
     assert len(joins) == 1
     assert joins[0]["join_type"] == "LEFT"
+
+
+def test_classify_cardinality_one_to_one():
+    result = classify_cardinality(left_distinct=100, right_distinct=100, result_rows=100, left_rows=100)
+    assert result["cardinality"] == "1:1"
+    assert result["fan_out"] is False
+    assert result["expansion_ratio"] == 1.0
+
+
+def test_classify_cardinality_fan_out():
+    result = classify_cardinality(left_distinct=50, right_distinct=10, result_rows=150, left_rows=100)
+    assert result["cardinality"] == "1:M"
+    assert result["fan_out"] is True
+
+
+def test_classify_cardinality_many_to_many():
+    # Equal distinct counts but result expands -- should be M:M, not 1:M
+    result = classify_cardinality(left_distinct=100, right_distinct=100, result_rows=200, left_rows=100)
+    assert result["cardinality"] == "M:M"
+    assert result["fan_out"] is True
+
+
+def test_classify_cardinality_many_to_one():
+    result = classify_cardinality(left_distinct=10, right_distinct=100, result_rows=100, left_rows=100)
+    assert result["cardinality"] == "M:1"
+    assert result["fan_out"] is False
