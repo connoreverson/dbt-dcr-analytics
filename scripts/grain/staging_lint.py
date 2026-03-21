@@ -145,10 +145,10 @@ def _render_terminal(target: SelectionTarget, findings: list[dict]) -> None:
     print("=" * (14 + len(target.table)))
 
     if not findings:
-        print("  Clean staging model -- cast, rename, return only.")
+        print("  \u2713 Clean staging model \u2014 cast, rename, return only.")
         return
 
     for f in findings:
-        icon = "X" if f["severity"] == "error" else "!"
+        icon = "\u2717" if f["severity"] == "error" else "\u26a0"
         print(f"  {icon} {f['message']}")
         print(f"    -> {f['detail']}")

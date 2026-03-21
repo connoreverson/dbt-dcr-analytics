@@ -62,7 +62,7 @@ def check_no_dimension_joins(depends_on: list[str]) -> dict[str, Any] | None:
 
 def check_missing_date_dimension(columns: dict, depends_on: list[str]) -> dict[str, Any] | None:
     """Flag facts with date columns but no dim_date join."""
-    date_cols = [c for c in columns if c.endswith(("_date", "_at", "_on", "_key")) and "date" in c]
+    date_cols = [c for c in columns if c.endswith(("_date", "_at", "_on")) or (c.endswith("_key") and "date" in c)]
     dim_date_joined = any(".dim_date" in d for d in depends_on)
     if date_cols and not dim_date_joined:
         return {
@@ -200,10 +200,10 @@ def _render_terminal(target: SelectionTarget, findings: list[dict]) -> None:
     print("=" * (len(label) + 7 + len(target.table)))
 
     if not findings:
-        print("  OK No anti-patterns detected.")
+        print("  \u2713 No anti-patterns detected.")
         return
 
     for f in findings:
-        icon = "X" if f["severity"] == "error" else "!"
+        icon = "\u2717" if f["severity"] == "error" else "\u26a0"
         print(f"  {icon} {f['message']}")
         print(f"    -> {f['detail']}")

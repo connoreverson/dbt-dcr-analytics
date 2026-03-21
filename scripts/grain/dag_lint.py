@@ -110,18 +110,12 @@ def check_dependency_direction(
 
         # Skip-layer (mart directly referencing source)
         elif dep_lyr == "source" and model_layer in ("marts", "integration"):
-            if model_layer == "marts":
-                findings.append({
-                    "check": "skip_layer",
-                    "severity": "warning",
-                    "message": (
-                        f"Skip-layer: mart depends directly on source ({dep_name})"
-                    ),
-                    "detail": (
-                        "Mart models should depend on integration or staging, "
-                        "not sources directly."
-                    ),
-                })
+            findings.append({
+                "check": "skip_layer",
+                "severity": "warning",
+                "message": f"Skip-layer: {model_layer} depends directly on source ({dep_name})",
+                "detail": f"{model_layer.title()} models should depend on staging/integration, not sources directly.",
+            })
 
         # Reverse reference
         else:
@@ -174,10 +168,10 @@ def _render_terminal(target: SelectionTarget, findings: list[dict]) -> None:
     print("=" * (10 + len(target.table)))
 
     if not findings:
-        print("  All dependencies follow valid DAG direction.")
+        print("  \u2713 All dependencies follow valid DAG direction.")
         return
 
     for f in findings:
-        icon = "X" if f["severity"] == "error" else "!"
+        icon = "\u2717" if f["severity"] == "error" else "\u26a0"
         print(f"  {icon} {f['message']}")
         print(f"    -> {f['detail']}")
