@@ -12,11 +12,8 @@ import os
 from pathlib import Path
 from typing import Literal
 
-from scripts._core.config import ensure_manifest
+from scripts._core.config import ensure_manifest, MANIFEST_PATH
 from scripts._core.models import SelectionTarget
-
-
-MANIFEST_PATH = Path("target/manifest.json")
 
 
 def resolve_selector(
@@ -79,6 +76,10 @@ def _load_manifest() -> dict:
     try:
         with open(MANIFEST_PATH, encoding="utf-8") as f:
             return json.load(f)
+    except FileNotFoundError as exc:
+        raise FileNotFoundError(
+            f"manifest.json not found at {MANIFEST_PATH}. Run `dbt parse` to generate it."
+        ) from exc
     except json.JSONDecodeError as exc:
         raise ValueError(
             f"manifest.json is malformed: {exc}. Run `dbt parse` to regenerate."
