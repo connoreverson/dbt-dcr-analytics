@@ -59,7 +59,7 @@ Before every `dbt build`, do this manually:
 
 **DuckDB Type Mismatches:** When enforcing YAML contracts with DuckDB, `SUM(integer)` returns `HUGEINT` and date `EXTRACT()` returns `INTEGER`. You must explicitly `cast()` these to `bigint` (or whatever your contract specifies) in the final SELECT to prevent `dbt build` from failing on contract type assertion.
 
-**Running Checks:** When using `python scripts/check_model.py`, output to JSON using `--json --output tmp/check.json` and read the file to avoid PowerShell terminal encoding/truncation issues.
+**Running Checks:** When using `python -m scripts.reviewer`, output to JSON using `--json --output tmp/check.json` and read the file to avoid PowerShell terminal encoding/truncation issues.
 
 ## Description Quality Gate
 

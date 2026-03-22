@@ -141,7 +141,7 @@ def check(session):
 
     session.run(
         "python",
-        "scripts/check_model.py",
+        "-m", "scripts.reviewer",
         "--select", select,
         *extra,
         "--json",
@@ -167,7 +167,7 @@ def export(session):
     """Export all mart model data to CSV and Parquet."""
     session.run(
         "python",
-        "scripts/export_mart_data.py",
+        "-m", "scripts.export",
         "--format",
         "both",
         external=True,

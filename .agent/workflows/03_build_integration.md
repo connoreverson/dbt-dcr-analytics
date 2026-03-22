@@ -34,7 +34,7 @@ description: Build Integration
 
 6. Request Qualitative Peer Review (Principle 9)
    - For each model name from the `dbt ls` output in Step 2, run:
-     `python scripts/review_model.py --select <model_name> --agent`
+     `python -m scripts.reviewer --select <model_name> --agent`
    - Do NOT use `glob`, filesystem scanning, or $() substitution to find
      model names — use only the Step 2 dbt ls output.
    - Collect all generated `tmp/review_<model_name>.md` files, compile the

@@ -167,7 +167,7 @@ See `noxfile.py` for individual session definitions. You can also run sessions i
 To export all mart model data to CSV and Parquet files:
 
 ```powershell
-python scripts/export_mart_data.py --format both --select fct_reservations
+python -m scripts.export --format both --select fct_reservations
 ```
 
 Use `--format csv` or `--format parquet` for a single format, or omit `--select` to export all marts. Outputs go to the `output/` directory.
@@ -204,10 +204,10 @@ Environment variables are set per-session using `$env:`. They do not persist aft
 $env:PYTHONUTF8=1
 
 # Set inline for a single command (semicolon separates the two statements)
-$env:PYTHONUTF8=1; python scripts/check_model.py --select int_parks
+$env:PYTHONUTF8=1; python -m scripts.reviewer --select int_parks
 ```
 
-In Bash or Git Bash, the equivalent is `PYTHONUTF8=1 python scripts/check_model.py --select int_parks` — the variable is prefixed directly to the command.
+In Bash or Git Bash, the equivalent is `PYTHONUTF8=1 python -m scripts.reviewer --select int_parks` — the variable is prefixed directly to the command.
 
 ### Virtual Environment Activation
 
@@ -451,14 +451,14 @@ dbt source freshness
 
 The `scripts/` directory contains Python utilities that support development, governance, and data discovery. Activate the virtual environment before running any script.
 
-### check_model.py — Automated Governance Gate
+### scripts.reviewer — Automated Governance Gate
 
 The primary quality gate. Runs sqlfluff, dbt build, dbt-score, dbt-project-evaluator, and a suite of custom static analysis checks against one or more models.
 
 ```powershell
-$env:PYTHONUTF8=1; python scripts/check_model.py --select int_parks
-$env:PYTHONUTF8=1; python scripts/check_model.py --select models/integration --json
-$env:PYTHONUTF8=1; python scripts/check_model.py --select int_parks --output tmp/results.json
+$env:PYTHONUTF8=1; python -m scripts.reviewer --select int_parks
+$env:PYTHONUTF8=1; python -m scripts.reviewer --select models/integration --json
+$env:PYTHONUTF8=1; python -m scripts.reviewer --select int_parks --output tmp/results.json
 ```
 
 The `PYTHONUTF8=1` environment variable is needed on Windows to prevent encoding errors in the rich console output.
@@ -471,19 +471,19 @@ What it checks:
 - **Manifest analysis** — YAML/SQL column alignment, CTE structure, layer-specific rules
 - **CDM conformance** — column mapping to Common Data Model entity catalogs
 
-### review_model.py — Qualitative Review
+### scripts.reviewer — Qualitative Review
 
 Evaluates the standards that automated linters cannot check: meaningful names, description quality, and business rule design. Operates in two modes.
 
 ```powershell
 # Generate a review checklist for an AI agent or manual review
-python scripts/review_model.py --select int_parks --agent
+python -m scripts.reviewer --select int_parks --agent
 
 # Export structured YAML review files for batch processing
-python scripts/review_model.py --select models/integration --export-yaml
+python -m scripts.reviewer --select models/integration --export-yaml
 
 # Interactive CLI review (prompts you step-by-step)
-python scripts/review_model.py --select int_parks
+python -m scripts.reviewer --select int_parks
 ```
 
 #### Sending a Review to Gemini via the Clipboard
@@ -491,7 +491,7 @@ python scripts/review_model.py --select int_parks
 After generating an agent checklist, you can pipe the file directly into the Windows clipboard and paste it into [Gemini](https://gemini.google.com/app) in Chrome for a qualitative peer review. This is useful when you want a second opinion on description quality, business rule design, or CDM mapping decisions that automated tools cannot evaluate.
 
 ```powershell
-python scripts/review_model.py --select int_parks --agent; Get-Content tmp/review_int_parks.md | Set-Clipboard
+python -m scripts.reviewer --select int_parks --agent; Get-Content tmp/review_int_parks.md | Set-Clipboard
 ```
 
 The script writes its checklist to `tmp/review_<model>.md`, and `Set-Clipboard` loads the file into the clipboard. Open Chrome, navigate to [gemini.google.com/app](https://gemini.google.com/app), and paste with `Ctrl+V`.
@@ -499,26 +499,26 @@ The script writes its checklist to `tmp/review_<model>.md`, and `Set-Clipboard` 
 For batch reviews, use `--export-yaml` and copy each model file individually:
 
 ```powershell
-python scripts/review_model.py --select models/integration --export-yaml; Get-Content tmp/reviews/int_financial_transactions.yaml | Set-Clipboard
+python -m scripts.reviewer --select models/integration --export-yaml; Get-Content tmp/reviews/int_financial_transactions.yaml | Set-Clipboard
 ```
 
 In Gemini, a useful prompt framing is: *"You are reviewing a dbt integration model against the DCR Analytics project standards. Here is the review checklist — please evaluate each item and flag any FAIL or NEEDS-ATTENTION findings with your reasoning."* Paste the checklist content immediately after the prompt.
 
-### inspect_source.py — Source Data Discovery
+### scripts.inspect — Source Data Discovery
 
 Profiles a source table before writing staging models. Reports row counts, column schemas, uniqueness and cardinality analysis, null distributions, date ranges, and sample rows.
 
 ```powershell
 # List all tables in a source database
-python scripts/inspect_source.py --type duckdb --conn source_data/duckdb/dcr_rev_01_vistareserve.duckdb
+python -m scripts.inspect --type duckdb --conn source_data/duckdb/dcr_rev_01_vistareserve.duckdb
 
 # Profile a specific table
-python scripts/inspect_source.py --type duckdb --conn source_data/duckdb/dcr_rev_01_vistareserve.duckdb --table main.reservations
+python -m scripts.inspect --type duckdb --conn source_data/duckdb/dcr_rev_01_vistareserve.duckdb --table main.reservations
 ```
 
 ### profiler/ — Source and Model Profiling
 
-A deeper statistical profiler for dbt sources and models. Unlike `inspect_source.py`, the profiler uses dbt's selector syntax so you can profile any node the same way you reference it in `dbt build` — no need to know the underlying file path or schema name. It produces column-level statistics, PII detection, and dbt-specific signals (cast hints, rename hints, unused column warnings) across three output formats.
+A deeper statistical profiler for dbt sources and models. Unlike `scripts.inspect`, the profiler uses dbt's selector syntax so you can profile any node the same way you reference it in `dbt build` — no need to know the underlying file path or schema name. It produces column-level statistics, PII detection, and dbt-specific signals (cast hints, rename hints, unused column warnings) across three output formats.
 
 ```powershell
 # Profile a staging model — terminal output (default)
@@ -581,35 +581,35 @@ pip install "presidio-analyzer>=2.2"
 python -m spacy download en_core_web_lg
 ```
 
-### search_cdm.py — CDM Catalog Search
+### scripts.cdm — CDM Catalog Search
 
 Searches the full Microsoft Common Data Model column catalog using keyword and fuzzy matching. Useful when mapping staging columns to CDM entity attributes.
 
 ```powershell
 # Search for columns related to a concept
-python scripts/search_cdm.py reservation status
+python -m scripts.cdm reservation status
 
 # Require all keywords to match
-python scripts/search_cdm.py park name --all
+python -m scripts.cdm park name --all
 
 # Filter to a specific CDM entity
-python scripts/search_cdm.py amount --entity FinancialTransaction
+python -m scripts.cdm amount --entity FinancialTransaction
 ```
 
-### summarize_reviews.py — Review Aggregator
+### scripts.reviewer summarize — Review Aggregator
 
 Aggregates review YAML files (from `review_model.py --export-yaml`) into a single Markdown summary report showing failure trends and rule-by-rule breakdowns.
 
 ```powershell
-python scripts/summarize_reviews.py --input_dir tmp/reviews --output_file tmp/review_summary.md
+python -m scripts.reviewer summarize --input_dir tmp/reviews --output_file tmp/review_summary.md
 ```
 
-### parse_standards.py — Standards JSON Builder
+### scripts.governance.parse_standards — Standards JSON Builder
 
 Parses the 103 governance rules from `reference/dbt_project_standards.md` into a structured JSON file used by the review scripts. Run this if the standards document changes.
 
 ```powershell
-python scripts/parse_standards.py
+python -m scripts.governance.parse_standards
 ```
 
 ## Linting and Governance
@@ -651,7 +651,7 @@ dbt-score lint
 dbt-score lint --select models/integration
 ```
 
-The scoring rules include four project-specific rules defined in `scripts/dbt_score_rules.py`:
+The scoring rules include four project-specific rules defined in `scripts/governance/dbt_score_rules.py`:
 
 | Rule | What It Checks |
 |---|---|
@@ -666,12 +666,12 @@ The scoring rules include four project-specific rules defined in `scripts/dbt_sc
 
 The project also maintains a `seeds/dbt_project_evaluator_exceptions.csv` for documented, intentional deviations from the evaluator's default rules.
 
-### check_model.py — All Three Combined
+### scripts.reviewer — All Three Combined
 
-In practice, you rarely need to run these tools individually. `check_model.py` orchestrates all three — plus additional static analysis — into a single pass:
+In practice, you rarely need to run these tools individually. `scripts.reviewer` orchestrates all three — plus additional static analysis — into a single pass:
 
 ```powershell
-$env:PYTHONUTF8=1; python scripts/check_model.py --select int_parks
+$env:PYTHONUTF8=1; python -m scripts.reviewer --select int_parks
 ```
 
 ## Data Quality and DAMA Dimensions
@@ -771,11 +771,11 @@ The 10 source systems in this project span a wide range of data maturity, and th
 
 ### Analyst Responsibilities for Data Quality
 
-The governance toolchain — sqlfluff, dbt-score, dbt-project-evaluator, and `check_model.py` — automates roughly 47% of the project's 103 standards. The remaining 53% depend on the judgment of the person writing or reviewing the model. Automated tools can confirm that a test exists; they cannot confirm that the right test exists, or that the test is sufficient for the risk it is meant to address.
+The governance toolchain — sqlfluff, dbt-score, dbt-project-evaluator, and `scripts.reviewer` — automates roughly 47% of the project's 103 standards. The remaining 53% depend on the judgment of the person writing or reviewing the model. Automated tools can confirm that a test exists; they cannot confirm that the right test exists, or that the test is sufficient for the risk it is meant to address.
 
 When writing or modifying a model, consider the following responsibilities as part of the work — not as a separate review step, but as part of how the model is designed.
 
-**Understand the source before writing the model.** Run `inspect_source.py` on the source table to see its actual column types, cardinality, null distribution, and sample values, or run the profiler (`python -m scripts.profiler.cli`) against an existing source or model node using dbt selector syntax for deeper statistical analysis and automatic dbt Signals. Read the Data Inventory entry for the source system to understand its known quality issues. A staging model for a table with a 20% null rate on a critical field needs a different testing strategy than one for a table where that field is always populated.
+**Understand the source before writing the model.** Run `scripts.inspect` on the source table to see its actual column types, cardinality, null distribution, and sample values, or run the profiler (`python -m scripts.profiler.cli`) against an existing source or model node using dbt selector syntax for deeper statistical analysis and automatic dbt Signals. Read the Data Inventory entry for the source system to understand its known quality issues. A staging model for a table with a 20% null rate on a critical field needs a different testing strategy than one for a table where that field is always populated.
 
 **Choose test severity based on what the source system can guarantee.** A `not_null` test with `severity: error` is appropriate when the source system enforces the field as required — a null value genuinely indicates a pipeline break or a system failure. The same test with `severity: warn` is appropriate when the source system allows blanks and blanks are a known, expected condition — walk-up park visitors who are not required to provide contact information, seasonal employees whose certification records have not yet been entered, or grants whose compliance deadlines have not been set because the award is still in negotiation.
 
@@ -802,10 +802,10 @@ When adding or modifying a model, follow this workflow to identify which quality
 
 4. **Add the test to the `_models.yml` file** in the appropriate directory. Place tests under the column they validate. Document the DAMA dimension in a `meta:` block if the mapping is not obvious.
 
-5. **Verify with `check_model.py`.** Run the governance checker to confirm the new tests pass and the model's score has not dropped.
+5. **Verify with `scripts.reviewer`.** Run the governance checker to confirm the new tests pass and the model's score has not dropped.
 
 ```powershell
-$env:PYTHONUTF8=1; python scripts/check_model.py --select <your_model>
+$env:PYTHONUTF8=1; python -m scripts.reviewer --select <your_model>
 ```
 
 ### Reconciliation Tests
@@ -888,7 +888,7 @@ git branch -d feat/add-int-work-orders
 Run the governance checker on any models you changed before pushing your branch. This catches formatting, documentation, and structural issues before they reach review:
 
 ```powershell
-$env:PYTHONUTF8=1; python scripts/check_model.py --select <your_model>
+$env:PYTHONUTF8=1; python -m scripts.reviewer --select <your_model>
 ```
 
 If the checker passes, push your branch:
@@ -899,7 +899,7 @@ git push -u origin feat/add-int-work-orders
 
 ### Pull Requests
 
-When opening a pull request, include which models were added or changed, whether `dbt build` and `check_model.py` pass, and any governance decisions worth noting (CDM exceptions, severity choices, known data quality gaps). Reviewers should be able to understand the scope and rationale without reading every line of SQL.
+When opening a pull request, include which models were added or changed, whether `dbt build` and `scripts.reviewer` pass, and any governance decisions worth noting (CDM exceptions, severity choices, known data quality gaps). Reviewers should be able to understand the scope and rationale without reading every line of SQL.
 
 ### Copying Files into an Existing Repository
 
@@ -921,7 +921,7 @@ git commit -m "chore: adopt DCR Analytics agent rules"
 To copy individual files rather than a whole directory, list them explicitly:
 
 ```powershell
-git -C C:\path\to\dbt-dcr-analytics archive HEAD scripts/check_model.py scripts/review_model.py | tar -x -C C:\path\to\your-repo
+# scripts.reviewer and scripts.reviewer are importable modules — copy from site-packages or clone the repo
 ```
 
 If `tar` is not available, use `Copy-Item` directly and then `git add`:
@@ -934,7 +934,7 @@ Copy-Item -Recurse C:\path\to\dbt-dcr-analytics\.agent\rules\ C:\path\to\your-re
 
 The 103 governance rules in [reference/dbt_project_standards.md](reference/dbt_project_standards.md) define what "done" looks like for every file in the project. The document is organized by the type of work it governs — cross-model formatting, CTE structure, layer-specific SQL conventions, YAML properties, and testing expectations — so that contributors can evaluate their own work before it reaches review, and reviewers can assess completeness against a shared standard rather than individual preference.
 
-Each rule has an ID (e.g., `ALL-CTE-01`, `STG-YML-03`, `MRT-YML-04`) and is tagged as either **Automated** (enforced by sqlfluff, dbt-score, dbt-project-evaluator, or `check_model.py`) or **Manual** (requires human judgment during review). The automated toolchain covers roughly 47% of the rules; the remaining 53% — meaningful names, description quality, business rule test design — are evaluated through `review_model.py` and peer review.
+Each rule has an ID (e.g., `ALL-CTE-01`, `STG-YML-03`, `MRT-YML-04`) and is tagged as either **Automated** (enforced by sqlfluff, dbt-score, dbt-project-evaluator, or `scripts.reviewer`) or **Manual** (requires human judgment during review). The automated toolchain covers roughly 47% of the rules; the remaining 53% — meaningful names, description quality, business rule test design — are evaluated through `scripts.reviewer` and peer review.
 
 Rules that govern data quality testing include parenthetical DAMA dimension labels (e.g., "Uniqueness, Completeness") so that the connection between a governance rule and the quality dimension it protects is traceable at the rule level. See the [Data Quality and DAMA Dimensions](#data-quality-and-dama-dimensions) section for how these dimensions translate into dbt testing patterns.
 

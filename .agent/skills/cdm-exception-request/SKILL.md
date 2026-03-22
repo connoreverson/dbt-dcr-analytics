@@ -19,7 +19,7 @@ metadata:
 ## Steps
 
 1. **Identify the failing model and current CDM mapping.**
-   Run: `python scripts/check_model.py --select <model_name>`
+   Run: `python -m scripts.reviewer --select <model_name>`
    Note which CDM entity is mapped in `seeds/cdm_crosswalk.csv`.
 
 2. **Evaluate candidate CDM entities.**
@@ -48,7 +48,7 @@ metadata:
      `meta: cdm_entity_rationale:` referencing the exception document
 
 5. **Re-run validation.**
-   `python scripts/check_model.py --select <model_name>`
+   `python -m scripts.reviewer --select <model_name>`
    SQL-INT-03 and SQL-INT-05 should now pass against the custom entity.
 
 ## Acceptance Criteria

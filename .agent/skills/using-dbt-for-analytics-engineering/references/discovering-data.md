@@ -80,7 +80,7 @@ Preview rows from each source table. It is highly recommended to use the `inspec
 
 ```bash
 # Get table overview and data quality hints
-python scripts/inspect_source.py --type duckdb --conn path/to.duckdb --table schema.table_name
+python -m scripts.inspect --type duckdb --conn path/to.duckdb --table schema.table_name
 ```
 
 ```bash

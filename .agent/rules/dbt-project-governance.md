@@ -81,7 +81,7 @@ If no standard CDM entity provides both semantic correctness and adequate column
 
 ## Linting
 
-> For per-model verification during development, run `python scripts/check_model.py --select <model_name>`. This consolidates sqlfluff, dbt build, dbt-score, and dbt-project-evaluator checks into a single command with a unified pass/fail summary.
+> For per-model verification during development, run `python -m scripts.reviewer --select <model_name>`. This consolidates sqlfluff, dbt build, dbt-score, and dbt-project-evaluator checks into a single command with a unified pass/fail summary.
 
 - sqlfluff must pass on all SQL files before a model is considered complete
 - dbt-score must meet minimum thresholds defined in the project configuration
