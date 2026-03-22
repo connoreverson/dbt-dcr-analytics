@@ -8,20 +8,30 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 
-def build_source_context(node: dict) -> dict[str, Any]:
+def build_source_context(node: dict, live_schema: list | None = None) -> dict[str, Any]:
     """Extract structured context from a manifest source node.
 
     Args:
         node: A dbt manifest source node dict (from manifest.json sources section).
+        live_schema: Optional list of ColumnDef from a live database query. When
+            provided, actual database types are shown instead of YAML-declared types.
 
     Returns:
         Dict of section_name -> content suitable for rendering.
     """
     columns = node.get("columns", {})
-    col_list = []
-    for col_name, col_info in columns.items():
-        dtype = col_info.get("data_type") or "—"
-        col_list.append(f"{col_name} ({dtype})")
+
+    if live_schema:
+        # Prefer live database types; fall back to YAML for columns not in the DB result
+        live_types = {c.name: c.source_type for c in live_schema}
+        yaml_types = {name: (info.get("data_type") or "—") for name, info in columns.items()}
+        all_cols = {**yaml_types, **live_types}  # live overwrites YAML
+        col_list = [f"{col} ({dtype})" for col, dtype in all_cols.items()]
+    else:
+        col_list = []
+        for col_name, col_info in columns.items():
+            dtype = col_info.get("data_type") or "—"
+            col_list.append(f"{col_name} ({dtype})")
 
     return {
         "Source System": node.get("source_name", "unknown"),
@@ -97,7 +107,19 @@ def run_source_summary(selector: str) -> int:
             print(f"Source {target.table} not found in manifest.")
             continue
 
-        context = build_source_context(node)
+        # Fetch live column types from the database
+        live_schema = None
+        try:
+            from scripts._core.connectors.duckdb import DuckDBConnector
+            conn = DuckDBConnector(target)
+            try:
+                live_schema = conn.get_schema()
+            finally:
+                conn.close()
+        except Exception:
+            pass  # Live schema is best-effort; fall back to YAML
+
+        context = build_source_context(node, live_schema=live_schema)
         prompt = _build_suggested_prompt(context)
         output = render_llm_context(context, suggested_prompt=prompt)
         print(output)
