@@ -147,6 +147,7 @@ def generate_report_sql(
         lines.append(f"    left join {cte} using (/* TODO: grain columns */)")
     lines.append(")")
     lines.append("")
+    lines.append("")
     lines.append("select * from final")
     lines.append("")
 
@@ -158,7 +159,8 @@ def generate_mart_yaml(name: str, grain: str, model_type: str) -> str:
     sk = name.removeprefix("fct_").removeprefix("dim_").removeprefix("rpt_") + "_sk"
     return f"""  - name: {name}
     description: >
-      {model_type.title()} model. {grain}.
+      {model_type.title()} table at {grain} grain.
+      TODO: Describe the business purpose and role of this model in analytics.
     meta:
       model_type: {model_type}
       grain: "{grain}"
