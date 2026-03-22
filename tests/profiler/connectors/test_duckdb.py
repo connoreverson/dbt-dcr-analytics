@@ -5,7 +5,7 @@ import duckdb
 import pandas as pd
 import pytest
 
-from scripts.profiler.connectors.duckdb import DuckDBConnector
+from scripts._core.connectors.duckdb import DuckDBConnector
 from scripts.profiler.models import ColumnDef, SelectionTarget
 
 

@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 
 from scripts.profiler.models import SelectionTarget
-from scripts.profiler.selector import _build_target, _load_manifest
+from scripts._core.selector import _build_target, _load_manifest
 
 FIXTURE_MANIFEST = Path("tests/profiler/fixtures/manifest.json")
 
@@ -60,7 +60,7 @@ def test_load_manifest_returns_dict(tmp_path):
     p = tmp_path / "manifest.json"
     p.write_text(json.dumps(fake), encoding="utf-8")
     # Monkeypatch MANIFEST_PATH for the duration of this test
-    import scripts.profiler.selector as sel_mod
+    import scripts._core.selector as sel_mod
     original = sel_mod.MANIFEST_PATH
     sel_mod.MANIFEST_PATH = p
     try:
