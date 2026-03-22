@@ -1,0 +1,233 @@
+# scripts/scaffold/test_scaffold.py
+"""Generate missing YAML tests for a dbt model."""
+from __future__ import annotations
+
+import logging
+from typing import Any
+
+import pandas as pd
+import sqlglot
+from sqlglot import exp
+
+logger = logging.getLogger(__name__)
+
+LOW_CARDINALITY_THRESHOLD = 15
+
+
+def suggest_tests_for_column(
+    col_name: str,
+    dtype: str,
+    series: pd.Series,
+    existing_tests: list[str],
+) -> list[dict[str, Any]]:
+    """Suggest tests for a column based on name patterns and data characteristics.
+
+    Args:
+        col_name: Column name.
+        dtype: Column data type string (e.g., "VARCHAR", "INTEGER").
+        series: Sample data for the column.
+        existing_tests: Tests already configured for this column.
+
+    Returns:
+        List of dicts with keys: test, config, rule_id, reason.
+    """
+    suggestions: list[dict[str, Any]] = []
+
+    if col_name.endswith(("_id", "_sk", "_key")):
+        if "not_null" not in existing_tests:
+            suggestions.append({
+                "test": "not_null",
+                "config": {},
+                "rule_id": "YAML-COL-02",
+                "reason": f"{col_name} is a key column — must not be null",
+            })
+        if "unique" not in existing_tests:
+            n_unique = series.nunique()
+            if n_unique == len(series.dropna()):
+                suggestions.append({
+                    "test": "unique",
+                    "config": {},
+                    "rule_id": "YAML-COL-03",
+                    "reason": f"{col_name} is unique in sample — candidate primary key",
+                })
+
+    if col_name.endswith(("_date", "_at", "_on")):
+        if "not_null" not in existing_tests:
+            null_rate = series.isna().mean()
+            if null_rate < 0.1:
+                suggestions.append({
+                    "test": "not_null",
+                    "config": {},
+                    "rule_id": "YAML-COL-02",
+                    "reason": f"{col_name} has <10% nulls — likely required",
+                })
+
+    is_key_column = col_name.endswith(("_id", "_sk", "_key"))
+    if dtype.upper() in ("VARCHAR", "TEXT", "STRING") and not is_key_column:
+        n_unique = series.nunique()
+        if 1 < n_unique <= LOW_CARDINALITY_THRESHOLD:
+            if "accepted_values" not in existing_tests:
+                values = sorted(series.dropna().unique().tolist())
+                suggestions.append({
+                    "test": "accepted_values",
+                    "config": {"values": values},
+                    "rule_id": "YAML-COL-06",
+                    "reason": f"{col_name} has {n_unique} distinct values — categorical",
+                })
+
+    return suggestions
+
+
+def detect_hardcoded_case(sql: str, dialect: str = "duckdb") -> list[dict[str, Any]]:
+    """Detect hardcoded CASE statements that could be replaced with seed lookups.
+
+    Args:
+        sql: SQL string to analyze.
+        dialect: SQL dialect for sqlglot parsing (default "duckdb").
+
+    Returns:
+        List of dicts with keys: column, values, mappings.
+    """
+    cases: list[dict[str, Any]] = []
+    try:
+        parsed = sqlglot.parse(sql, dialect=dialect)
+    except sqlglot.errors.ParseError:
+        return []
+
+    for statement in parsed:
+        if statement is None:
+            continue
+        for alias_node in statement.find_all(exp.Alias):
+            case_node = alias_node.find(exp.Case)
+            if case_node is None:
+                continue
+
+            alias_name = alias_node.alias
+            values: list[str] = []
+            mappings: dict[str, str] = {}
+
+            for if_node in case_node.find_all(exp.If):
+                cond = if_node.args.get("this")
+                true_val = if_node.args.get("true")
+                if cond and true_val:
+                    for lit in cond.find_all(exp.Literal):
+                        val = lit.this
+                        values.append(val)
+                        result_lit = true_val.find(exp.Literal)
+                        if result_lit:
+                            mappings[val] = result_lit.this
+
+            if values:
+                cases.append({
+                    "column": alias_name,
+                    "values": values,
+                    "mappings": mappings,
+                })
+
+    return cases
+
+
+def run_test_scaffold(
+    selector: str,
+    apply_changes: bool = False,
+    count_only: bool = False,
+) -> int:
+    """Full test scaffolding pipeline.
+
+    Args:
+        selector: dbt model selector.
+        apply_changes: If True, write suggestions into YAML file.
+        count_only: If True, return count of missing tests (for preflight use).
+
+    Returns:
+        Exit code (0 for success), or suggestion count when count_only=True.
+    """
+    from scripts._core.selector import resolve_selector, load_manifest
+
+    targets = resolve_selector(selector)
+    manifest = load_manifest()
+    total_suggestions = 0
+
+    for target in targets:
+        node_key = f"model.dcr_analytics.{target.table}"
+        node = manifest.get("nodes", {}).get(node_key)
+        if node is None:
+            continue
+
+        existing: dict[str, list[str]] = {}
+        for col_name, col_info in node.get("columns", {}).items():
+            existing[col_name] = [
+                t if isinstance(t, str) else list(t.keys())[0]
+                for t in col_info.get("constraints", []) + col_info.get("tests", [])
+            ]
+
+        try:
+            if target.connector_type == "duckdb":
+                from scripts._core.connectors.duckdb import DuckDBConnector
+
+                connector = DuckDBConnector(target)
+            else:
+                from scripts._core.connectors.bigquery import BigQueryConnector
+
+                connector = BigQueryConnector(target)
+            df = connector.get_sample(1000)
+            if hasattr(connector, "close"):
+                connector.close()
+        except Exception:
+            df = None
+
+        all_suggestions: list[dict[str, Any]] = []
+        if df is not None:
+            for col_name in df.columns:
+                dtype = str(df[col_name].dtype)
+                col_existing = existing.get(col_name, [])
+                suggestions = suggest_tests_for_column(
+                    col_name=col_name,
+                    dtype=dtype,
+                    series=df[col_name],
+                    existing_tests=col_existing,
+                )
+                all_suggestions.extend(suggestions)
+
+        total_suggestions += len(all_suggestions)
+        if count_only:
+            continue
+
+        from scripts.grain.join_analysis import _find_compiled_sql
+
+        compiled_path = _find_compiled_sql(target.table)
+        case_findings: list[dict[str, Any]] = []
+        if compiled_path:
+            sql = compiled_path.read_text(encoding="utf-8")
+            case_findings = detect_hardcoded_case(sql)
+
+        print(f"\nTEST SCAFFOLD: {target.table}")
+        print("=" * (16 + len(target.table)))
+
+        if not all_suggestions and not case_findings:
+            print("  \u2713 No missing tests detected.")
+            continue
+
+        print("\n# Suggested tests (add to your model's YAML columns section):")
+        for s in all_suggestions:
+            print(f"\n# Rule {s['rule_id']}: {s['reason']}")
+            if s["test"] == "accepted_values":
+                values_str = ", ".join(f"'{v}'" for v in s["config"]["values"][:10])
+                print(f"      - accepted_values:")
+                print(f"          values: [{values_str}]")
+            else:
+                print(f"      - {s['test']}")
+
+        for case in case_findings:
+            print(
+                f"\n# \u26a0 Hardcoded CASE on column '{case['column']}'"
+                " — consider seed:"
+            )
+            for k, v in case.get("mappings", {}).items():
+                print(f"#   {k} \u2192 {v}")
+            print("# See spec Phase 3 for seed-driven lookup suggestion template.")
+
+    if count_only:
+        return total_suggestions
+
+    return 0
