@@ -1,0 +1,40 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Preflight: Current Model",
+            "type": "shell",
+            "command": "source .venv/Scripts/activate && PYTHONUTF8=1 python -m scripts.preflight --select ${input:modelName}",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Profile: Source Table",
+            "type": "shell",
+            "command": "source .venv/Scripts/activate && PYTHONUTF8=1 python -m scripts.profiler.cli --select ${input:modelName}",
+            "group": "test"
+        },
+        {
+            "label": "New Model: Guided Intake",
+            "type": "shell",
+            "command": "source .venv/Scripts/activate && PYTHONUTF8=1 python -m scripts.llm_context new-model",
+            "group": "none"
+        },
+        {
+            "label": "Grain Check: Current Model",
+            "type": "shell",
+            "command": "source .venv/Scripts/activate && PYTHONUTF8=1 python -m scripts.grain --select ${input:modelName}",
+            "group": "test"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "modelName",
+            "type": "promptString",
+            "description": "dbt model or source selector"
+        }
+    ]
+}
