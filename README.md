@@ -457,8 +457,8 @@ The primary quality gate. Runs sqlfluff, dbt build, dbt-score, dbt-project-evalu
 
 ```powershell
 $env:PYTHONUTF8=1; python -m scripts.reviewer --select int_parks
-$env:PYTHONUTF8=1; python -m scripts.reviewer --select models/integration --json
-$env:PYTHONUTF8=1; python -m scripts.reviewer --select int_parks --output tmp/results.json
+$env:PYTHONUTF8=1; python -m scripts.reviewer --select models/integration
+$env:PYTHONUTF8=1; python -m scripts.reviewer --branch feature/my-branch
 ```
 
 The `PYTHONUTF8=1` environment variable is needed on Windows to prevent encoding errors in the rich console output.
@@ -471,19 +471,19 @@ What it checks:
 - **Manifest analysis** — YAML/SQL column alignment, CTE structure, layer-specific rules
 - **CDM conformance** — column mapping to Common Data Model entity catalogs
 
-### scripts.reviewer — Qualitative Review
+### scripts.reviewer.qualitative — Qualitative Review
 
 Evaluates the standards that automated linters cannot check: meaningful names, description quality, and business rule design. Operates in two modes.
 
 ```powershell
 # Generate a review checklist for an AI agent or manual review
-python -m scripts.reviewer --select int_parks --agent
+python -m scripts.reviewer.qualitative --select int_parks --agent
 
 # Export structured YAML review files for batch processing
-python -m scripts.reviewer --select models/integration --export-yaml
+python -m scripts.reviewer.qualitative --select models/integration --export-yaml
 
 # Interactive CLI review (prompts you step-by-step)
-python -m scripts.reviewer --select int_parks
+python -m scripts.reviewer.qualitative --select int_parks
 ```
 
 #### Sending a Review to Gemini via the Clipboard
@@ -491,7 +491,7 @@ python -m scripts.reviewer --select int_parks
 After generating an agent checklist, you can pipe the file directly into the Windows clipboard and paste it into [Gemini](https://gemini.google.com/app) in Chrome for a qualitative peer review. This is useful when you want a second opinion on description quality, business rule design, or CDM mapping decisions that automated tools cannot evaluate.
 
 ```powershell
-python -m scripts.reviewer --select int_parks --agent; Get-Content tmp/review_int_parks.md | Set-Clipboard
+python -m scripts.reviewer.qualitative --select int_parks --agent; Get-Content tmp/review_int_parks.md | Set-Clipboard
 ```
 
 The script writes its checklist to `tmp/review_<model>.md`, and `Set-Clipboard` loads the file into the clipboard. Open Chrome, navigate to [gemini.google.com/app](https://gemini.google.com/app), and paste with `Ctrl+V`.
@@ -499,7 +499,7 @@ The script writes its checklist to `tmp/review_<model>.md`, and `Set-Clipboard` 
 For batch reviews, use `--export-yaml` and copy each model file individually:
 
 ```powershell
-python -m scripts.reviewer --select models/integration --export-yaml; Get-Content tmp/reviews/int_financial_transactions.yaml | Set-Clipboard
+python -m scripts.reviewer.qualitative --select models/integration --export-yaml; Get-Content tmp/reviews/int_financial_transactions.yaml | Set-Clipboard
 ```
 
 In Gemini, a useful prompt framing is: *"You are reviewing a dbt integration model against the DCR Analytics project standards. Here is the review checklist — please evaluate each item and flag any FAIL or NEEDS-ATTENTION findings with your reasoning."* Paste the checklist content immediately after the prompt.
@@ -516,9 +516,9 @@ python -m scripts.inspect --type duckdb --conn source_data/duckdb/dcr_rev_01_vis
 python -m scripts.inspect --type duckdb --conn source_data/duckdb/dcr_rev_01_vistareserve.duckdb --table main.reservations
 ```
 
-### profiler/ — Source and Model Profiling
+### scripts.profiler — Source and Model Profiling
 
-A deeper statistical profiler for dbt sources and models. Unlike `scripts.inspect`, the profiler uses dbt's selector syntax so you can profile any node the same way you reference it in `dbt build` — no need to know the underlying file path or schema name. It produces column-level statistics, PII detection, and dbt-specific signals (cast hints, rename hints, unused column warnings) across three output formats.
+A statistical profiler for dbt sources and models. Unlike `scripts.inspect`, the profiler uses dbt's selector syntax so you can profile any node the same way you reference it in `dbt build` — no need to know the underlying file path or schema name. By default it runs a fast warehouse-side SQL query to produce per-column statistics with no large data transfer. Pass `--full-profile` to enable ydata-profiling with correlations and distributions.
 
 ```powershell
 # Profile a staging model — terminal output (default)
@@ -540,10 +540,11 @@ Run the profiler as a module (`python -m scripts.profiler.cli`) from the project
 
 | Mode | Output | Description |
 |---|---|---|
-| `terminal` | Console | Compact stats table (via skimpy) with color-coded dbt Signals and PII panels |
-| `markdown` | `tmp/profile_<model>.md` | Full ydata-profiling statistics in Markdown, suitable for committing or pasting into a review |
-| `html` | `tmp/profile_<model>.html` | Interactive HTML report with distributions, correlations, and sample rows |
-| `all` | All three | Equivalent to `--output terminal,markdown,html` |
+| `terminal` | Console | Per-column stats (null rate, distinct count, min/max/avg, top values) with candidate key and PII panels |
+| `markdown` | `tmp/profile_<model>.md` | Full statistics in Markdown, suitable for committing or pasting into a review |
+| `html` | `tmp/profile_<model>.html` | Interactive HTML report with distributions, correlations, and sample rows (requires `--full-profile`) |
+| `llm` | Console | Structured context block formatted for pasting into an LLM |
+| `all` | All four | Equivalent to `--output terminal,markdown,html,llm` |
 
 #### Options
 
@@ -598,10 +599,10 @@ python -m scripts.cdm amount --entity FinancialTransaction
 
 ### scripts.reviewer summarize — Review Aggregator
 
-Aggregates review YAML files (from `review_model.py --export-yaml`) into a single Markdown summary report showing failure trends and rule-by-rule breakdowns.
+Aggregates review YAML files (from `scripts.reviewer.qualitative --export-yaml`) into a single Markdown summary report showing failure trends and rule-by-rule breakdowns.
 
 ```powershell
-python -m scripts.reviewer summarize --input_dir tmp/reviews --output_file tmp/review_summary.md
+python -m scripts.reviewer summarize --input tmp/reviews
 ```
 
 ### scripts.governance.parse_standards — Standards JSON Builder
@@ -918,10 +919,10 @@ git add .agent/rules/
 git commit -m "chore: adopt DCR Analytics agent rules"
 ```
 
-To copy individual files rather than a whole directory, list them explicitly:
+To copy the scripts toolchain, copy the whole `scripts/` directory — the sub-packages (`reviewer/`, `profiler/`, `inspect/`, etc.) must be copied together with `_core/` since they share internal imports:
 
 ```powershell
-# scripts.reviewer and scripts.reviewer are importable modules — copy from site-packages or clone the repo
+git -C C:\path\to\dbt-dcr-analytics archive HEAD scripts/ | tar -x -C C:\path\to\your-repo
 ```
 
 If `tar` is not available, use `Copy-Item` directly and then `git add`:
@@ -973,6 +974,17 @@ dbt-dcr-analytics/
 ├── tests/                        # Singular SQL tests (reconciliation, FK validation)
 ├── macros/                       # Reusable SQL macros
 ├── scripts/                      # Python governance and discovery tools
+│   ├── _core/                    #   Shared connectors, renderers, and selector
+│   ├── reviewer/                 #   Automated + qualitative model review
+│   ├── profiler/                 #   Column-level statistical profiling
+│   ├── grain/                    #   Key discovery and join cardinality
+│   ├── llm_context/              #   LLM context generation and CDM advisor
+│   ├── scaffold/                 #   Model scaffolding
+│   ├── preflight/                #   Pre-build compile + lint + test
+│   ├── governance/               #   Standards parsing and dbt-score rules
+│   ├── cdm/                      #   CDM catalog search
+│   ├── export/                   #   Mart data export to CSV/Parquet
+│   └── inspect/                  #   Source table profiling and discovery
 ├── analyses/                     # Ad hoc analytical queries
 ├── reference/                    # Project documentation, standards, and specs
 │   ├── dbt_project_standards.md  #   103 governance rules

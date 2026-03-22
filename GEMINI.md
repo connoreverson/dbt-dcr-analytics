@@ -87,7 +87,7 @@ Read these before making substantive decisions:
 25. **Inspect sources automatically.** Before generating or checking staging models and performing data discovery, run `python -m scripts.inspect --type <duckdb|bigquery> --conn <path_to_db> --table <schema.table_name>` to understand table uniqueness, cardinality, and schemas.
 26. **PowerShell Terminal Truncation.** Do not use `Get-Content` or `Out-String` to read large command outputs or logs in PowerShell, as it will wrap and truncate text obscuring errors. Instead, pipe the output to a file (`> tmp/output.txt` or `| Out-File -Encoding utf8 tmp/output.txt`) and read it with the `view_file` or `grep_search` tools.
 27. **DuckDB Type Mismatches.** When enforcing YAML contracts with DuckDB, remember that `SUM(integer)` returns `HUGEINT` and `EXTRACT()` from dates returns `INTEGER`. You must explicitly `cast()` these to `bigint` (or the contract type) in the final SELECT to prevent `dbt build` contract assertion failures.
-28. **Review Script Outputs.** When running Python scripts like `check_model.py` or `review_model.py`, do not rely on terminal output because PowerShell may garble the box-drawing characters. Always use the JSON flags (e.g., `--json --output tmp/check_model.json`) and read the JSON file directly.
+28. **Review Script Outputs.** When running `python -m scripts.reviewer`, do not rely on terminal output because PowerShell may garble box-drawing characters. Redirect to a file (`> tmp/check_model.txt`) and read it directly.
 
 ## Technology Stack
 
