@@ -43,7 +43,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     sub_fact.add_argument("--name", required=True, help="Model name")
     sub_fact.add_argument("--grain", required=True, help="Grain description")
     sub_fact.add_argument("--dimensions", nargs="+", default=[], help="Dimension models to join")
-    sub_fact.add_argument("--measures", default="", help="Comma-separated measure columns")
+    sub_fact.add_argument("--measures", nargs="*", default=[], help="Measure column names")
 
     # dimension
     sub_dim = subparsers.add_parser("dimension", help="Generate dimension model skeleton")
