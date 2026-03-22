@@ -40,9 +40,14 @@ def generate_fact_sql(
     lines.append("),")
     lines.append("")
 
-    # Final select with dimension FKs and measures only
+    # Final select: surrogate key first, then dimension FKs, then measures
+    fact_entity = name.removeprefix("fct_")
     lines.append("final as (")
     lines.append("    select")
+    lines.append(
+        f"        {{{{ dbt_utils.generate_surrogate_key(['TODO_key_column']) }}}}"
+        f" as {fact_entity}_sk,"
+    )
 
     # Dimension FK columns
     for dim in dimensions:

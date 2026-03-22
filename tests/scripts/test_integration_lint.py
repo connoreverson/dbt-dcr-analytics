@@ -17,7 +17,7 @@ def test_single_source_detected():
 def test_multiple_sources_ok():
     depends_on = [
         "model.dcr_analytics.stg_vistareserve__reservations",
-        "model.dcr_analytics.stg_emphasys_elite__bookings",
+        "model.dcr_analytics.stg_vistareserve__bookings",
     ]
     finding = check_single_source(depends_on)
     assert finding is None

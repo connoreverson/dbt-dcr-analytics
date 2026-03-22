@@ -127,6 +127,102 @@ def detect_hardcoded_case(sql: str, dialect: str = "duckdb") -> list[dict[str, A
     return cases
 
 
+def _apply_suggestions(
+    node: dict,
+    model_name: str,
+    suggestions: list[dict[str, Any]],
+) -> int:
+    """Write test suggestions into the model's YAML properties file.
+
+    Args:
+        node: Manifest node for the model.
+        model_name: Model name (used to find the entry in the YAML models list).
+        suggestions: List of suggestion dicts from suggest_tests_for_column.
+
+    Returns:
+        Number of tests written.
+    """
+    import yaml
+    from pathlib import Path
+
+    patch_path = node.get("patch_path", "")
+    if not patch_path or "://" not in patch_path:
+        return 0
+
+    # Strip the project prefix (e.g. "dcr_analytics://")
+    rel_path = patch_path.split("://", 1)[1].replace("\\", "/")
+    yaml_path = Path(rel_path)
+    if not yaml_path.exists():
+        return 0
+
+    content = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))
+    if not content or "models" not in content:
+        return 0
+
+    # Find the model entry by name
+    model_entry = next(
+        (m for m in content["models"] if m.get("name") == model_name), None
+    )
+    if model_entry is None:
+        return 0
+
+    if "columns" not in model_entry or model_entry["columns"] is None:
+        model_entry["columns"] = []
+
+    columns_list: list[dict] = model_entry["columns"]
+
+    applied = 0
+    for suggestion in suggestions:
+        col_name = _find_col_name_for_suggestion(suggestion, suggestions)
+        if col_name is None:
+            continue
+
+        # Find or create column entry
+        col_entry = next((c for c in columns_list if c.get("name") == col_name), None)
+        if col_entry is None:
+            col_entry = {"name": col_name}
+            columns_list.append(col_entry)
+
+        if "tests" not in col_entry or col_entry["tests"] is None:
+            col_entry["tests"] = []
+
+        test_name = suggestion["test"]
+        existing_test_names = [
+            t if isinstance(t, str) else next(iter(t), "")
+            for t in col_entry["tests"]
+        ]
+
+        if test_name in existing_test_names:
+            continue
+
+        if suggestion["config"]:
+            col_entry["tests"].append({test_name: suggestion["config"]})
+        else:
+            col_entry["tests"].append(test_name)
+        applied += 1
+
+    if applied > 0:
+        yaml_path.write_text(
+            yaml.dump(content, default_flow_style=False, allow_unicode=True, sort_keys=False),
+            encoding="utf-8",
+        )
+
+    return applied
+
+
+def _find_col_name_for_suggestion(
+    suggestion: dict[str, Any],
+    all_suggestions: list[dict[str, Any]],
+) -> str | None:
+    """Extract the column name a suggestion refers to from its reason text."""
+    # The reason always starts with the column name followed by a space or " is"
+    reason = suggestion.get("reason", "")
+    # Reason format: "<col_name> is a key column..." or "<col_name> has ..."
+    if " " in reason:
+        return reason.split(" ", 1)[0]
+    return None
+
+
 def run_test_scaffold(
     selector: str,
     apply_changes: bool = False,
@@ -209,6 +305,10 @@ def run_test_scaffold(
             sql = compiled_path.read_text(encoding="utf-8")
             case_findings = detect_hardcoded_case(sql)
 
+        applied_count = 0
+        if apply_changes and all_suggestions:
+            applied_count = _apply_suggestions(node, target.table, all_suggestions)
+
         print(f"\nTEST SCAFFOLD: {target.table}")
         print("=" * (16 + len(target.table)))
 
@@ -216,15 +316,23 @@ def run_test_scaffold(
             print("  \u2713 No missing tests detected.")
             continue
 
-        print("\n# Suggested tests (add to your model's YAML columns section):")
-        for s in all_suggestions:
-            print(f"\n# Rule {s['rule_id']}: {s['reason']}")
-            if s["test"] == "accepted_values":
-                values_str = ", ".join(f"'{v}'" for v in s["config"]["values"][:10])
-                print(f"      - accepted_values:")
-                print(f"          values: [{values_str}]")
+        if apply_changes and all_suggestions:
+            if applied_count > 0:
+                print(f"  \u2713 Applied {applied_count} test(s) to YAML.")
             else:
-                print(f"      - {s['test']}")
+                print("  \u26a0 Could not apply tests — YAML file not found or model entry missing.")
+            if case_findings:
+                print()
+        else:
+            print("\n# Suggested tests (add to your model's YAML columns section):")
+            for s in all_suggestions:
+                print(f"\n# Rule {s['rule_id']}: {s['reason']}")
+                if s["test"] == "accepted_values":
+                    values_str = ", ".join(f"'{v}'" for v in s["config"]["values"][:10])
+                    print(f"      - accepted_values:")
+                    print(f"          values: [{values_str}]")
+                else:
+                    print(f"      - {s['test']}")
 
         for case in case_findings:
             print(
