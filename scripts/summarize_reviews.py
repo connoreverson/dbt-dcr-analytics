@@ -1,3 +1,10 @@
+import warnings
+warnings.warn(
+    "scripts/summarize_reviews.py is deprecated. Use: python -m scripts.reviewer summarize --input <dir>",
+    DeprecationWarning,
+    stacklevel=2,
+)
+
 import os
 import yaml
 import glob

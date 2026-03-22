@@ -1,3 +1,10 @@
+import warnings
+warnings.warn(
+    "scripts/review_model.py is deprecated. Use: python -m scripts.reviewer --select <model>",
+    DeprecationWarning,
+    stacklevel=2,
+)
+
 import sys
 import os
 import argparse
