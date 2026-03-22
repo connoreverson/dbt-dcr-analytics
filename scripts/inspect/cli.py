@@ -371,8 +371,8 @@ def inspect_bigquery(conn_str: str, schema: str = None, table: str = None):
 def main():
     import warnings
     warnings.warn(
-        "inspect_source.py is deprecated and will be removed in a future release. "
-        "Use 'python scripts/profiler/cli.py' instead.",
+        "scripts.inspect is deprecated and will be removed in a future release. "
+        "Use 'python -m scripts.profiler' instead.",
         DeprecationWarning,
         stacklevel=1,
     )

@@ -79,6 +79,44 @@ def resolve_output_modes(output_str: str) -> set[str]:
     return modes
 
 
+def _render_quick_stats_table(quick_stats: dict, table_name: str) -> None:
+    """Render warehouse-side quick stats as a rich Table."""
+    from rich.console import Console
+    from rich.table import Table as RichTable
+
+    console = Console()
+    console.rule(f"[bold blue]Warehouse Stats: {table_name}[/bold blue]")
+
+    tbl = RichTable(show_header=True, header_style="bold cyan", box=None, padding=(0, 1))
+    tbl.add_column("Column", style="bold", no_wrap=True)
+    tbl.add_column("Total", justify="right")
+    tbl.add_column("Nulls", justify="right")
+    tbl.add_column("Null %", justify="right")
+    tbl.add_column("Distinct", justify="right")
+    tbl.add_column("Unique %", justify="right")
+    tbl.add_column("Min", justify="right", style="dim")
+    tbl.add_column("Max", justify="right", style="dim")
+    tbl.add_column("Top Values", style="dim")
+
+    for col, s in quick_stats.items():
+        null_pct = f"{s['null_rate'] * 100:.1f}%"
+        uniq_pct = f"{s['uniqueness_ratio'] * 100:.1f}%"
+        top_vals = ", ".join(str(v) for v in (s.get("top_values") or [])[:3])
+        tbl.add_row(
+            col,
+            str(s["total_count"]),
+            str(s["null_count"]),
+            null_pct,
+            str(s["distinct_count"]),
+            uniq_pct,
+            str(s.get("min") or ""),
+            str(s.get("max") or ""),
+            top_vals,
+        )
+
+    console.print(tbl)
+
+
 def profile_target(target, args, modes: set[str]) -> None:
     """Run the full profiling pipeline for a single SelectionTarget."""
     from scripts._core.connectors.duckdb import DuckDBConnector
@@ -86,15 +124,19 @@ def profile_target(target, args, modes: set[str]) -> None:
     from scripts.profiler.analyzers.pii import detect_pii
     from scripts.profiler.analyzers.dbt_signals import detect_signals
 
+    # html/markdown require a ydata-profiling ProfileReport — auto-upgrade if needed
+    needs_full_profile = args.full_profile or "html" in modes or "markdown" in modes
+
     # Connect
     if target.connector_type == "duckdb":
         connector = DuckDBConnector(target)
     else:
         connector = BigQueryConnector(target)
 
+    quick_stats: dict | None = None
     try:
-        if args.full_profile:
-            # Deep mode: fetch sample DataFrame and run ydata-profiling
+        if needs_full_profile:
+            # Full mode: fetch sample DataFrame for ydata-profiling
             df = connector.get_sample(args.sample)
         else:
             # Quick mode: run SQL-based stats warehouse-side, no large data transfer
@@ -114,15 +156,7 @@ def profile_target(target, args, modes: set[str]) -> None:
             sql = build_quick_profile_sql(schema, table, columns, dialect=target.connector_type)
             quick_stats = parse_quick_profile_result(connector.run_query(sql))
 
-            # Print quick stats summary to terminal
-            if "terminal" in modes or "llm" in modes:
-                print(f"\n=== Quick Profile: {target.table} ===")
-                for col, s in quick_stats.items():
-                    null_pct = f"{s['null_rate']*100:.1f}%"
-                    uniq = f"{s['uniqueness_ratio']*100:.1f}%"
-                    print(f"  {col}: nulls={null_pct}, unique={uniq}, distinct={s['distinct_count']}")
-
-            # Also fetch a small sample for PII detection and grain analysis
+            # Small sample for PII detection and grain analysis
             df = connector.get_sample(min(args.sample, 200))
     finally:
         if hasattr(connector, "close"):
@@ -140,22 +174,10 @@ def profile_target(target, args, modes: set[str]) -> None:
     except Exception:
         pass  # Grain analysis is best-effort
 
-    # Run analyzers
-    if args.full_profile:
+    # Build AnalysisResult
+    if needs_full_profile:
         from scripts.profiler.analyzers.stats import profile_dataframe
-        needs_full_stats = "html" in modes or "markdown" in modes
-        if needs_full_stats:
-            result = profile_dataframe(df, target, full_profile=args.full_profile)
-        else:
-            from scripts.profiler.models import AnalysisResult
-            result = AnalysisResult(
-                target=target,
-                profile=None,
-                description=None,
-                sample=df,
-                pii_columns=set(),
-                dbt_signals=[],
-            )
+        result = profile_dataframe(df, target, full_profile=args.full_profile)
     else:
         from scripts.profiler.models import AnalysisResult
         result = AnalysisResult(
@@ -172,7 +194,10 @@ def profile_target(target, args, modes: set[str]) -> None:
         result.dbt_signals = detect_signals(result.description)
 
     # Render outputs
-    if "terminal" in modes and args.full_profile:
+    if "terminal" in modes:
+        # Quick mode: show warehouse-side stats table first, then signals/PII panels
+        if quick_stats is not None:
+            _render_quick_stats_table(quick_stats, target.table)
         from scripts.profiler.renderers.terminal import render_terminal
         render_terminal(result)
 
@@ -188,11 +213,23 @@ def profile_target(target, args, modes: set[str]) -> None:
 
     if "llm" in modes:
         from scripts._core.renderers.llm import render_llm_context
-        sections = {
+        sections: dict = {
             "Table": target.table,
             "Row Count": str(len(df)),
             "PII Columns": list(result.pii_columns) if result.pii_columns else ["none detected"],
         }
+        if quick_stats is not None:
+            sections["Column Stats"] = [
+                f"{col}: nulls={s['null_rate']*100:.1f}%, "
+                f"distinct={s['distinct_count']}, "
+                f"unique={s['uniqueness_ratio']*100:.1f}%"
+                + (
+                    f", top=[{', '.join(str(v) for v in s.get('top_values', [])[:3])}]"
+                    if s.get("top_values")
+                    else ""
+                )
+                for col, s in quick_stats.items()
+            ]
         print(render_llm_context(sections))
 
 

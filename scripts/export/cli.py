@@ -6,7 +6,7 @@ This script connects to the DuckDB target database and exports all mart model
 tables to the output/ directory. Supports selective export via --select flag.
 
 Usage:
-    python scripts/export_mart_data.py [--format csv|parquet|both] [--select model_name]
+    python -m scripts.export [--format csv|parquet|both] [--select model_name]
 """
 
 import argparse

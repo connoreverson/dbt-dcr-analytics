@@ -605,6 +605,92 @@ Aggregates review YAML files (from `scripts.reviewer.qualitative --export-yaml`)
 python -m scripts.reviewer summarize --input tmp/reviews
 ```
 
+### scripts.grain — Grain and Join Cardinality
+
+Verifies model grain, join cardinality, and layer-specific structural rules. Useful before writing downstream models to confirm what a model's grain actually is.
+
+```powershell
+# Full check: grain, join cardinality, and DAG lint
+python -m scripts.grain --select fct_reservations
+
+# Markdown output (saves to tmp/)
+python -m scripts.grain --select int_parks --output markdown
+
+# Run only specific checks
+python -m scripts.grain --select stg_vistareserve__reservations --checks grain,lint
+```
+
+| Check | What It Does |
+|---|---|
+| `grain` | Identifies candidate key columns (columns or combinations at 100% uniqueness) |
+| `joins` | Detects fan-out and row-multiplication from joins |
+| `lint` | Layer-specific structural rules (staging, integration, mart) + DAG shape |
+
+---
+
+### scripts.llm_context — LLM Context Generation
+
+Generates structured prompts and context blocks for use with AI assistants. Helps with CDM entity matching, model onboarding, and building context summaries.
+
+```powershell
+# Interactive intake questionnaire for a new model
+python -m scripts.llm_context new-model
+
+# Find the best-fit CDM entity for a business concept
+python -m scripts.llm_context cdm-match --concept "grant application"
+python -m scripts.llm_context cdm-match --concept "park reservation" --source-columns "reservation_id,start_date,contact_id"
+
+# Build an LLM context summary for an existing model
+python -m scripts.llm_context model-summary --select int_parks
+
+# Build an LLM context summary for a source table
+python -m scripts.llm_context source-summary --select "source:peoplefirst.employees"
+```
+
+---
+
+### scripts.scaffold — Model and Test Scaffolding
+
+Generates model and YAML scaffolding for common patterns, reducing boilerplate when starting new models.
+
+```powershell
+# Generate missing YAML tests for a model
+python -m scripts.scaffold tests --select stg_vistareserve__reservations
+
+# Apply test suggestions directly to the YAML file
+python -m scripts.scaffold tests --select stg_vistareserve__reservations --apply
+
+# Generate an integration model skeleton
+python -m scripts.scaffold integration --entity Request --sources stg_permit_a stg_permit_b --key request_id
+
+# Generate a fact model skeleton
+python -m scripts.scaffold fact --name fct_permits --grain "one row per permit issuance" --dimensions dim_parks dim_employees
+
+# Generate a dimension model skeleton
+python -m scripts.scaffold dimension --name dim_trails --grain "one row per trail segment" --key trail_id
+
+# Generate source freshness YAML
+python -m scripts.scaffold freshness --select "source:peoplefirst"
+```
+
+---
+
+### scripts.preflight — Pre-PR Self-Check
+
+Runs a full pre-flight sequence before opening a PR: compile, build, grain verification, lint, tests, and YAML/SQL column alignment. Meant to be the last thing you run before pushing.
+
+```powershell
+# Full preflight check
+python -m scripts.preflight --select int_grant_applications
+
+# Skip the compile + build steps (when the model already builds cleanly)
+python -m scripts.preflight --select fct_reservations --skip-build
+```
+
+The preflight sequence runs: `dbt compile` → `dbt build` → `scripts.grain` → `sqlfluff lint` → `scripts.reviewer` → YAML column alignment check.
+
+---
+
 ### scripts.governance.parse_standards — Standards JSON Builder
 
 Parses the 103 governance rules from `reference/dbt_project_standards.md` into a structured JSON file used by the review scripts. Run this if the standards document changes.
