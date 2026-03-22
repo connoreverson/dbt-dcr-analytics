@@ -485,6 +485,9 @@ class ModelChecker:
             self.console.print(f"SQL Path: {sql_path}")
             self.console.print(f"Layer: {layer}\n")
 
+            # Run sqlfluff FIRST — before dbt opens the DuckDB file
+            self.check_sqlfluff(model_name, sql_path)
+
             self.check_dbt_build(model_name, dbt)
             self.check_dbt_score(model_name)
             self.check_dbt_project_evaluator(model_name, dbt)
@@ -493,9 +496,6 @@ class ModelChecker:
             self.check_layer_and_manifest(model_name, sql_path, layer, node)
             self.check_runtime_schema(model_name, layer, node, dbt)
             self.check_sql_file_content(model_name, sql_path)
-
-            # Run sqlfluff LAST because it spawns a subprocess that competes for the DuckDB lock
-            self.check_sqlfluff(model_name, sql_path)
 
         return self.results
 
