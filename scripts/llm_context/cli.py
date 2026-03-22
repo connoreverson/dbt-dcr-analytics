@@ -15,6 +15,14 @@ import sys
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse command-line arguments for the llm_context package.
+
+    Args:
+        argv: Argument list to parse. Defaults to sys.argv[1:] when None.
+
+    Returns:
+        Parsed namespace with `subcommand` and subcommand-specific attributes.
+    """
     parser = argparse.ArgumentParser(
         description="LLM context generation, CDM advisor, and guided intake.",
     )
@@ -43,6 +51,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Entry point for the llm_context CLI.
+
+    Args:
+        argv: Argument list. Defaults to sys.argv[1:] when None.
+
+    Returns:
+        Exit code (0 for success, non-zero for failure).
+    """
     args = parse_args(argv)
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
 
@@ -63,7 +79,8 @@ def main(argv: list[str] | None = None) -> int:
         from scripts.llm_context.source_context import run_source_summary
         return run_source_summary(args.select)
 
-    return 0
+    else:
+        raise AssertionError(f"Unhandled subcommand: {args.subcommand}")
 
 
 if __name__ == "__main__":

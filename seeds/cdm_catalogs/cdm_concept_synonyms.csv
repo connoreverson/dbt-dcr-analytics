@@ -1,25 +1,25 @@
 concept,cdm_entity,confidence_note
-park,Asset,Parks are physical assets managed by the organization
-facility,Asset,Facilities (buildings, shelters, pools) are assets within parks
-reservation,Reservation,A booking or reservation of a facility or resource
-booking,Reservation,Synonym for reservation — same CDM entity
-permit,Permit,Authorization to use a park resource or perform an activity
-transaction,FinancialTransaction,A monetary exchange — POS sale, fee payment, refund
-payment,FinancialTransaction,Synonym for transaction — same CDM entity
-sale,FinancialTransaction,A point-of-sale transaction
-employee,Employee,A person employed by the organization
-staff,Employee,Synonym for employee
-worker,Employee,Synonym for employee
-visitor,VisitorCount,Aggregated visitor traffic measurement
-traffic,VisitorCount,Vehicle or pedestrian traffic count at a park entrance
-inspection,EcologicalSurvey,Field observation or inspection of ecological conditions
-survey,EcologicalSurvey,Ecological or environmental survey
-observation,EcologicalSurvey,A field observation (flora, fauna, water quality)
-officer,OfficerShift,Law enforcement officer shift assignment
-shift,OfficerShift,A work shift for park police or rangers
-patrol,OfficerShift,Synonym for officer shift
-grant,Grant,A financial grant application or award
-application,Grant,A grant or permit application
-customer,Contact,A person or organization that interacts with DCR services
-contact,Contact,A person or organization — the CDM Contact entity
-guest,Contact,A park visitor or reservation guest
+park,Asset,"Parks are physical assets managed by the organization"
+facility,Asset,"Facilities (buildings, shelters, pools) are assets within parks"
+reservation,Reservation,"A booking or reservation of a facility or resource"
+booking,Reservation,"Synonym for reservation — same CDM entity"
+permit,Permit,"Authorization to use a park resource or perform an activity"
+transaction,FinancialTransaction,"A monetary exchange — POS sale, fee payment, refund"
+payment,FinancialTransaction,"Synonym for transaction — same CDM entity"
+sale,FinancialTransaction,"A point-of-sale transaction"
+employee,Employee,"A person employed by the organization"
+staff,Employee,"Synonym for employee"
+worker,Employee,"Synonym for employee"
+visitor,VisitorCount,"Aggregated visitor traffic measurement"
+traffic,VisitorCount,"Vehicle or pedestrian traffic count at a park entrance"
+inspection,EcologicalSurvey,"Field observation or inspection of ecological conditions"
+survey,EcologicalSurvey,"Ecological or environmental survey"
+observation,EcologicalSurvey,"A field observation (flora, fauna, water quality)"
+officer,OfficerShift,"Law enforcement officer shift assignment"
+shift,OfficerShift,"A work shift for park police or rangers"
+patrol,OfficerShift,"Synonym for officer shift"
+grant,Grant,"A financial grant application or award"
+application,Grant,"A grant or permit application"
+customer,Contact,"A person or organization that interacts with DCR services"
+contact,Contact,"A person or organization — the CDM Contact entity"
+guest,Contact,"A park visitor or reservation guest"

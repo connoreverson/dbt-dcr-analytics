@@ -25,3 +25,8 @@ def test_parse_source_summary():
     args = parse_args(["source-summary", "--select", "source:peoplefirst.employees"])
     assert args.subcommand == "source-summary"
     assert args.select == "source:peoplefirst.employees"
+
+
+def test_parse_new_model():
+    args = parse_args(["new-model"])
+    assert args.subcommand == "new-model"
