@@ -1,7 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git commit:-m *)",
+      "Bash(git:*)",
       "Bash(dbt build:*)",
       "Bash(dbt show:*)",
       "Bash(dbt list:*)",
@@ -23,16 +23,17 @@
       "Bash(wc:*)",
       "Bash(source:*)",
       "Bash(python -c:*)",
-      "Bash(python scripts/inspect_source.py:*)"
+      "Bash(python -m:*)",
+      "Bash(PYTHONUTF8=1:*)",
+      "Bash(python scripts/inspect_source.py:*)",
+      "Bash(C:/Users/conno/Documents/dbt-dcr-analytics/.venv/Scripts/pip.exe install:*)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
       "Bash(rm -r:*)",
       "Bash(pip install:*)",
       "Write(reference/business_artifacts/*)",
-      "Edit(reference/business_artifacts/*)",
-      "Write(requirements.txt)",
-      "Edit(requirements.txt)"
+      "Edit(reference/business_artifacts/*)"
     ]
   }
 }
