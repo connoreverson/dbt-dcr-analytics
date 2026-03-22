@@ -154,12 +154,20 @@ def run_test_scaffold(
         if node is None:
             continue
 
+        # Build existing tests lookup: {col_name: [test_names]}
         existing: dict[str, list[str]] = {}
-        for col_name, col_info in node.get("columns", {}).items():
-            existing[col_name] = [
-                t if isinstance(t, str) else list(t.keys())[0]
-                for t in col_info.get("constraints", []) + col_info.get("tests", [])
-            ]
+        for key, test_node in manifest.get("nodes", {}).items():
+            if not key.startswith("test."):
+                continue
+            # Check this test is attached to the current model
+            depends = test_node.get("depends_on", {}).get("nodes", [])
+            if node_key not in depends:
+                continue
+            test_meta = test_node.get("test_metadata", {})
+            test_name = test_meta.get("name", "")
+            col_name = test_meta.get("kwargs", {}).get("column_name", "")
+            if col_name and test_name:
+                existing.setdefault(col_name, []).append(test_name)
 
         try:
             if target.connector_type == "duckdb":
