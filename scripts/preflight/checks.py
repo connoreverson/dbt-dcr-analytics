@@ -28,13 +28,37 @@ def summarize_results(results: list[CheckResult]) -> tuple[int, int, int]:
     return passed, failed, warnings
 
 
+def _run_dbt_subprocess(args: list[str]) -> bool:
+    """Run a dbt command in a subprocess and return True on success.
+
+    Using a subprocess (rather than dbtRunner in-process) ensures dbt's DuckDB
+    connection is fully closed before the subsequent grain/alignment checks open
+    the same file. dbtRunner keeps the connection alive for the lifetime of the
+    Python process, which causes a read_only conflict with DuckDBConnector.
+
+    stdout is flushed before spawning so Python-buffered output (the PREFLIGHT
+    header and check labels) appears before dbt's unbuffered terminal output.
+    """
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    # Flush Python's buffered output so our labels precede dbt's terminal output
+    sys.stdout.flush()
+
+    # Resolve the dbt executable from the same venv as the current interpreter
+    dbt_bin = Path(sys.executable).parent / "dbt"
+    if not dbt_bin.exists():
+        dbt_bin = Path(sys.executable).parent / "dbt.exe"
+
+    cmd = [str(dbt_bin)] + args
+    result = subprocess.run(cmd)
+    return result.returncode == 0
+
+
 def _check_compile(selector: str) -> CheckResult:
     """Step 1: Does the model compile?"""
-    from dbt.cli.main import dbtRunner
-
-    runner = dbtRunner()
-    result = runner.invoke(["compile", "--select", selector])
-    if result.success:
+    if _run_dbt_subprocess(["compile", "--select", selector]):
         return CheckResult(name="Compile", passed=True)
     return CheckResult(
         name="Compile",
@@ -47,11 +71,7 @@ def _check_compile(selector: str) -> CheckResult:
 
 def _check_build(selector: str) -> CheckResult:
     """Step 2: Does the model build and pass tests?"""
-    from dbt.cli.main import dbtRunner
-
-    runner = dbtRunner()
-    result = runner.invoke(["build", "--select", selector])
-    if result.success:
+    if _run_dbt_subprocess(["build", "--select", selector]):
         return CheckResult(name="Build", passed=True)
     return CheckResult(
         name="Build",
@@ -95,9 +115,9 @@ def _check_joins(target) -> CheckResult:
 
 def _check_layer_lint(target) -> CheckResult:
     """Step 5: Layer-specific lint."""
-    from scripts._core.selector import _determine_layer
+    from scripts._core.selector import determine_layer
 
-    layer = _determine_layer(target.table)
+    layer = determine_layer(target.table)
 
     findings = []
     if layer in ("staging", "base"):
