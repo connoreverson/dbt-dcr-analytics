@@ -38,7 +38,7 @@ def test_resolve_output_modes_terminal():
 
 
 def test_resolve_output_modes_all():
-    assert resolve_output_modes("all") == {"terminal", "markdown", "html"}
+    assert resolve_output_modes("all") == {"terminal", "markdown", "html", "llm"}
 
 
 def test_resolve_output_modes_multiple():
