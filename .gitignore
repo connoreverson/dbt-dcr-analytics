@@ -13,7 +13,8 @@ docs/
 *.swp
 *.swo
 *~
-.vscode/
+.vscode/*
+!.vscode/tasks.json
 .idea/
 
 # OS files
