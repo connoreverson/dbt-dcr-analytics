@@ -280,15 +280,15 @@ def run_preflight(selector: str, skip_build: bool = False) -> int:
 def _print_result(r: CheckResult) -> None:
     """Print a single check result."""
     if r.passed and not r.warnings:
-        print(f"  PASS {r.name}")
+        print(f"  \u2713 {r.name}")
     elif r.passed and r.warnings:
-        print(f"  WARN {r.name}")
+        print(f"  \u26a0 {r.name}")
         for w in r.warnings[:3]:
-            print(f"    -> {w}")
+            print(f"    \u2192 {w}")
         if r.fix_command:
             print(f"    Fix: {r.fix_command}")
     else:
-        print(f"  FAIL {r.name}: {r.message}")
+        print(f"  \u2717 {r.name}: {r.message}")
         if r.fix_command:
             print(f"    Fix: {r.fix_command}")
 
@@ -296,9 +296,9 @@ def _print_result(r: CheckResult) -> None:
 def _print_summary(results: list[CheckResult]) -> None:
     """Print final summary."""
     passed, failed, warnings = summarize_results(results)
-    print(f"\n{'-' * 40}")
+    print(f"\n{chr(0x2500) * 40}")
     print(f"  {passed} passed, {failed} failed, {warnings} with warnings")
     if failed == 0:
-        print("  PASS Ready for PR")
+        print(f"  \u2713 Ready for PR")
     else:
-        print("  FAIL Fix failures before opening PR")
+        print(f"  \u2717 Fix failures before opening PR")
