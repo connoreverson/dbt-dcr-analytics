@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import re
 from typing import Any
 
 from scripts._core.selector import determine_layer
@@ -51,17 +52,64 @@ def build_model_context(node: dict) -> dict[str, Any]:
     ]
     attributes = [c for c in columns if c not in keys and c not in measures]
 
+    description = node.get("description", "") or ""
+
+    # Grain: prefer structured meta field; fall back to extracting from description
+    grain = meta.get("grain") or _extract_grain_from_description(description) or "Not documented"
+
+    # CDM entity: prefer structured meta field; fall back to description mention
+    cdm_entity = meta.get("cdm_entity") or _extract_cdm_entity_from_description(description) or "Not specified"
+
     return {
         "Model": name,
         "Layer": layer_label,
-        "Description": node.get("description", "") or "No description",
-        "CDM Entity": meta.get("cdm_entity", "Not specified"),
-        "Grain": meta.get("grain", "Not documented"),
+        "Description": description or "No description",
+        "CDM Entity": cdm_entity,
+        "Grain": grain,
         "Parents": parents if parents else ["None"],
         "Key Columns": keys if keys else ["None identified"],
         "Measures": measures if measures else ["None"],
         "Attributes": attributes[:15] if attributes else ["None"],
     }
+
+
+def _extract_grain_from_description(description: str) -> str | None:
+    """Try to extract a grain statement from the model description text.
+
+    Looks for patterns like "Grain: one row per..." embedded in the description.
+
+    Args:
+        description: The model's description string.
+
+    Returns:
+        Extracted grain text, or None if not found.
+    """
+    match = re.search(r"\bGrain[:\s]+([^.]+)\.", description, re.IGNORECASE)
+    if match:
+        return match.group(1).strip()
+    return None
+
+
+def _extract_cdm_entity_from_description(description: str) -> str | None:
+    """Try to extract a CDM entity mention from the model description text.
+
+    Looks for patterns like "CDM X entity" or "CDM entity X" in the description.
+
+    Args:
+        description: The model's description string.
+
+    Returns:
+        Extracted CDM entity name, or None if not found.
+    """
+    # Matches "CDM Park entity", "CDM Employee entity", etc.
+    match = re.search(r"\bCDM\s+(\w+)\s+entity\b", description, re.IGNORECASE)
+    if match:
+        return match.group(1)
+    # Matches "custom CDM X entity"
+    match = re.search(r"\bcustom\s+CDM\s+(\w+)\s+entity\b", description, re.IGNORECASE)
+    if match:
+        return match.group(1)
+    return None
 
 
 def _build_suggested_prompt(context: dict) -> str:

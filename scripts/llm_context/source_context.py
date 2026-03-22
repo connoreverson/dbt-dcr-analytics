@@ -20,7 +20,7 @@ def build_source_context(node: dict) -> dict[str, Any]:
     columns = node.get("columns", {})
     col_list = []
     for col_name, col_info in columns.items():
-        dtype = col_info.get("data_type", "unknown")
+        dtype = col_info.get("data_type") or "—"
         col_list.append(f"{col_name} ({dtype})")
 
     return {
@@ -65,17 +65,33 @@ def run_source_summary(selector: str) -> int:
     from scripts._core.selector import resolve_selector, load_manifest
     from scripts._core.renderers.llm import render_llm_context
 
+    # Extract the dbt source name from the selector (e.g. "peoplefirst" from
+    # "source:peoplefirst.employees"). resolve_selector returns the database
+    # schema (e.g. "raw_peoplefirst") which differs from the dbt source name.
+    dbt_source_name: str | None = None
+    if selector.startswith("source:"):
+        parts = selector[len("source:"):].split(".", 1)
+        dbt_source_name = parts[0]
+
     targets = resolve_selector(selector)
     manifest = load_manifest()
 
     for target in targets:
-        source_key = f"source.dcr_analytics.{target.schema}.{target.table}"
+        # Try key using dbt source name first, then fall back to schema
+        source_key = (
+            f"source.dcr_analytics.{dbt_source_name}.{target.table}"
+            if dbt_source_name
+            else f"source.dcr_analytics.{target.schema}.{target.table}"
+        )
         node = manifest.get("sources", {}).get(source_key)
+
         if node is None:
+            # Fallback: match by table name AND source_name to avoid ambiguity
             for val in manifest.get("sources", {}).values():
                 if val.get("name") == target.table:
-                    node = val
-                    break
+                    if dbt_source_name is None or val.get("source_name") == dbt_source_name:
+                        node = val
+                        break
 
         if node is None:
             print(f"Source {target.table} not found in manifest.")
