@@ -643,9 +643,15 @@ python -m scripts.llm_context cdm-match --concept "park reservation" --source-co
 # Build an LLM context summary for an existing model
 python -m scripts.llm_context model-summary --select int_parks
 
+# Build a context summary with layer-applicable governance standards appended
+# Use this when starting a fresh chat in Gemini or another LLM
+PYTHONUTF8=1 python -m scripts.llm_context model-summary --select int_parks --include-standards
+
 # Build an LLM context summary for a source table
 python -m scripts.llm_context source-summary --select "source:peoplefirst.employees"
 ```
+
+The `--include-standards` flag appends two sections to the model summary: **Governance: Judgment Rules** (the non-automated standards requiring human evaluation, condensed for token efficiency) and **Governance: Automated Checks** (titles only, since these are already enforced by the linting toolchain). Use this flag when pasting into a fresh LLM session that has no prior context about the project's standards — it gives the model enough governance context to evaluate design decisions and suggest improvements grounded in the actual project rules rather than general best practices.
 
 ---
 
@@ -1060,7 +1066,7 @@ dbt-dcr-analytics/
 ├── tests/                        # Singular SQL tests (reconciliation, FK validation)
 ├── macros/                       # Reusable SQL macros
 ├── scripts/                      # Python governance and discovery tools
-│   ├── _core/                    #   Shared connectors, renderers, and selector
+│   ├── _core/                    #   Shared connectors, renderers, selector, and standards loader
 │   ├── reviewer/                 #   Automated + qualitative model review
 │   ├── profiler/                 #   Column-level statistical profiling
 │   ├── grain/                    #   Key discovery and join cardinality
@@ -1104,7 +1110,7 @@ dbt-dcr-analytics/
 
 This project was built with [Claude Code](https://claude.com/claude-code) and [Google Gemini](https://gemini.google.com/app), demonstrating how AI-assisted development can accelerate dbt project scaffolding while maintaining governance, testing, and documentation standards. Cross-agent coordination via [Anthropic's Agent SDK](https://github.com/anthropics/anthropic-sdk-python) and Google's Antigravity enables shared governance rules and prompts across different AI assistants.
 
-The synthetic source data is generated using [Mimesis](https://mimesis.name/). The governance toolchain includes [dbt-score](https://github.com/mkdocs-plugins/dbt-score), [dbt-project-evaluator](https://github.com/dbt-labs/dbt-project-evaluator), and [sqlfluff](https://github.com/sqlfluff/sqlfluff).
+The governance toolchain includes [dbt-score](https://github.com/mkdocs-plugins/dbt-score), [dbt-project-evaluator](https://github.com/dbt-labs/dbt-project-evaluator), and [sqlfluff](https://github.com/sqlfluff/sqlfluff).
 
 Inspired by real-world challenges in public sector analytics, this project demonstrates best practices for:
 - Standardized dbt project structure across 10 heterogeneous source systems

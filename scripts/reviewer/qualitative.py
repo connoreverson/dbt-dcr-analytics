@@ -9,6 +9,7 @@ from pathlib import Path
 # Add project root to path so we can import from scripts
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from scripts.reviewer.automated import run_checks
+from scripts._core.standards import load_standards_for_layer
 
 from rich.console import Console
 from rich.panel import Panel
@@ -118,7 +119,7 @@ def get_model_metadata(model_name):
 
     return sql_content, yaml_content, sql_path, yaml_path
 
-def process_model(model_name, args, rules):
+def process_model(model_name, args):
     console.print()
     console.print(Panel(f"Evaluating Model: [bold cyan]{model_name}[/bold cyan]", border_style="blue", expand=False))
 
@@ -139,7 +140,7 @@ def process_model(model_name, args, rules):
         console.print(f"\n[green]\u2713[/green] {model_name} passed all automated checks.\n")
 
     layer = get_layer(model_name)
-    manual_rules = [r for r in rules if not r.get("is_automated") and r.get("layer") in ["all", layer]]
+    manual_rules, _ = load_standards_for_layer(layer, condense=False)
 
     if not manual_rules:
         console.print(f"[dim]No manual rules found for layer: {layer}.[/dim]")
@@ -308,15 +309,6 @@ def main():
     parser.add_argument("--reviews-dir", type=str, help="Output directory for review files (default: tmp/reviews)", default=None)
     args = parser.parse_args()
 
-    # Load standards once
-    standards_path = Path("reference/dbt_project_standards.json")
-    if not standards_path.exists():
-        console.print(f"[red]Standards JSON not found at {standards_path}. Run python scripts/parse_standards.py first.[/red]")
-        sys.exit(1)
-
-    with open(standards_path, "r", encoding="utf-8") as f:
-        rules = json.load(f)
-
     console.print(f"Resolving model selection: [bold]{args.select}[/bold] (excluding packages)...")
     # dbtRunner.invoke("ls") in dbt-core 1.9.x prints to stdout but returns res.result=[].
     # Use subprocess to capture the output reliably.
@@ -338,7 +330,7 @@ def main():
     console.print(f"Discovered [bold]{len(resolved_models)}[/bold] model(s): [cyan]{', '.join(resolved_models)}[/cyan]")
 
     for model_name in resolved_models:
-        process_model(model_name, args, rules)
+        process_model(model_name, args)
 
 if __name__ == "__main__":
     main()

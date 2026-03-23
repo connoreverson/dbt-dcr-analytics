@@ -42,6 +42,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     # model-summary
     sub_model = subparsers.add_parser("model-summary", help="Summarize existing model for LLM")
     sub_model.add_argument("--select", "-s", required=True, help="dbt model selector")
+    sub_model.add_argument(
+        "--include-standards",
+        action="store_true",
+        default=False,
+        help="Append layer-applicable governance standards (for fresh LLM sessions)",
+    )
 
     # source-summary
     sub_source = subparsers.add_parser("source-summary", help="Summarize source table for LLM")
@@ -73,7 +79,7 @@ def main(argv: list[str] | None = None) -> int:
 
     elif args.subcommand == "model-summary":
         from scripts.llm_context.model_context import run_model_summary
-        return run_model_summary(args.select)
+        return run_model_summary(args.select, include_standards=args.include_standards)
 
     elif args.subcommand == "source-summary":
         from scripts.llm_context.source_context import run_source_summary
