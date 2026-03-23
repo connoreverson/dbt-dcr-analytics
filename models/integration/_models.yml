@@ -295,9 +295,13 @@ models:
 
   - name: int_contacts
     description: >
-      Integration model harmonizing customer profiles from VistaReserve (DCR-REV-01) into
-      the CDM Contact entity. Grain: one row per unique customer contact.
+      3NF extensible integration model representing the canonical contact entity across DCR
+      source systems. Currently sourced from VistaReserve (DCR-REV-01); the schema is
+      intentionally designed to absorb contacts from additional systems (staff directories,
+      permit applicants, partner organizations) without structural change.
+      Grain: one row per unique customer contact.
     meta:
+      integration_pattern: 3nf_extensible
       testing_rationale: >
         Tests protect against duplicate contacts emerging from the integration layer
         and guarantee downstream referential integrity.
@@ -336,10 +340,13 @@ models:
 
   - name: int_customer_assets
     description: >
-      Integration model harmonizing bookable inventory assets (campsites, cabins, yurts) from
-      VistaReserve (DCR-REV-01) into the CDM CustomerAsset entity. Grain: one row per unique
-      inventory asset.
+      3NF extensible integration model representing bookable inventory assets (campsites, cabins,
+      yurts, day-use areas) across DCR reservation systems. Currently sourced from VistaReserve
+      (DCR-REV-01); the schema is designed to absorb assets from additional reservation platforms
+      or facility management systems. Each asset belongs to a parent park via _parent_park_sk.
+      Grain: one row per unique inventory asset.
     meta:
+      integration_pattern: 3nf_extensible
       testing_rationale: Tests protect referential alignment and ensure every asset is uniquely identifiable.
     tests:
       - dbt_expectations.expect_table_row_count_to_equal_other_table:
@@ -370,11 +377,13 @@ models:
 
   - name: int_transactions
     description: >
-      Harmonized financial transactions from VistaReserve POS (DCR-REV-01) mapped to the CDM
-      Transaction entity. Grain: one row per unique point-of-sale transaction.
-      Revenue batch records are excluded — they represent daily aggregates and would
-      mix grain if included here.
+      3NF extensible integration model representing point-of-sale financial transactions across
+      DCR revenue systems. Currently sourced from VistaReserve POS (DCR-REV-01); the schema is
+      designed to absorb transactions from additional payment processors or kiosk systems.
+      Revenue batch records are excluded — they represent daily aggregates and would mix grain.
+      Grain: one row per unique point-of-sale transaction.
     meta:
+      integration_pattern: 3nf_extensible
       testing_rationale: >
         Tests protect the financial ledger by guaranteeing every transaction is uniquely recorded
         without loss. Cardinality testing ensures no row loss from the POS system staging.

@@ -98,7 +98,9 @@ Integration models are NOT rename-only passthroughs. If an integration model onl
 
 If the model consumes only one staging source and the spec says it should consume multiple, consume all specified sources. If the spec identifies foreign key relationships (e.g., int_reservations should include FKs to int_contacts and int_customer_assets), implement those joins.
 
-Before writing an integration model, re-read the SPEC's entry for that model to confirm: (1) which staging sources it consumes, (2) what transformations it performs, (3) what its output grain is, and (4) which CDM entity it maps to.
+Before writing an integration model, re-read the SPEC's entry for that model to confirm: (1) which staging sources it consumes, (2) what transformations it performs, (3) what its output grain is, and (4) which CDM entity it maps to — or whether it uses the 3NF extensible pattern (see below).
+
+**3NF Extensible Pattern (no CDM entity required).** An integration model may declare `meta: integration_pattern: 3nf_extensible` instead of `meta: cdm_entity:` when all three conditions hold: (a) the model is in third normal form, (b) the column set is intentionally designed to be extensible across multiple source systems rather than bound to a single system's schema, and (c) the model's description explains this design intent. SQL-INT-03 and SQL-INT-05 do not apply to models carrying this meta flag. Do not add this flag to escape CDM mapping on models that simply haven't been mapped yet — it is a design declaration, not a workaround.
 
 ## Seed Naming and Completeness
 
@@ -119,6 +121,7 @@ Before writing an integration model, re-read the SPEC's entry for that model to 
 - The SPEC defines which CDM entity each integration model maps to. Do not substitute a different CDM entity without explicit user approval and documented rationale.
 - If the CDM catalog seeds do not contain the expected entity columns, flag this to the user rather than silently choosing a different entity.
 - CDM column mappings must be semantically correct — do not map unrelated fields (e.g., `total_acres` to `yomi_name`) to satisfy column count requirements.
+- Models carrying `meta: integration_pattern: 3nf_extensible` are exempt from SQL-INT-03 and SQL-INT-05. Do not add a `cdm_entity` meta field to those models — the two patterns are mutually exclusive.
 
 ## YAML/SQL Consistency
 

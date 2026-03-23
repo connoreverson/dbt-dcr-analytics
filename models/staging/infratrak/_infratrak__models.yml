@@ -229,6 +229,7 @@ models:
       GeoParks Enterprise (DCR-GEO-01); crosswalk tables exist but have drifted
       since 2022.
     meta:
+      grain: one row per park_id (InfraTrak integer park identifier, Regions 1 and 2 only)
       testing_rationale: >
         Primary keys are tested to ensure dimension table uniqueness.
     columns:

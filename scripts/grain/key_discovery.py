@@ -189,5 +189,5 @@ def _render_terminal(target: SelectionTarget, candidates: list[dict]) -> None:
     for i, c in enumerate(candidates[:10]):
         cols = ", ".join(c["columns"])
         ratio = c["uniqueness_ratio"]
-        marker = "\u2713" if ratio >= 0.99 else "~" if ratio >= 0.9 else "\u2717"
+        marker = "[ok]" if ratio >= 0.99 else "[ ~]" if ratio >= 0.9 else "[ x]"
         print(f"  {marker} [{ratio:.1%}] {cols}")

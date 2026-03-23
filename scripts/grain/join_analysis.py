@@ -129,6 +129,6 @@ def _render_terminal(target: SelectionTarget, joins: list[dict]) -> None:
         return
 
     for i, j in enumerate(joins, 1):
-        print(f"  {i}. {j['join_type']} JOIN → {j['right_table']}")
+        print(f"  {i}. {j['join_type']} JOIN -> {j['right_table']}")
         if j["on_condition"]:
             print(f"     ON {j['on_condition']}")

@@ -627,6 +627,8 @@ Must exactly match the name of the assigned Microsoft Common Data Model entity, 
 
 > Custom entities are permitted when no standard CDM entity is semantically appropriate. Custom entity names must be documented in a `CDM_EXCEPTION_<model>.md` file in `reference/` before adoption. See `reference/CDM_EXCEPTION_int_parks.md` for the template.
 
+> **3NF Extensible Exception.** This rule does not apply to integration models that declare `meta: integration_pattern: 3nf_extensible`. Those models are in third normal form and are designed to be extensible across source systems; they are not bound to any single CDM entity. The model name should reflect the business entity it represents (e.g., `int_contacts`, `int_visits`), but need not match a CDM entity name.
+
 ##### **Rule: SQL-INT-04 File Name Underscore Delimitation** [Automated]
 One underscore between the 'int' prefix and entity; 'int\_projects'.
 
@@ -635,6 +637,8 @@ One underscore between the 'int' prefix and entity; 'int\_projects'.
 Integration model columns must conform with the Microsoft Common Data Model definition for the entity that corresponds to the model. The non-profit core manifest is preferred, but a different manifest can be used when an appropriate schema is not available in it. Integration models may not contain columns — aside from foreign keys or surrogate keys — that are not specified by the Common Data Model entity definition. If a staging model produces columns that are valuable but not in the CDM, those columns must be dropped from the integration model; they can be joined back in at the marts layer from the staging model if needed. If an analyst believes a non-CDM column belongs in the integration layer, they must request an exception from their supervisor and document the rationale in the model description.
 
 > If no standard CDM entity provides adequate coverage, file a CDM Entity Exception Request per the `cdm-exception-request` skill. The custom entity must be cataloged in `seeds/cdm_catalogs/` and registered in `seeds/cdm_crosswalk.csv`. The exception request documents which standard entities were evaluated and why each was rejected.
+
+> **3NF Extensible Exception.** This rule does not apply to integration models that declare `meta: integration_pattern: 3nf_extensible`. Those models define their own column contract based on the requirements of all source systems they are designed to absorb, not on a CDM entity schema. Column governance for these models is enforced through the YAML contract (presence, type, and test coverage) rather than CDM conformance.
 
 When applying CDM column names to this project, convert from the CDM's camelCase to snake\_case and from singular to plural where appropriate. Lookup columns that are integer values in the CDM can be simplified to strings.
 

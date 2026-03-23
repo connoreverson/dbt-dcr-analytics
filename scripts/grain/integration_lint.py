@@ -121,10 +121,10 @@ def _render_terminal(target: SelectionTarget, findings: list[dict]) -> None:
     print("=" * (18 + len(target.table)))
 
     if not findings:
-        print("  \u2713 No anti-patterns detected.")
+        print("  [ok] No anti-patterns detected.")
         return
 
     for f in findings:
-        icon = {"error": "\u2717", "warning": "\u26a0", "info": "\u2139"}.get(f["severity"], "?")
+        icon = {"error": "[ x]", "warning": "[ !]", "info": "[ i]"}.get(f["severity"], "?")
         print(f"  {icon} {f['message']}")
         print(f"    -> {f['detail']}")
